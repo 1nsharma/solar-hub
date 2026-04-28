@@ -17,15 +17,31 @@ export default function AuthModal({ isOpen, onClose }) {
     }
   };
 
-  const handleVerifyOTP = (e) => {
+  const handleVerifyOTP = async (e) => {
     e.preventDefault();
-    if (otp === '1234') { // Mock OTP
-      setUser({ name: 'Guest User', phone: phone });
-      onClose();
-    } else {
-      alert('Invalid OTP. Hint: 1234');
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, otp })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUser(data.user);
+        onClose();
+      } else {
+        alert(data.message || 'Invalid OTP. Hint: 1234');
+      }
+    } catch (err) {
+      console.error('Auth error:', err);
+      // Fallback for dev
+      if (otp === '1234') {
+        setUser({ name: 'Dev User', phone: phone, role: 'customer' });
+        onClose();
+      }
     }
   };
+
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">

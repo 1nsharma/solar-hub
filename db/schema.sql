@@ -110,3 +110,14 @@ CREATE TABLE payments (
     status VARCHAR(50) DEFAULT 'success', -- success, failed, pending
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 11. Audit Logs Table
+CREATE TABLE audit_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    actor_id UUID REFERENCES users(id),
+    action VARCHAR(255) NOT NULL,
+    entity_type VARCHAR(50) NOT NULL, -- order, booking, vendor, product
+    entity_id UUID NOT NULL,
+    old_value JSONB,
+    new_value JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

@@ -3,6 +3,17 @@ const cors = require('cors');
 const db = require('./db');
 require('dotenv').config();
 
+// Operational Services
+const paymentService = require('./services/payment');
+const logisticsService = require('./services/logistics');
+const notificationService = require('./services/notification');
+const mapsService = require('./services/maps');
+const analyticsService = require('./services/analytics');
+const storageService = require('./services/storage');
+const auditService = require('./services/audit');
+
+
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -35,12 +46,30 @@ app.get('/api/products', async (req, res) => {
     // Fallback to static data if DB fails
     res.json({ 
       products: [
-        { id: 1, title: 'Premium Solar Kit 5kW', price: 250000, category: 'Kits', vendor: 'Tata Solar', rating: 4.9, description: 'Complete on-grid solar solution for 3-4 BHK homes.', image_url: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&q=80&w=800' }
+        { id: 101, title: 'Premium On-Grid Kit 5kW', price: 280000, category: 'Kits', vendor: 'Tata Power', rating: 4.9, description: '10 Panels + 5kW Inverter + Structure + Net Metering. Perfect for large homes.', image_url: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&q=80&w=800' },
+        { id: 102, title: 'Essential Hybrid Kit 3kW', price: 195000, category: 'Kits', vendor: 'Luminous', rating: 4.8, description: '6 Panels + 3kW Inverter + 2 Batteries. Ideal for areas with power cuts.', image_url: 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d?auto=format&fit=crop&q=80&w=800' },
+        { id: 103, title: 'Micro Off-Grid Kit 1kW', price: 75000, category: 'Kits', vendor: 'Loom Solar', rating: 4.7, description: '2 Panels + 1kW Inverter + 1 Battery. Best for remote cabins or shops.', image_url: 'https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?auto=format&fit=crop&q=80&w=800' }
       ],
       services: [
-        { id: 1, title: 'Panel Cleaning', price: 499, icon_name: 'Zap', duration: '1 Hour', description: 'Deep cleaning of panels to increase efficiency.' }
+        { id: 201, title: 'AMC: Basic Protection', price: 2999, icon_name: 'ShieldCheck', duration: '1 Year', description: '4 Cleaning visits + 2 Electrical safety audits per year.' },
+        { id: 202, title: 'AMC: Premium Care', price: 5999, icon_name: 'ShieldCheck', duration: '1 Year', description: 'Monthly cleaning + Real-time monitoring + 24/7 Priority support.' },
+        { id: 203, title: 'Panel Cleaning', price: 499, icon_name: 'Zap', duration: '2 Hours', description: 'Deep cleaning using high-pressure tools and solar-safe solvents.' },
+        { id: 204, title: 'Battery Health Check', price: 799, icon_name: 'Settings', duration: '1 Hour', description: 'Full diagnostic of battery gravity, voltage, and backup time.' }
       ]
     });
+  }
+});
+
+// 1.1 Standalone Services
+app.get('/api/services', async (req, res) => {
+  try {
+    const servicesResult = await db.query('SELECT * FROM services ORDER BY created_at DESC');
+    res.json(servicesResult.rows);
+  } catch (err) {
+    console.error('DB Error:', err);
+    res.json([
+      { id: 1, title: 'Panel Cleaning', price: 499, icon_name: 'Zap', duration: '1 Hour', description: 'Deep cleaning of panels to increase efficiency.' }
+    ]);
   }
 });
 
@@ -80,7 +109,26 @@ app.post('/api/orders', async (req, res) => {
       );
     }
     await db.query('COMMIT');
-    res.status(201).json(orderResult.rows[0]);
+
+    // --- Live Operational Flow ---
+    
+    // 0. Audit: Log system action
+    await auditService.log(user_id, 'ORDER_CREATED', 'order', orderId, null, { amount: total_amount });
+
+    // 1. Analytics: Track order creation
+
+    await analyticsService.trackEvent(user_id, 'order_created', { orderId, amount: total_amount });
+
+    // 2. Logistics: Create shipment (Simulated)
+    const shipment = await logisticsService.createShipment({ id: orderId, total_amount, address_id });
+    
+    // 3. Notification: Send Confirmation
+    await notificationService.sendSMS('9876543210', `Order #${orderId} confirmed! Tracking ID: ${shipment.tracking_id}`);
+
+    res.status(201).json({ 
+      ...orderResult.rows[0], 
+      shipment_details: shipment 
+    });
   } catch (err) {
     await db.query('ROLLBACK');
     res.status(500).json({ error: err.message });
@@ -110,7 +158,25 @@ app.post('/api/bookings', async (req, res) => {
       'INSERT INTO service_bookings (user_id, service_id, booking_date, time_slot, address_id, status) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
       [user_id, service_id, booking_date, time_slot, address_id, 'confirmed']
     );
-    res.status(201).json(result.rows[0]);
+    const booking = result.rows[0];
+
+    // --- Live Operational Flow ---
+
+    // 1. Maps: Distance Calculation for Dispatch
+    const distanceInfo = await mapsService.calculateDistance('SolarHub Central', 'User Address');
+    
+    // 2. Notification: Alert Technician & User
+    await notificationService.sendWhatsApp('9876543210', 'booking_confirmed', { 
+      booking_id: booking.id, 
+      date: booking_date, 
+      slot: time_slot 
+    });
+
+    res.status(201).json({ 
+      ...booking, 
+      dispatch_estimate: distanceInfo 
+    });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -154,6 +220,10 @@ app.post('/api/auth/verify-otp', async (req, res) => {
         );
         user = result.rows[0];
       }
+
+      // Analytics: Track Login
+      await analyticsService.trackEvent(user.id, 'user_login', { role: user.role });
+
       res.json({ success: true, token: 'mock-jwt-token', user });
     } catch (err) {
       // Fallback if DB fails
@@ -201,7 +271,8 @@ app.get('/api/dev/seed', async (req, res) => {
     
     res.json({ message: 'Database seeded with expanded catalog!' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Seed Error:', err);
+    res.status(500).json({ error: err.message, stack: err.stack });
   }
 });
 

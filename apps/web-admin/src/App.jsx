@@ -74,6 +74,18 @@ function App() {
     fetchExternal();
   }, [fetchProducts]);
 
+  // Role-Based Automatic Routing
+  useEffect(() => {
+    if (user) {
+      if (user.role === 'admin') setCurrentPage('admin');
+      else if (user.role === 'vendor') setCurrentPage('vendorDashboard');
+      else if (user.role === 'technician') setCurrentPage('technician');
+      else if (user.role === 'customer') setCurrentPage('dashboard');
+    } else {
+      setCurrentPage('home');
+    }
+  }, [user]);
+
   const recommendedKW = (calcInputs.bill / 1500).toFixed(1);
   const estimatedSavings = (calcInputs.bill * 0.9).toFixed(0);
   const estimatedCost = (recommendedKW * 60000).toLocaleString();
@@ -554,23 +566,28 @@ function App() {
               </li>
             </ul>
           </div>
-
-            <h4 className="text-lg mb-6">Demo Views (Dev)</h4>
+          
+          <div>
+            <h4 className="text-lg mb-6">Partner With Us</h4>
             <ul className="space-y-4 text-text-dim">
               <li>
-                <button onClick={() => { setCurrentPage('dashboard'); window.scrollTo(0,0); }} className="hover:text-primary transition-colors">User Dashboard</button>
+                <button 
+                  onClick={() => { setCurrentPage('vendor'); window.scrollTo(0,0); }}
+                  className="bg-primary/10 text-primary px-4 py-2 rounded-lg text-sm font-bold w-full hover:bg-primary/20 transition-all"
+                >
+                  Apply as Vendor
+                </button>
               </li>
               <li>
-                <button onClick={() => { setCurrentPage('vendorDashboard'); window.scrollTo(0,0); }} className="hover:text-primary transition-colors">Vendor Dashboard</button>
-              </li>
-              <li>
-                <button onClick={() => { setCurrentPage('technician'); window.scrollTo(0,0); }} className="hover:text-primary transition-colors">Technician View</button>
-              </li>
-              <li>
-                <button onClick={() => { setCurrentPage('admin'); window.scrollTo(0,0); }} className="hover:text-primary transition-colors">Admin Panel</button>
+                <button 
+                  className="bg-white/5 text-text-dim px-4 py-2 rounded-lg text-sm font-bold w-full hover:bg-white/10 transition-all"
+                >
+                  Technician Registration
+                </button>
               </li>
             </ul>
           </div>
+
 
           <div>
             <h4 className="text-lg mb-6">Contact</h4>

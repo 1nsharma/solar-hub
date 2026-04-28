@@ -8,9 +8,12 @@
     "packages/*"
   ],
   "scripts": {
+    "dev": "npm run dev -ws",
     "dev:web": "npm run dev -w @solar-hub/web-admin",
     "dev:backend": "npm run dev -w @solar-hub/backend",
+    "dev:mobile": "npm run start -w mobile",
     "build:web": "npm run build -w @solar-hub/web-admin",
     "lint": "npm run lint -ws"
+
   }
 }

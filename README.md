@@ -1,16 +1,46 @@
-# React + Vite
+# SolarHub Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SolarHub is a hybrid solar ecosystem combining an e-commerce marketplace for solar products with a comprehensive service platform for installation, maintenance, and AMC.
 
-Currently, two official plugins are available:
+## Project Structure (Monorepo)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+This project uses **npm workspaces** to manage multiple applications and shared packages.
 
-## React Compiler
+### Applications (`apps/`)
+- **[web-admin](file:///c:/Users/amits/Desktop/solar-hub/apps/web-admin)**: Dashboards for Admins, Vendors, and Technicians (React + Vite).
+- **[mobile](file:///c:/Users/amits/Desktop/solar-hub/apps/mobile)**: Customer-facing mobile application (React Native / Expo).
+- **[backend](file:///c:/Users/amits/Desktop/solar-hub/apps/backend)**: Express.js API handling business logic, payments, and orders.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Shared Packages (`packages/`)
+- **[shared](file:///c:/Users/amits/Desktop/solar-hub/packages/shared)**: Core business logic, constants, and validation rules.
+- **[types](file:///c:/Users/amits/Desktop/solar-hub/packages/types)**: Shared TypeScript definitions and interfaces.
+- **[ui](file:///c:/Users/amits/Desktop/solar-hub/packages/ui)**: Reusable React components shared across web applications.
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+- Node.js (v18+)
+- npm (v7+)
+
+### Installation
+```bash
+npm install
+```
+
+### Running Locally
+
+- **Start all services (Dev)**:
+  ```bash
+  npm run dev -ws
+  ```
+
+- **Start specific app**:
+  ```bash
+  npm run dev -w @solar-hub/web-admin
+  npm run dev -w @solar-hub/backend
+  ```
+
+## Deployment
+
+For detailed deployment instructions and architecture, see [docs/deployment_architecture.md](file:///c:/Users/amits/Desktop/solar-hub/docs/deployment_architecture.md).
+
