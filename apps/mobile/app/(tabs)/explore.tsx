@@ -4,8 +4,8 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ProductCard } from '@/components/solar/product-card';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 
 const CATEGORIES = ['All', 'Kits', 'Panels', 'Inverters', 'Eco-Home', 'Services'];
 
