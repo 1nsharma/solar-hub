@@ -13,7 +13,12 @@
     "dev:backend": "npm run dev -w @solar-hub/backend",
     "dev:mobile": "npm run start -w mobile",
     "build:web": "npm run build -w @solar-hub/web-admin",
-    "lint": "npm run lint -ws"
-
+    "build:mobile:web": "npm run web -w mobile",
+    "build:apk": "npm run build:apk -w mobile",
+    "build:vendor:apk": "npm run build:vendor:apk -w mobile",
+    "build:vendor:aab": "npm run build:vendor:aab -w mobile",
+    "test:backend": "npm run test -w @solar-hub/backend",
+    "lint": "npm run lint -w @solar-hub/web-admin && npm run lint -w mobile",
+    "release:check": "npm run lint && npm run build:web && npm run test:backend"
   }
 }

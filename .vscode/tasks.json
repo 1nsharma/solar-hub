@@ -1,0 +1,25 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "release-check",
+      "type": "shell",
+      "command": "npm.cmd run release:check",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "backend-smoke",
+      "type": "shell",
+      "command": "npm.cmd run smoke -w @solar-hub/backend",
+      "problemMatcher": []
+    },
+    {
+      "label": "build-web",
+      "type": "shell",
+      "command": "npm.cmd run build:web",
+      "group": "build",
+      "problemMatcher": []
+    }
+  ]
+}

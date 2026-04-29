@@ -9,9 +9,12 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "build:apk": "eas build --platform android --profile production",
-    "build:ios": "eas build --platform ios --profile production",
-    "build:local": "eas build --platform android --profile production --local"
+    "build:apk": "npx eas-cli build --platform android --profile preview",
+    "build:aab": "npx eas-cli build --platform android --profile production",
+    "build:vendor:apk": "npx eas-cli build --platform android --profile vendor-apk",
+    "build:vendor:aab": "npx eas-cli build --platform android --profile vendor-production",
+    "build:ios": "npx eas-cli build --platform ios --profile production",
+    "build:local": "npx eas-cli build --platform android --profile production --local"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

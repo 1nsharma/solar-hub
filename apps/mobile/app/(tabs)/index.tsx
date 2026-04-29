@@ -1,30 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, ScrollView, View, TouchableOpacity, Dimensions } from 'react-native';
-import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { SolarCalculator } from '@/components/solar/calculator';
 import { ProductCard } from '@/components/solar/product-card';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { apiUrl } from '@/constants/api';
 
 const { width } = Dimensions.get('window');
 
+type Kit = {
+  id: string | number;
+  title: string;
+  price: number;
+  category: string;
+  vendor: string;
+  rating: number;
+  image_url: string;
+  description: string;
+};
+
 export default function HomeScreen() {
-  const [featuredKits, setFeaturedKits] = useState([]);
+  const [featuredKits, setFeaturedKits] = useState<Kit[]>([]);
   const [orderStatus, setOrderStatus] = useState('idle'); // idle, ordered
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/products')
+    fetch(apiUrl('/api/products'))
       .then(res => res.json())
       .then(data => {
-        setFeaturedKits(data.products.filter(p => p.category === 'Kits'));
+        setFeaturedKits(data.products.filter((p: Kit) => p.category === 'Kits'));
       })
       .catch(err => {
         console.log('Using mock data for featured kits');
         setFeaturedKits([
-          { id: 101, title: 'Premium On-Grid Kit 5kW', price: 285000, category: 'Kits', vendor: 'Tata Power', rating: 4.9, image_url: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d' },
-          { id: 102, title: 'Essential Hybrid Kit 3kW', price: 195000, category: 'Kits', vendor: 'Luminous', rating: 4.8, image_url: 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d' }
+          { id: 101, title: 'Premium On-Grid Kit 5kW', price: 285000, category: 'Kits', vendor: 'Tata Power', rating: 4.9, image_url: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d', description: '5kW on-grid kit' },
+          { id: 102, title: 'Essential Hybrid Kit 3kW', price: 195000, category: 'Kits', vendor: 'Luminous', rating: 4.8, image_url: 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d', description: '3kW hybrid kit' }
         ]);
       });
   }, []);
@@ -93,7 +104,7 @@ export default function HomeScreen() {
             <ThemedText type="title" style={styles.logoText}>SolarHub</ThemedText>
           </View>
           <ThemedText style={styles.heroSubtitle}>
-            "One-Step" Solar Installation. Easy as WiFi.
+            One-Step Solar Installation. Easy as WiFi.
           </ThemedText>
         </View>
       </View>
@@ -149,6 +160,33 @@ function FlowItem({ icon, label, color }: { icon: string; label: string; color: 
         <IconSymbol name={icon as any} size={20} color={color} />
       </View>
       <ThemedText style={styles.flowLabel}>{label}</ThemedText>
+    </View>
+  );
+}
+
+function TimelineItem({
+  status,
+  title,
+  desc,
+  time,
+}: {
+  status: 'completed' | 'active' | 'pending';
+  title: string;
+  desc: string;
+  time: string;
+}) {
+  const color = status === 'completed' ? '#4CAF50' : status === 'active' ? '#FFD700' : '#999';
+
+  return (
+    <View style={styles.timelineItem}>
+      <View style={[styles.timelineDot, { backgroundColor: color }]} />
+      <View style={styles.timelineBody}>
+        <View style={styles.timelineHeader}>
+          <ThemedText type="defaultSemiBold">{title}</ThemedText>
+          <ThemedText style={styles.timelineTime}>{time}</ThemedText>
+        </View>
+        <ThemedText style={styles.timelineDesc}>{desc}</ThemedText>
+      </View>
     </View>
   );
 }
@@ -239,6 +277,44 @@ const styles = StyleSheet.create({
   },
   kitCardWrapper: {
     width: width * 0.7,
-  }
+  },
+  button: {
+    backgroundColor: '#FFD700',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    borderRadius: 16,
+  },
+  buttonText: {
+    color: '#000',
+    fontWeight: 'bold',
+  },
+  timelineItem: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 18,
+  },
+  timelineDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginTop: 4,
+  },
+  timelineBody: {
+    flex: 1,
+  },
+  timelineHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  timelineTime: {
+    fontSize: 12,
+    opacity: 0.6,
+  },
+  timelineDesc: {
+    fontSize: 13,
+    opacity: 0.7,
+    marginTop: 4,
+  },
 });
-

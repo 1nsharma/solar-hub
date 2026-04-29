@@ -28,8 +28,11 @@ import AudiencePitch from './components/AudiencePitch';
 import TechnicianDashboard from './pages/TechnicianDashboard/index';
 import AdminDashboard from './pages/AdminDashboard/index';
 import VendorDashboard from './pages/VendorDashboard/index';
+import PartnerDashboard from './pages/PartnerDashboard/index';
 import BookingModal from './components/BookingModal';
 import { translations } from './utils/translations';
+import { apiUrl } from './config/api';
+import PwaInstallButton from './components/PwaInstallButton';
 
 function App() {
   const { user, setUser, cart, addToCart, products, services, fetchProducts, language, setLanguage } = useStore();
@@ -60,7 +63,7 @@ function App() {
     
     const fetchExternal = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/external-deals');
+        const res = await fetch(apiUrl('/api/external-deals'));
         const data = await res.json();
         setExternalDeals(data);
       } catch (err) {
@@ -80,6 +83,7 @@ function App() {
       if (user.role === 'admin') setCurrentPage('admin');
       else if (user.role === 'vendor') setCurrentPage('vendorDashboard');
       else if (user.role === 'technician') setCurrentPage('technician');
+      else if (user.role === 'partner' || user.role === 'ca') setCurrentPage('partnerDashboard');
       else if (user.role === 'customer') setCurrentPage('dashboard');
     } else {
       setCurrentPage('home');
@@ -129,6 +133,10 @@ function App() {
     return <VendorDashboard onBack={() => setCurrentPage('home')} />;
   }
 
+  if (currentPage === 'partnerDashboard') {
+    return <PartnerDashboard onBack={() => setCurrentPage('home')} />;
+  }
+
   return (
     <div className="min-h-screen">
       {/* Notifications */}
@@ -163,6 +171,7 @@ function App() {
           </div>
 
           <div className="flex items-center gap-4">
+            <PwaInstallButton />
             <button 
               onClick={() => setIsCartOpen(true)}
               className="relative p-3 hover:bg-white/5 rounded-full transition-all group"

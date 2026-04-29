@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { apiUrl } from '../config/api';
 
 export const useStore = create((set) => ({
   language: 'en',
@@ -14,7 +15,7 @@ export const useStore = create((set) => ({
   // Actions
   fetchProducts: async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/products');
+      const res = await fetch(apiUrl('/api/products'));
       const data = await res.json();
       set({ products: data.products, services: data.services });
     } catch (err) {
@@ -24,7 +25,7 @@ export const useStore = create((set) => ({
 
   addOrder: async (order) => {
     try {
-      const res = await fetch('http://localhost:5000/api/orders', {
+      const res = await fetch(apiUrl('/api/orders'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(order)
@@ -38,7 +39,7 @@ export const useStore = create((set) => ({
 
   addBooking: async (booking) => {
     try {
-      const res = await fetch('http://localhost:5000/api/bookings', {
+      const res = await fetch(apiUrl('/api/bookings'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(booking)

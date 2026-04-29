@@ -44,3 +44,12 @@ npm install
 
 For detailed deployment instructions and architecture, see [docs/deployment_architecture.md](file:///c:/Users/amits/Desktop/solar-hub/docs/deployment_architecture.md).
 
+For launch steps covering APK/AAB builds, API environment setup, ecommerce monetization, and QA, see [docs/release_checklist.md](file:///c:/Users/amits/Desktop/solar-hub/docs/release_checklist.md).
+
+For the product and revenue model, see [docs/business_model.md](file:///c:/Users/amits/Desktop/solar-hub/docs/business_model.md).
+
+For Chrome install, vendor APK, Android Studio, and Play Store launch steps, see [docs/provider_chrome_and_vendor_apk.md](file:///c:/Users/amits/Desktop/solar-hub/docs/provider_chrome_and_vendor_apk.md).
+
+For running everything locally now and switching to real keys later, see [docs/local_runbook.md](file:///c:/Users/amits/Desktop/solar-hub/docs/local_runbook.md).
+
+For debugger setup and GitHub APK release workflow, see [docs/debugging_and_release.md](file:///c:/Users/amits/Desktop/solar-hub/docs/debugging_and_release.md).

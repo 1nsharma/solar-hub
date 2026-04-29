@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, View, TextInput, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -8,7 +8,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 const ROOF_TYPES = ['RCC (Flat)', 'Tile (Sloped)', 'Asbestos/Tin'];
 
-export function SolarCalculator() {
+export function SolarCalculator({ onOrder }: { onOrder?: () => void }) {
   const [bill, setBill] = useState('2500');
   const [pincode, setPincode] = useState('');
   const [roofType, setRoofType] = useState('RCC (Flat)');
@@ -115,7 +115,7 @@ export function SolarCalculator() {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={onOrder}>
         <ThemedText style={styles.buttonText}>Order Now & Lock Installer</ThemedText>
         <IconSymbol name="chevron.right" size={18} color="#000" />
       </TouchableOpacity>
@@ -261,4 +261,3 @@ const styles = StyleSheet.create({
     marginTop: 12,
   }
 });
-

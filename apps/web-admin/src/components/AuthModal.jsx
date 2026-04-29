@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Phone, ShieldCheck, ChevronRight } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { apiUrl } from '../config/api';
 
 export default function AuthModal({ isOpen, onClose }) {
   const [step, setStep] = useState(1); // 1: Phone, 2: OTP
@@ -20,7 +21,7 @@ export default function AuthModal({ isOpen, onClose }) {
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('http://localhost:5000/api/auth/verify-otp', {
+      const res = await fetch(apiUrl('/api/auth/verify-otp'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, otp })
@@ -119,6 +120,12 @@ export default function AuthModal({ isOpen, onClose }) {
         )}
 
         <p className="text-center text-xs text-text-dim mt-8">
+          <strong>Testing Personas (+91):</strong><br />
+          9999999991 (Partner) | 9999999992 (Tech)<br />
+          9999999993 (Vendor) | 9999999994 (Admin)
+        </p>
+
+        <p className="text-center text-xs text-text-dim mt-4">
           By continuing, you agree to SolarHub's <br />
           <span className="text-primary cursor-pointer">Terms of Service</span> & <span className="text-primary cursor-pointer">Privacy Policy</span>
         </p>

@@ -6,7 +6,7 @@ CREATE TABLE users (
     name VARCHAR(255) NOT NULL,
     phone VARCHAR(20) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE,
-    role VARCHAR(50) DEFAULT 'customer', -- customer, admin, vendor, technician
+    role VARCHAR(50) DEFAULT 'customer', -- customer, admin, vendor, technician, partner
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -46,6 +46,7 @@ CREATE TABLE technicians (
 CREATE TABLE products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     vendor_id UUID REFERENCES vendors(id) ON DELETE CASCADE,
+    vendor VARCHAR(255),
     title VARCHAR(255) NOT NULL,
     description TEXT,
     price DECIMAL(12,2) NOT NULL,
@@ -99,7 +100,52 @@ CREATE TABLE service_bookings (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 10. Payments Table
+-- 10. Service Programs
+-- These are operational service workflows, not SolarHub platform revenue plans.
+CREATE TABLE service_programs (
+    id VARCHAR(100) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    channel VARCHAR(100) NOT NULL, -- on_demand_service, vendor_after_sales, scheme_facilitation
+    revenue_model VARCHAR(100) DEFAULT 'non_monetized_service_workflow',
+    customer_charge_owner VARCHAR(100),
+    platform_revenue BOOLEAN DEFAULT false,
+    features JSONB DEFAULT '[]'::jsonb,
+    active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 11. Ecommerce Revenue Events
+-- Only ecommerce checkout should be counted as direct platform monetization.
+CREATE TABLE ecommerce_revenue_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id UUID REFERENCES orders(id),
+    gross_amount DECIMAL(12,2) NOT NULL,
+    platform_margin DECIMAL(12,2),
+    commission_amount DECIMAL(12,2),
+    source VARCHAR(50) DEFAULT 'product_checkout',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 12. Leads
+CREATE TABLE leads (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    partner_id UUID REFERENCES users(id),
+    name VARCHAR(255),
+    customer_name VARCHAR(255),
+    phone VARCHAR(20) NOT NULL,
+    customer_phone VARCHAR(20),
+    customer_email VARCHAR(255),
+    pincode VARCHAR(10),
+    requirement TEXT NOT NULL,
+    interest_type VARCHAR(100),
+    estimated_load DECIMAL(6,2),
+    notes TEXT,
+    source VARCHAR(50) DEFAULT 'web',
+    status VARCHAR(50) DEFAULT 'new',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 13. Payments Table
 CREATE TABLE payments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID REFERENCES orders(id),
@@ -110,7 +156,8 @@ CREATE TABLE payments (
     status VARCHAR(50) DEFAULT 'success', -- success, failed, pending
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
--- 11. Audit Logs Table
+
+-- 14. Audit Logs Table
 CREATE TABLE audit_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     actor_id UUID REFERENCES users(id),
@@ -119,5 +166,41 @@ CREATE TABLE audit_logs (
     entity_id UUID NOT NULL,
     old_value JSONB,
     new_value JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 12. Partners Table (Solopreneurs/Referrers)
+CREATE TABLE partners (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    referral_code VARCHAR(50) UNIQUE NOT NULL,
+    payout_details JSONB, -- Bank info, UPI ID, etc.
+    status VARCHAR(50) DEFAULT 'active', -- active, suspended
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 13. Leads Table (Referred Customers)
+CREATE TABLE leads (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    partner_id UUID REFERENCES partners(id),
+    customer_name VARCHAR(255) NOT NULL,
+    customer_phone VARCHAR(20) NOT NULL,
+    customer_email VARCHAR(255),
+    interest_type VARCHAR(100), -- residential, commercial, industrial
+    estimated_load DECIMAL(10,2), -- in kW
+    status VARCHAR(50) DEFAULT 'new', -- new, contacted, survey_done, converted, lost
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 14. Commissions Table
+CREATE TABLE commissions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    partner_id UUID REFERENCES partners(id),
+    lead_id UUID REFERENCES leads(id),
+    order_id UUID REFERENCES orders(id), -- Linked when lead converts to order
+    amount DECIMAL(12,2) NOT NULL,
+    status VARCHAR(50) DEFAULT 'pending', -- pending, approved, paid, cancelled
+    payout_date TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

@@ -10,7 +10,9 @@ import {
   Search,
   CheckCircle2,
   Clock,
-  MoreVertical
+  MoreVertical,
+  ShieldCheck,
+  Truck
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 

@@ -14,9 +14,9 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      - run: npm install
+      - run: npm ci
       - name: Build Backend
-        run: cd apps/backend && node --check index.js
+        run: npm run test -w @solar-hub/backend
 
   build-web:
     runs-on: ubuntu-latest
@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      - run: npm install
+      - run: npm ci
       - name: Build Web Admin
         run: npm run build -w @solar-hub/web-admin
 
@@ -38,7 +38,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      - run: npm install
+      - run: npm ci
       - name: Setup Expo
         uses: expo/expo-github-action@v8
         with:
@@ -47,8 +47,7 @@ jobs:
       - name: Build Mobile (Internal Testing)
         run: |
           cd apps/mobile
-          # npx eas-build --platform android --profile preview --non-interactive (Simulated)
-          echo "Building mobile app for internal testing track..."
+          npx eas-cli build --platform android --profile preview --non-interactive --no-wait
 
   # 2. Deploy Backend to Staging
   deploy-staging:
@@ -70,11 +69,15 @@ jobs:
         with:
           node-version: '20'
       - name: Run QA Smoke Tests
+        env:
+          STAGING_URL: ${{ secrets.STAGING_URL }}
         run: |
-          cd apps/backend
-          npm install axios
-          # node tests/qa_smoke_test.js (Simulated with local BASE_URL fallback)
-          echo "QA checks completed: Payments, Orders, and Bookings verified."
+          if [ -z "$STAGING_URL" ]; then
+            echo "STAGING_URL secret is not configured; skipping live smoke tests."
+            exit 0
+          fi
+          npm ci
+          npm run smoke -w @solar-hub/backend
 
   # 4. Mobile Internal Release
   mobile-internal-release:
@@ -83,8 +86,7 @@ jobs:
     steps:
       - name: Upload to Internal Testing
         run: |
-          echo "Uploading AAB to Play Console Internal Testing track..."
-          echo "Uploading IPA to TestFlight..."
+          echo "EAS build was queued for internal testing. Configure EAS submit after store credentials are connected."
 
   # 5. Production Store Release (Manual Gate Simulation)
   production-release:

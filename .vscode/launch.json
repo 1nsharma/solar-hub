@@ -1,0 +1,36 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Backend API",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm.cmd",
+      "runtimeArgs": ["run", "dev:backend"],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "USE_MOCK": "true"
+      },
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Web Admin",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm.cmd",
+      "runtimeArgs": ["run", "dev:web"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Mobile Expo",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm.cmd",
+      "runtimeArgs": ["run", "dev:mobile"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ]
+}

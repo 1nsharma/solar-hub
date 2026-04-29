@@ -6,6 +6,7 @@ import { ProductCard } from '@/components/solar/product-card';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { apiUrl } from '@/constants/api';
 
 const CATEGORIES = ['All', 'Kits', 'Panels', 'Inverters', 'Eco-Home', 'Services'];
 
@@ -17,7 +18,7 @@ export default function MarketplaceScreen() {
   const themeColors = Colors[colorScheme];
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/products')
+    fetch(apiUrl('/api/products'))
       .then(res => res.json())
       .then(data => {
         setProducts(data.products);
@@ -156,4 +157,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   }
 });
-

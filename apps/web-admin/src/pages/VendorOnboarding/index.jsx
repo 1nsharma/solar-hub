@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ShieldCheck, Upload, ChevronRight, CheckCircle2 } from 'lucide-react';
 
 import { useStore } from '../../store/useStore';
+import { apiUrl } from '../../config/api';
 
 export default function VendorOnboarding({ onBack }) {
   const { user } = useStore();
@@ -22,7 +23,7 @@ export default function VendorOnboarding({ onBack }) {
     }
     
     try {
-      const res = await fetch('http://localhost:5000/api/vendors/apply', {
+      const res = await fetch(apiUrl('/api/vendors/apply'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

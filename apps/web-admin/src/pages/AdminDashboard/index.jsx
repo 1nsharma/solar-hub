@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { 
+import {
   Users, 
   ShoppingBag, 
   Truck, 
@@ -17,9 +17,12 @@ import {
   ShieldCheck,
   TrendingUp,
   CreditCard,
-  Star
+  Star,
+  User,
+  MapPin
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
+import { apiUrl } from '../../config/api';
 
 export default function AdminDashboard({ onBack }) {
   const [activeTab, setActiveTab] = useState('overview');
@@ -28,7 +31,7 @@ export default function AdminDashboard({ onBack }) {
 
   React.useEffect(() => {
     if (activeTab === 'vendors') {
-      fetch('http://localhost:5000/api/admin/vendors')
+      fetch(apiUrl('/api/admin/vendors'))
         .then(res => res.json())
         .then(data => setVendors(data))
         .catch(err => console.error('Failed to fetch vendors:', err));

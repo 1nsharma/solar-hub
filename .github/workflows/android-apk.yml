@@ -1,0 +1,68 @@
+name: Android APK Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      variant:
+        description: App variant to build
+        required: true
+        default: vendor
+        type: choice
+        options:
+          - vendor
+          - customer
+      release_tag:
+        description: Optional GitHub release tag, for example v1.0.0-vendor-apk
+        required: false
+        type: string
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      APP_VARIANT: ${{ inputs.variant }}
+      EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL || 'https://api.solarhub.in' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - run: npm ci
+
+      - name: Prebuild Android project
+        working-directory: apps/mobile
+        run: npx expo prebuild --platform android --clean --non-interactive
+
+      - name: Build release APK
+        working-directory: apps/mobile/android
+        run: ./gradlew assembleRelease
+
+      - name: Rename APK
+        run: |
+          mkdir -p release
+          cp apps/mobile/android/app/build/outputs/apk/release/app-release.apk release/solarhub-${{ inputs.variant }}.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: solarhub-${{ inputs.variant }}-apk
+          path: release/solarhub-${{ inputs.variant }}.apk
+
+      - name: Publish GitHub release
+        if: inputs.release_tag != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.release_tag }}
+          name: SolarHub ${{ inputs.variant }} APK ${{ inputs.release_tag }}
+          files: release/solarhub-${{ inputs.variant }}.apk

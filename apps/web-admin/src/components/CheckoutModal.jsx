@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, MapPin, CreditCard, ChevronRight, CheckCircle2, QrCode } from 'lucide-react';
+import { X, MapPin, CreditCard, ChevronRight, CheckCircle2, QrCode, ShieldCheck, Zap } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
 const CheckoutModal = ({ isOpen, onClose, onTrack }) => {

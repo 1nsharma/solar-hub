@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const db = require('./db');
+const { randomUUID } = require('crypto');
 require('dotenv').config();
 
 // Operational Services
@@ -23,11 +24,130 @@ app.use(express.json());
 // Helper for Mock Fallback (during development)
 const USE_MOCK = process.env.USE_MOCK === 'true';
 
+const mockProducts = [
+  { id: 101, title: 'Premium On-Grid Kit 5kW', price: 285000, category: 'Kits', vendor: 'Tata Power', rating: 4.9, description: '10 Panels + 5kW Inverter + Structure + Net Metering. Perfect for large homes.', image_url: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&q=80&w=800' },
+  { id: 102, title: 'Essential Hybrid Kit 3kW', price: 195000, category: 'Kits', vendor: 'Luminous', rating: 4.8, description: '6 Panels + 3kW Inverter + 2 Batteries. Ideal for areas with power cuts.', image_url: 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d?auto=format&fit=crop&q=80&w=800' },
+  { id: 103, title: 'Micro Off-Grid Kit 1kW', price: 78000, category: 'Kits', vendor: 'Loom Solar', rating: 4.7, description: '2 Panels + 1kW Inverter + 1 Battery. Best for remote cabins or shops.', image_url: 'https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?auto=format&fit=crop&q=80&w=800' },
+  { id: 201, title: 'Monocrystalline Panel 550W', price: 18500, category: 'Panels', vendor: 'Waaree', rating: 4.8, description: 'High efficiency solar panel with 25 years warranty.', image_url: 'https://images.unsplash.com/photo-1497440001374-f26997328c1b?auto=format&fit=crop&q=80&w=800' },
+  { id: 301, title: 'Smart Solar Inverter 5kVA', price: 52000, category: 'Inverters', vendor: 'Microtek', rating: 4.6, description: 'Pure sine wave inverter with MPPT charge controller.', image_url: 'https://images.unsplash.com/photo-1558444479-c84851218670?auto=format&fit=crop&q=80&w=800' },
+  { id: 401, title: 'Smart Water Heater', price: 12500, category: 'Eco-Home', vendor: 'Havells', rating: 4.5, description: 'Energy efficient water heater with mobile app control.', image_url: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&q=80&w=800' }
+];
+
+const mockServices = [
+  { id: 501, title: 'AMC: Basic Protection', price: 2999, icon_name: 'ShieldCheck', duration: '1 Year', description: '4 cleaning visits + 2 electrical safety audits per year.' },
+  { id: 502, title: 'AMC: Premium Care', price: 5999, icon_name: 'ShieldCheck', duration: '1 Year', description: 'Monthly cleaning + real-time monitoring + priority support.' },
+  { id: 503, title: 'Panel Cleaning', price: 499, icon_name: 'Zap', duration: '2 Hours', description: 'Deep cleaning using solar-safe tools and solvents.' }
+];
+
+const servicePrograms = [
+  {
+    id: 'external-maintenance',
+    name: 'External Product Maintenance',
+    channel: 'on_demand_service',
+    revenue_model: 'non_monetized_service_workflow',
+    customer_charge_owner: 'technician_or_service_partner',
+    platform_revenue: false,
+    features: ['panel cleaning', 'inverter checkup', 'battery health inspection']
+  },
+  {
+    id: 'vendor-service',
+    name: 'Vendor Service Fulfillment',
+    channel: 'vendor_after_sales',
+    revenue_model: 'non_monetized_service_workflow',
+    customer_charge_owner: 'vendor',
+    platform_revenue: false,
+    features: ['installation coordination', 'warranty support', 'order-linked service ticket']
+  },
+  {
+    id: 'government-scheme',
+    name: 'Government Scheme Assistance',
+    channel: 'scheme_facilitation',
+    revenue_model: 'non_monetized_service_workflow',
+    customer_charge_owner: 'government_or_vendor_process',
+    platform_revenue: false,
+    features: ['eligibility capture', 'document checklist', 'vendor assignment']
+  },
+  {
+    id: 'ca-compliance',
+    name: 'CA & Compliance Onboarding',
+    channel: 'compliance_support',
+    revenue_model: 'non_monetized_service_workflow',
+    customer_charge_owner: 'vendor_or_customer_direct',
+    platform_revenue: false,
+    features: ['GST help', 'invoice support', 'subsidy document review', 'vendor KYC']
+  }
+];
+
+const revenueModel = {
+  primary_revenue: 'ecommerce',
+  ecommerce: {
+    enabled: true,
+    sources: ['product margin', 'vendor product commission', 'kit checkout payment'],
+    payment_endpoint: '/api/payments/create-order'
+  },
+  services: {
+    enabled: true,
+    monetized_by_platform: false,
+    purpose: 'lead capture, booking, vendor fulfillment, technician assignment, government scheme support'
+  }
+};
+
+const providerIntegrations = [
+  {
+    id: 'payment',
+    name: 'Razorpay / UPI Payment',
+    required_env: ['RAZORPAY_KEY_ID', 'RAZORPAY_KEY_SECRET'],
+    mode: process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET ? 'live_ready' : 'mock'
+  },
+  {
+    id: 'notification',
+    name: 'SMS / WhatsApp Notification',
+    required_env: ['SMS_PROVIDER_KEY', 'WHATSAPP_PROVIDER_TOKEN'],
+    mode: process.env.SMS_PROVIDER_KEY || process.env.WHATSAPP_PROVIDER_TOKEN ? 'live_ready' : 'mock'
+  },
+  {
+    id: 'maps',
+    name: 'Google Maps / Distance Matrix',
+    required_env: ['MAPS_API_KEY'],
+    mode: process.env.MAPS_API_KEY ? 'live_ready' : 'mock'
+  },
+  {
+    id: 'logistics',
+    name: 'Shiprocket / Delhivery',
+    required_env: ['SHIPROCKET_EMAIL', 'SHIPROCKET_PASSWORD', 'DELHIVERY_API_KEY'],
+    mode: process.env.SHIPROCKET_EMAIL || process.env.DELHIVERY_API_KEY ? 'live_ready' : 'mock'
+  },
+  {
+    id: 'storage',
+    name: 'S3 / Cloudflare R2 Storage',
+    required_env: ['STORAGE_BUCKET', 'STORAGE_ACCESS_KEY', 'STORAGE_SECRET_KEY'],
+    mode: process.env.STORAGE_BUCKET && process.env.STORAGE_ACCESS_KEY ? 'live_ready' : 'mock'
+  }
+];
+
 // Mock Data
 let mockUsers = [
   { id: 'u1', name: 'Admin User', phone: '6393741171', role: 'admin' },
   { id: 'u2', name: 'Test User', phone: '9876543210', role: 'customer' }
 ];
+
+app.get('/api/health', async (req, res) => {
+  let database = 'unavailable';
+  try {
+    await db.query('SELECT 1');
+    database = 'ok';
+  } catch (err) {
+    database = USE_MOCK ? 'mock' : 'unavailable';
+  }
+
+  res.json({
+    status: database === 'unavailable' && !USE_MOCK ? 'degraded' : 'ok',
+    service: 'solarhub-api',
+    database,
+    mock_mode: USE_MOCK,
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Routes
 
@@ -37,27 +157,10 @@ app.get('/api/products', async (req, res) => {
     const productsResult = await db.query('SELECT * FROM products ORDER BY created_at DESC');
     const servicesResult = await db.query('SELECT * FROM services ORDER BY created_at DESC');
     
-    res.json({ 
-      products: productsResult.rows, 
-      services: servicesResult.rows 
-    });
+    res.json({ products: productsResult.rows, services: servicesResult.rows });
   } catch (err) {
     console.error('DB Error:', err);
-    // Fallback to static data if DB fails
-    res.json({ 
-      products: [
-        { id: 101, title: 'Premium On-Grid Kit 5kW', price: 285000, category: 'Kits', vendor: 'Tata Power', rating: 4.9, description: '10 Panels + 5kW Inverter + Structure + Net Metering. Perfect for large homes.', image_url: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&q=80&w=800' },
-        { id: 102, title: 'Essential Hybrid Kit 3kW', price: 195000, category: 'Kits', vendor: 'Luminous', rating: 4.8, description: '6 Panels + 3kW Inverter + 2 Batteries. Ideal for areas with power cuts.', image_url: 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d?auto=format&fit=crop&q=80&w=800' },
-        { id: 103, title: 'Micro Off-Grid Kit 1kW', price: 78000, category: 'Kits', vendor: 'Loom Solar', rating: 4.7, description: '2 Panels + 1kW Inverter + 1 Battery. Best for remote cabins or shops.', image_url: 'https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?auto=format&fit=crop&q=80&w=800' },
-        { id: 201, title: 'Monocrystalline Panel 550W', price: 18500, category: 'Panels', vendor: 'Waaree', rating: 4.8, description: 'High efficiency solar panel with 25 years warranty.', image_url: 'https://images.unsplash.com/photo-1497440001374-f26997328c1b?auto=format&fit=crop&q=80&w=800' },
-        { id: 301, title: 'Smart Solar Inverter 5kVA', price: 52000, category: 'Inverters', vendor: 'Microtek', rating: 4.6, description: 'Pure sine wave inverter with MPPT charge controller.', image_url: 'https://images.unsplash.com/photo-1558444479-c84851218670?auto=format&fit=crop&q=80&w=800' },
-        { id: 401, title: 'Smart Water Heater', price: 12500, category: 'Eco-Home', vendor: 'Havells', rating: 4.5, description: 'Energy efficient water heater with mobile app control.', image_url: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&q=80&w=800' }
-      ],
-      services: [
-        { id: 501, title: 'AMC: Basic Protection', price: 2999, icon_name: 'ShieldCheck', duration: '1 Year', description: '4 Cleaning visits + 2 Electrical safety audits per year.' },
-        { id: 502, title: 'AMC: Premium Care', price: 5999, icon_name: 'ShieldCheck', duration: '1 Year', description: 'Monthly cleaning + Real-time monitoring + 24/7 Priority support.' }
-      ]
-    });
+    res.json({ products: mockProducts, services: mockServices });
   }
 });
 
@@ -68,10 +171,43 @@ app.get('/api/services', async (req, res) => {
     res.json(servicesResult.rows);
   } catch (err) {
     console.error('DB Error:', err);
-    res.json([
-      { id: 1, title: 'Panel Cleaning', price: 499, icon_name: 'Zap', duration: '1 Hour', description: 'Deep cleaning of panels to increase efficiency.' }
-    ]);
+    res.json(mockServices);
   }
+});
+
+app.get('/api/revenue-model', (req, res) => {
+  res.json(revenueModel);
+});
+
+app.get('/api/service-programs', (req, res) => {
+  res.json(servicePrograms);
+});
+
+app.get('/api/provider-integrations', (req, res) => {
+  res.json({
+    mode: USE_MOCK ? 'local_mock' : 'production',
+    integrations: providerIntegrations
+  });
+});
+
+app.get('/api/subscriptions/plans', (req, res) => {
+  // Backward-compatible alias for older clients. These are service programs, not platform-paid subscriptions.
+  res.json(servicePrograms);
+});
+
+app.post('/api/payments/create-order', async (req, res) => {
+  const { amount, currency = 'INR', user_id, purpose = 'checkout' } = req.body;
+  if (!amount || Number(amount) <= 0) {
+    return res.status(400).json({ error: 'amount is required and must be greater than 0' });
+  }
+
+  const paymentOrder = await paymentService.createOrder(Number(amount), currency);
+  await analyticsService.trackEvent(user_id || 'guest', 'ecommerce_payment_order_created', { amount, currency, purpose });
+  res.status(201).json({
+    ...paymentOrder,
+    gateway: process.env.RAZORPAY_KEY_ID ? 'razorpay' : 'mock',
+    public_key: process.env.RAZORPAY_KEY_ID || 'mock_public_key'
+  });
 });
 
 // 2. Orders
@@ -131,7 +267,27 @@ app.post('/api/orders', async (req, res) => {
       shipment_details: shipment 
     });
   } catch (err) {
-    await db.query('ROLLBACK');
+    try {
+      await db.query('ROLLBACK');
+    } catch (rollbackErr) {
+      console.error('Rollback failed:', rollbackErr.message);
+    }
+
+    if (USE_MOCK) {
+      const order = {
+        id: `ord_${randomUUID()}`,
+        user_id,
+        total_amount,
+        address_id,
+        status: 'processing',
+        items,
+        created_at: new Date().toISOString()
+      };
+      const shipment = await logisticsService.createShipment(order);
+      await analyticsService.trackEvent(user_id || 'guest', 'order_created_mock', { orderId: order.id, amount: total_amount });
+      return res.status(201).json({ ...order, shipment_details: shipment });
+    }
+
     res.status(500).json({ error: err.message });
   }
 });
@@ -148,6 +304,10 @@ app.get('/api/bookings/:userId', async (req, res) => {
     `, [req.params.userId]);
     res.json(result.rows);
   } catch (err) {
+    if (USE_MOCK) {
+      return res.json([]);
+    }
+
     res.status(500).json({ error: err.message });
   }
 });
@@ -179,6 +339,94 @@ app.post('/api/bookings', async (req, res) => {
     });
 
   } catch (err) {
+    if (USE_MOCK) {
+      const booking = {
+        id: `book_${randomUUID()}`,
+        user_id,
+        service_id,
+        booking_date,
+        time_slot,
+        address_id,
+        status: 'confirmed',
+        created_at: new Date().toISOString()
+      };
+      const distanceInfo = await mapsService.calculateDistance('SolarHub Central', 'User Address');
+      return res.status(201).json({ ...booking, dispatch_estimate: distanceInfo });
+    }
+
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 3.1 Leads (Referral Business)
+app.get('/api/leads/:partnerId', async (req, res) => {
+  try {
+    const result = await db.query('SELECT * FROM leads WHERE partner_id = $1 ORDER BY created_at DESC', [req.params.partnerId]);
+    res.json(result.rows);
+  } catch (err) {
+    if (USE_MOCK) {
+      return res.json([
+        { id: 'l1', customer_name: 'John Doe', customer_phone: '9988776655', status: 'new', created_at: new Date().toISOString() },
+        { id: 'l2', customer_name: 'Jane Smith', customer_phone: '8877665544', status: 'survey_done', created_at: new Date().toISOString() }
+      ]);
+    }
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/leads', async (req, res) => {
+  const {
+    partner_id,
+    customer_name,
+    customer_phone,
+    customer_email,
+    interest_type = 'Residential',
+    estimated_load,
+    notes,
+    name,
+    phone,
+    pincode,
+    requirement,
+    source = 'web'
+  } = req.body;
+
+  const leadName = customer_name || name || 'New Lead';
+  const leadPhone = customer_phone || phone;
+  const leadRequirement = requirement || notes || interest_type;
+
+  if (!leadPhone || !leadRequirement) {
+    return res.status(400).json({ error: 'phone and requirement are required' });
+  }
+
+  try {
+    const result = await db.query(
+      'INSERT INTO leads (partner_id, name, customer_name, phone, customer_phone, customer_email, pincode, requirement, interest_type, estimated_load, source, status, notes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *',
+      [partner_id || null, leadName, leadName, leadPhone, leadPhone, customer_email || null, pincode || null, leadRequirement, interest_type, estimated_load || null, source, 'new', notes || null]
+    );
+    
+    // Analytics: Track Lead Creation
+    await analyticsService.trackEvent(partner_id || leadPhone, 'lead_created', { customer_name: leadName, source });
+
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    if (USE_MOCK) {
+      const lead = {
+        id: `lead_${randomUUID()}`,
+        partner_id,
+        customer_name: leadName,
+        customer_phone: leadPhone,
+        phone: leadPhone,
+        pincode,
+        requirement: leadRequirement,
+        interest_type,
+        estimated_load,
+        source,
+        status: 'new',
+        created_at: new Date().toISOString()
+      };
+      await analyticsService.trackEvent(partner_id || leadPhone, 'lead_created_mock', { customer_name: leadName });
+      return res.status(201).json(lead);
+    }
     res.status(500).json({ error: err.message });
   }
 });
@@ -189,6 +437,12 @@ app.get('/api/admin/vendors', async (req, res) => {
     const result = await db.query('SELECT v.*, u.name as owner_name FROM vendors v JOIN users u ON v.user_id = u.id ORDER BY v.created_at DESC');
     res.json(result.rows);
   } catch (err) {
+    if (USE_MOCK) {
+      return res.json([
+        { id: 'vendor_mock_1', business_name: 'SolarNova Ltd.', owner_name: 'Demo Owner', status: 'pending', rating: 4.7, product_count: 12, created_at: new Date().toISOString() }
+      ]);
+    }
+
     res.status(500).json({ error: err.message });
   }
 });
@@ -202,6 +456,17 @@ app.post('/api/vendors/apply', async (req, res) => {
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
+    if (USE_MOCK) {
+      return res.status(201).json({
+        id: `vendor_${randomUUID()}`,
+        user_id,
+        business_name,
+        gst_number,
+        status: 'pending',
+        created_at: new Date().toISOString()
+      });
+    }
+
     res.status(500).json({ error: err.message });
   }
 });
@@ -215,9 +480,19 @@ app.post('/api/auth/verify-otp', async (req, res) => {
       let user = result.rows[0];
       
       if (!user) {
+        let role = 'customer';
+        let name = 'New User';
+        
+        // Magic Numbers for Testing
+        if (phone === '9999999991') { role = 'partner'; name = 'Solo Partner'; }
+        else if (phone === '9999999992') { role = 'technician'; name = 'Master Tech'; }
+        else if (phone === '9999999993') { role = 'vendor'; name = 'Solar Vendor'; }
+        else if (phone === '9999999994') { role = 'admin'; name = 'Super Admin'; }
+        else if (phone === '9999999995') { role = 'ca'; name = 'CA Partner'; }
+
         result = await db.query(
           'INSERT INTO users (name, phone, role) VALUES ($1, $2, $3) RETURNING *',
-          ['New User', phone, 'customer']
+          [name, phone, role]
         );
         user = result.rows[0];
       }
@@ -280,4 +555,3 @@ app.get('/api/dev/seed', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`SolarHub API running on port ${PORT}`);
 });
-

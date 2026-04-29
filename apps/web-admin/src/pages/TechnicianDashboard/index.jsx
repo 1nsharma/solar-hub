@@ -10,7 +10,8 @@ import {
   User,
   Zap,
   Calendar,
-  Filter
+  Filter,
+  Plus
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 

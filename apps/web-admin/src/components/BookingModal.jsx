@@ -3,7 +3,9 @@ import { X, Calendar, Clock, MapPin, CheckCircle2, ChevronRight, Zap } from 'luc
 import { useStore } from '../store/useStore';
 
 export default function BookingModal({ isOpen, onClose, service, onComplete }) {
+  const { user, addBooking } = useStore();
   const [step, setStep] = useState(1);
+  const [ticketId] = useState(() => `SRV-${Math.random().toString(36).substr(2, 6).toUpperCase()}`);
   const [formData, setFormData] = useState({
     date: '',
     slot: '',
@@ -43,13 +45,8 @@ export default function BookingModal({ isOpen, onClose, service, onComplete }) {
       ]
     };
 
-    setStep(3); // Loading/Processing
-    
-    // Simulate API delay
-    setTimeout(async () => {
-      await addBooking(bookingData);
-      setStep(4); // Success
-    }, 2000);
+    await addBooking(bookingData);
+    setStep(3);
   };
 
   return (
@@ -261,7 +258,7 @@ export default function BookingModal({ isOpen, onClose, service, onComplete }) {
             <h3 className="text-4xl font-bold mb-4 tracking-tighter">Booking Successful!</h3>
             <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-6 inline-block mx-auto">
               <p className="text-[10px] text-text-dim uppercase font-bold tracking-widest mb-1">Ticket ID</p>
-              <p className="text-xl font-mono font-bold text-primary">SRV-{Math.random().toString(36).substr(2, 6).toUpperCase()}</p>
+              <p className="text-xl font-mono font-bold text-primary">{ticketId}</p>
             </div>
             <p className="text-text-dim mb-8 max-w-sm mx-auto leading-relaxed">
               We've assigned your request to our technician pool. You'll receive a confirmation SMS and a call from the team shortly.
