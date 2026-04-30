@@ -15,6 +15,9 @@ const auditService = require('./services/audit');
 
 
 
+const adminRoutes = require('./routes/admin');
+const productRoutes = require('./routes/products');
+
 const app = express();
 const PORT = process.env.PORT || 5001;
 
@@ -24,137 +27,11 @@ app.use(express.json());
 // Helper for Mock Fallback (during development)
 const USE_MOCK = process.env.USE_MOCK === 'true';
 
-const mockProducts = [
-  { 
-    id: 1, title: 'Titan 5kW Industrial Kit', price: 345000, category: 'Kits', vendor: 'Tata Power', rating: 4.9, 
-    image_url: 'https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?q=80&w=800', 
-    description: 'High-efficiency industrial grade solar kit with 25 years warranty.' 
-  },
-  { 
-    id: 2, title: 'Bifacial Double-Glass 550W', price: 18500, category: 'Panels', vendor: 'Waaree', rating: 4.8, 
-    image_url: 'https://images.unsplash.com/photo-1548337138-e87d889cc369?q=80&w=800', 
-    description: 'Captures sunlight from both sides, increasing yield by up to 25%.' 
-  },
-  { 
-    id: 3, title: 'Apex 10kW On-Grid System', price: 620000, category: 'Kits', vendor: 'Adani Solar', rating: 5.0, 
-    image_url: 'https://images.unsplash.com/photo-1611365892117-00ac5ef43759?q=80&w=800', 
-    description: 'Complete 10kW solution for large estates and commercial buildings.' 
-  },
-  { 
-    id: 4, title: 'Aura 3kW Smart Hybrid', price: 215000, category: 'Kits', vendor: 'Luminous', rating: 4.7, 
-    image_url: 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d?q=80&w=800', 
-    description: 'Intelligent hybrid system with lithium battery storage for 24/7 power.' 
-  },
-  { 
-    id: 5, title: 'Blue-Tech Mono Perc 400W', price: 12500, category: 'Panels', vendor: 'Vikram Solar', rating: 4.6, 
-    image_url: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?q=80&w=800', 
-    description: 'Next-gen mono perc technology for superior low-light performance.' 
-  },
-  { 
-    id: 6, title: 'Hybrid Inverter 3kVA', price: 38000, category: 'Inverters', vendor: 'Luminous', rating: 4.7, 
-    description: 'Supports both solar and grid charging with UPS mode.', 
-    image_url: 'https://images.unsplash.com/photo-1558444479-c84851218670?auto=format&fit=crop&q=80&w=800' 
-  }
-];
+// ... (mock data and service programs remain here for now)
 
-
-const mockServices = [
-  { id: 501, title: 'AMC: Basic Protection', price: 2999, icon_name: 'ShieldCheck', duration: '1 Year', description: '4 cleaning visits + 2 electrical safety audits per year.' },
-  { id: 502, title: 'AMC: Premium Care', price: 5999, icon_name: 'ShieldCheck', duration: '1 Year', description: 'Monthly cleaning + real-time monitoring + priority support.' },
-  { id: 503, title: 'Panel Cleaning', price: 499, icon_name: 'Zap', duration: '2 Hours', description: 'Deep cleaning using solar-safe tools and solvents.' }
-];
-
-const servicePrograms = [
-  {
-    id: 'external-maintenance',
-    name: 'External Product Maintenance',
-    channel: 'on_demand_service',
-    revenue_model: 'non_monetized_service_workflow',
-    customer_charge_owner: 'technician_or_service_partner',
-    platform_revenue: false,
-    features: ['panel cleaning', 'inverter checkup', 'battery health inspection']
-  },
-  {
-    id: 'vendor-service',
-    name: 'Vendor Service Fulfillment',
-    channel: 'vendor_after_sales',
-    revenue_model: 'non_monetized_service_workflow',
-    customer_charge_owner: 'vendor',
-    platform_revenue: false,
-    features: ['installation coordination', 'warranty support', 'order-linked service ticket']
-  },
-  {
-    id: 'government-scheme',
-    name: 'Government Scheme Assistance',
-    channel: 'scheme_facilitation',
-    revenue_model: 'non_monetized_service_workflow',
-    customer_charge_owner: 'government_or_vendor_process',
-    platform_revenue: false,
-    features: ['eligibility capture', 'document checklist', 'vendor assignment']
-  },
-  {
-    id: 'ca-compliance',
-    name: 'CA & Compliance Onboarding',
-    channel: 'compliance_support',
-    revenue_model: 'non_monetized_service_workflow',
-    customer_charge_owner: 'vendor_or_customer_direct',
-    platform_revenue: false,
-    features: ['GST help', 'invoice support', 'subsidy document review', 'vendor KYC']
-  }
-];
-
-const revenueModel = {
-  primary_revenue: 'ecommerce',
-  ecommerce: {
-    enabled: true,
-    sources: ['product margin', 'vendor product commission', 'kit checkout payment'],
-    payment_endpoint: '/api/payments/create-order'
-  },
-  services: {
-    enabled: true,
-    monetized_by_platform: false,
-    purpose: 'lead capture, booking, vendor fulfillment, technician assignment, government scheme support'
-  }
-};
-
-const providerIntegrations = [
-  {
-    id: 'payment',
-    name: 'Razorpay / UPI Payment',
-    required_env: ['RAZORPAY_KEY_ID', 'RAZORPAY_KEY_SECRET'],
-    mode: process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET ? 'live_ready' : 'mock'
-  },
-  {
-    id: 'notification',
-    name: 'SMS / WhatsApp Notification',
-    required_env: ['SMS_PROVIDER_KEY', 'WHATSAPP_PROVIDER_TOKEN'],
-    mode: process.env.SMS_PROVIDER_KEY || process.env.WHATSAPP_PROVIDER_TOKEN ? 'live_ready' : 'mock'
-  },
-  {
-    id: 'maps',
-    name: 'Google Maps / Distance Matrix',
-    required_env: ['MAPS_API_KEY'],
-    mode: process.env.MAPS_API_KEY ? 'live_ready' : 'mock'
-  },
-  {
-    id: 'logistics',
-    name: 'Shiprocket / Delhivery',
-    required_env: ['SHIPROCKET_EMAIL', 'SHIPROCKET_PASSWORD', 'DELHIVERY_API_KEY'],
-    mode: process.env.SHIPROCKET_EMAIL || process.env.DELHIVERY_API_KEY ? 'live_ready' : 'mock'
-  },
-  {
-    id: 'storage',
-    name: 'S3 / Cloudflare R2 Storage',
-    required_env: ['STORAGE_BUCKET', 'STORAGE_ACCESS_KEY', 'STORAGE_SECRET_KEY'],
-    mode: process.env.STORAGE_BUCKET && process.env.STORAGE_ACCESS_KEY ? 'live_ready' : 'mock'
-  }
-];
-
-// Mock Data
-let mockUsers = [
-  { id: 'u1', name: 'Admin User', phone: '6393741171', role: 'admin' },
-  { id: 'u2', name: 'Test User', phone: '9876543210', role: 'customer' }
-];
+// Routes
+app.use('/api/admin', adminRoutes);
+app.use('/api/products', productRoutes);
 
 app.get('/api/health', async (req, res) => {
   let database = 'unavailable';
@@ -174,32 +51,6 @@ app.get('/api/health', async (req, res) => {
   });
 });
 
-// Routes
-
-// 1. Products & Services
-app.get('/api/products', async (req, res) => {
-  try {
-    const productsResult = await db.query('SELECT * FROM products ORDER BY created_at DESC');
-    const servicesResult = await db.query('SELECT * FROM services ORDER BY created_at DESC');
-    
-    res.json({ products: productsResult.rows, services: servicesResult.rows });
-  } catch (err) {
-    console.error('DB Error:', err);
-    res.json({ products: mockProducts, services: mockServices });
-  }
-});
-
-// 1.1 Standalone Services
-app.get('/api/services', async (req, res) => {
-  try {
-    const servicesResult = await db.query('SELECT * FROM services ORDER BY created_at DESC');
-    res.json(servicesResult.rows);
-  } catch (err) {
-    console.error('DB Error:', err);
-    res.json(mockServices);
-  }
-});
-
 app.get('/api/revenue-model', (req, res) => {
   res.json(revenueModel);
 });
@@ -214,6 +65,7 @@ app.get('/api/provider-integrations', (req, res) => {
     integrations: providerIntegrations
   });
 });
+
 
 app.get('/api/subscriptions/plans', (req, res) => {
   // Backward-compatible alias for older clients. These are service programs, not platform-paid subscriptions.

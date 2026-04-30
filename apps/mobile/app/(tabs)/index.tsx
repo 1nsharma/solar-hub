@@ -19,6 +19,7 @@ import Animated, {
 import { TechnicianTools } from '@/components/persona/technician-tools';
 import { VendorTools } from '@/components/persona/vendor-tools';
 import { CustomerTools } from '@/components/persona/customer-tools';
+import { AdminTools } from '@/components/persona/admin-tools';
 
 const { width } = Dimensions.get('window');
 
@@ -36,7 +37,7 @@ type Kit = {
 export default function HomeScreen() {
   const [featuredKits, setFeaturedKits] = useState<Kit[]>([]);
   const [orderStatus, setOrderStatus] = useState('idle'); // idle, ordered
-  const [demoRole, setDemoRole] = useState<'customer' | 'vendor' | 'technician' | null>(Constants.expoConfig?.extra?.isDemoMode ? null : (Constants.expoConfig?.extra?.appVariant as any));
+  const [demoRole, setDemoRole] = useState<'customer' | 'vendor' | 'technician' | 'admin' | null>(Constants.expoConfig?.extra?.isDemoMode ? null : (Constants.expoConfig?.extra?.appVariant as any));
 
   const pulse = useSharedValue(1);
 
@@ -106,6 +107,13 @@ export default function HomeScreen() {
             color="#4CAF50" 
             onPress={() => setDemoRole('technician')} 
           />
+          <LauncherCard 
+            title="Admin" 
+            desc="Ecosystem Pulse, Partners & Health" 
+            icon="shield.lefthalf.filled" 
+            color="#2196F3" 
+            onPress={() => setDemoRole('admin')} 
+          />
         </View>
 
         <View style={{ position: 'absolute', bottom: 40, alignSelf: 'center' }}>
@@ -121,6 +129,10 @@ export default function HomeScreen() {
 
   if (demoRole === 'technician') {
     return <TechnicianDashboard onBack={() => setDemoRole(Constants.expoConfig?.extra?.isDemoMode ? null : 'technician')} />;
+  }
+
+  if (demoRole === 'admin') {
+    return <AdminDashboard onBack={() => setDemoRole(Constants.expoConfig?.extra?.isDemoMode ? null : 'admin')} />;
   }
 
 
@@ -223,6 +235,7 @@ export default function HomeScreen() {
             <RoleTab active={demoRole === 'customer'} label="User" icon="person.fill" onPress={() => setDemoRole('customer')} />
             <RoleTab active={demoRole === 'vendor'} label="Vendor" icon="storefront.fill" onPress={() => setDemoRole('vendor')} />
             <RoleTab active={demoRole === 'technician'} label="Service" icon="wrench.fill" onPress={() => setDemoRole('technician')} />
+            <RoleTab active={demoRole === 'admin'} label="Admin" icon="shield.fill" onPress={() => setDemoRole('admin')} />
           </View>
         </View>
       )}
@@ -594,6 +607,42 @@ function TechnicianDashboard({ onBack }: { onBack: () => void }) {
   );
 }
 
+
+// Full Operational Admin Dashboard
+function AdminDashboard({ onBack }: { onBack: () => void }) {
+  return (
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+       <LinearGradient 
+         colors={['#1A237E', '#0D47A1']} 
+         style={{ height: 260, padding: 24, justifyContent: 'flex-end' }}
+       >
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+            <View>
+              <ThemedText style={{ color: '#64B5F6', fontSize: 12, fontWeight: '900', letterSpacing: 2 }}>OPERATIONS CENTER</ThemedText>
+              <ThemedText type="title" style={{ color: '#fff', fontSize: 36, fontWeight: '900', marginTop: 4 }}>System Root</ThemedText>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#4CAF50' }} />
+                <ThemedText style={{ color: '#4CAF50', fontSize: 12, fontWeight: 'bold' }}>All Services Normal</ThemedText>
+              </View>
+            </View>
+            <TouchableOpacity onPress={onBack} style={styles.backButtonRound}>
+              <IconSymbol name="chevron.left" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+          
+          <View style={{ backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <IconSymbol name="bell.fill" size={20} color="#FFD700" />
+            <ThemedText style={{ color: '#fff', fontSize: 13 }}>2 Pending Vendor approvals require action</ThemedText>
+          </View>
+       </LinearGradient>
+
+       <View style={styles.section}>
+          <AdminTools />
+       </View>
+       <View style={{ height: 100 }} />
+    </ScrollView>
+  );
+}
 
 function TimelineItem({
   status,
