@@ -210,6 +210,53 @@ app.post('/api/payments/create-order', async (req, res) => {
   });
 });
 
+// 1.5 Finance & Trust Engine (Transaction Control)
+app.post('/api/finance/calculate', (req, res) => {
+  const { systemSize, totalCost } = req.body;
+  
+  if (!systemSize || !totalCost) {
+    return res.status(400).json({ error: 'systemSize and totalCost are required' });
+  }
+
+  // Simplified MNRE Subsidy Logic (PM Surya Ghar)
+  const capacity = parseFloat(systemSize);
+  let subsidy = 0;
+  if (capacity <= 2) {
+    subsidy = capacity * 30000;
+  } else if (capacity > 2 && capacity <= 3) {
+    subsidy = 60000 + ((capacity - 2) * 18000);
+  } else if (capacity > 3) {
+    subsidy = 78000;
+  }
+
+  const customerPayable = totalCost - subsidy;
+  const loanAmount = customerPayable * 0.8; // 80% LTV
+  const interestRate = 0.09; // 9% per annum
+  const tenureMonths = 60; // 5 years
+
+  // EMI calculation (P * r * (1+r)^n)/((1+r)^n - 1)
+  const monthlyRate = interestRate / 12;
+  const emi = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, tenureMonths)) / (Math.pow(1 + monthlyRate, tenureMonths) - 1);
+
+  res.json({
+    totalCost,
+    subsidyEstimated: Math.round(subsidy),
+    customerPayable: Math.round(customerPayable),
+    financing: {
+      eligibleLoanAmount: Math.round(loanAmount),
+      emiEstimated: Math.round(emi),
+      tenureMonths,
+      interestRate
+    },
+    milestones: [
+      { name: 'Booking Advance (10%)', amount: Math.round(customerPayable * 0.10) },
+      { name: 'Material Dispatch (50%)', amount: Math.round(customerPayable * 0.50) },
+      { name: 'Installation Complete (30%)', amount: Math.round(customerPayable * 0.30) },
+      { name: 'Net Metering & Handover (10%)', amount: Math.round(customerPayable * 0.10) }
+    ]
+  });
+});
+
 // 2. Orders
 app.get('/api/orders/:userId', async (req, res) => {
   try {
@@ -230,12 +277,12 @@ app.get('/api/orders/:userId', async (req, res) => {
 });
 
 app.post('/api/orders', async (req, res) => {
-  const { user_id, total_amount, address_id, items } = req.body;
+  const { user_id, total_amount, address_id, items, subsidy_amount = 0, emi_details = null } = req.body;
   try {
     await db.query('BEGIN');
     const orderResult = await db.query(
-      'INSERT INTO orders (user_id, total_amount, address_id, status) VALUES ($1, $2, $3, $4) RETURNING *',
-      [user_id, total_amount, address_id, 'processing']
+      'INSERT INTO orders (user_id, total_amount, address_id, status, subsidy_amount, emi_details, payment_status) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [user_id, total_amount, address_id, 'processing', subsidy_amount, emi_details, 'partial']
     );
     const orderId = orderResult.rows[0].id;
 
@@ -245,26 +292,43 @@ app.post('/api/orders', async (req, res) => {
         [orderId, item.id, item.quantity, item.price]
       );
     }
+
+    // Generate Payment Milestones (Transaction Control)
+    const customerPayable = total_amount - subsidy_amount;
+    const milestones = [
+      { name: 'Booking Advance (10%)', amount: customerPayable * 0.10, status: 'paid' }, // Paid at checkout
+      { name: 'Material Dispatch (50%)', amount: customerPayable * 0.50, status: 'pending' },
+      { name: 'Installation Complete (30%)', amount: customerPayable * 0.30, status: 'pending' },
+      { name: 'Net Metering & Handover (10%)', amount: customerPayable * 0.10, status: 'pending' }
+    ];
+
+    for (const m of milestones) {
+      await db.query(
+        'INSERT INTO payment_milestones (order_id, milestone_name, amount, status) VALUES ($1, $2, $3, $4)',
+        [orderId, m.name, m.amount, m.status]
+      );
+    }
+
     await db.query('COMMIT');
 
     // --- Live Operational Flow ---
     
     // 0. Audit: Log system action
-    await auditService.log(user_id, 'ORDER_CREATED', 'order', orderId, null, { amount: total_amount });
+    await auditService.log(user_id, 'ORDER_CREATED', 'order', orderId, null, { amount: total_amount, milestones_created: true });
 
     // 1. Analytics: Track order creation
-
-    await analyticsService.trackEvent(user_id, 'order_created', { orderId, amount: total_amount });
+    await analyticsService.trackEvent(user_id, 'order_created', { orderId, amount: total_amount, financing: !!emi_details });
 
     // 2. Logistics: Create shipment (Simulated)
     const shipment = await logisticsService.createShipment({ id: orderId, total_amount, address_id });
     
     // 3. Notification: Send Confirmation
-    await notificationService.sendSMS('9876543210', `Order #${orderId} confirmed! Tracking ID: ${shipment.tracking_id}`);
+    await notificationService.sendSMS('9876543210', `Order #${orderId} confirmed! Next Milestone: Material Dispatch. Tracking: ${shipment.tracking_id}`);
 
     res.status(201).json({ 
       ...orderResult.rows[0], 
-      shipment_details: shipment 
+      shipment_details: shipment,
+      milestones_tracked: true
     });
   } catch (err) {
     try {
@@ -274,13 +338,21 @@ app.post('/api/orders', async (req, res) => {
     }
 
     if (USE_MOCK) {
+      const customerPayable = total_amount - subsidy_amount;
       const order = {
         id: `ord_${randomUUID()}`,
         user_id,
         total_amount,
+        subsidy_amount,
+        emi_details,
         address_id,
         status: 'processing',
+        payment_status: 'partial',
         items,
+        milestones: [
+          { name: 'Booking Advance (10%)', amount: customerPayable * 0.10, status: 'paid' },
+          { name: 'Material Dispatch (50%)', amount: customerPayable * 0.50, status: 'pending' }
+        ],
         created_at: new Date().toISOString()
       };
       const shipment = await logisticsService.createShipment(order);
@@ -308,6 +380,68 @@ app.get('/api/bookings/:userId', async (req, res) => {
       return res.json([]);
     }
 
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Phase 2: Vendor Quote Engine (Prevent Offline Leakage)
+app.post('/api/quotes', async (req, res) => {
+  const { vendor_id, lead_id, system_size, proposed_price, notes } = req.body;
+  // In a real scenario, this inserts into a `quotes` table.
+  
+  const quote = {
+    id: `qt_${randomUUID()}`,
+    vendor_id,
+    lead_id,
+    system_size,
+    proposed_price,
+    notes,
+    status: 'submitted',
+    created_at: new Date().toISOString()
+  };
+
+  // Trigger Notification to Customer
+  await notificationService.sendWhatsApp('customer_phone', 'new_quote_received', {
+    quote_id: quote.id,
+    vendor_id
+  });
+
+  res.status(201).json(quote);
+});
+
+// Phase 3: Workflow Engine (State Machine & Escrow Release)
+app.put('/api/orders/:id/status', async (req, res) => {
+  const { id } = req.params;
+  const { status, milestone_completed } = req.body;
+  
+  // Valid States: processing -> site_survey_done -> material_dispatched -> installation_done -> net_metering_done -> completed
+  
+  try {
+    // 1. Update Order Status
+    await db.query('UPDATE orders SET status = $1 WHERE id = $2', [status, id]);
+    
+    // 2. Update Milestone if applicable
+    if (milestone_completed) {
+      await db.query("UPDATE payment_milestones SET status = 'paid', paid_at = CURRENT_TIMESTAMP WHERE order_id = $1 AND milestone_name = $2", [id, milestone_completed]);
+      // Event: Trigger vendor payout from Escrow
+      // await paymentService.releaseEscrow(id, milestone_completed);
+    }
+    
+    // 3. Dispatch Background Job (Simulation of BullMQ)
+    setTimeout(() => {
+      console.log(`[BullMQ Worker] Processed state transition for ${id} to ${status}`);
+      notificationService.sendSMS('9876543210', `Order ${id} is now ${status}`);
+    }, 100);
+
+    res.json({ success: true, id, status });
+  } catch (err) {
+    if (USE_MOCK) {
+      // Mock State Machine Execution
+      setTimeout(() => {
+        console.log(`[BullMQ Worker Mock] Processed state transition for ${id} to ${status} and released escrow for ${milestone_completed || 'none'}`);
+      }, 100);
+      return res.json({ success: true, id, status, mock: true });
+    }
     res.status(500).json({ error: err.message });
   }
 });

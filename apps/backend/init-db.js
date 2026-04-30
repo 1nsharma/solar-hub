@@ -4,7 +4,7 @@ const db = require('./db');
 
 async function initDB() {
   try {
-    const schemaPath = path.join(__dirname, '../db/schema.sql');
+    const schemaPath = path.join(__dirname, '../../db/schema.sql');
     const schema = fs.readFileSync(schemaPath, 'utf8');
     
     console.log('Initializing database...');

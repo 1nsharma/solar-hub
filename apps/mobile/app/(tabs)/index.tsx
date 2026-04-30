@@ -93,18 +93,19 @@ export default function HomeScreen() {
       {/* Hero Header */}
       <View style={styles.hero}>
         <LinearGradient
-          colors={['#1D3D47', '#11181C']}
+          colors={['#0A0A0A', '#1A1A1A']}
           style={StyleSheet.absoluteFill}
         />
+        <View style={{...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(255, 215, 0, 0.05)'}} />
         <View style={styles.headerContent}>
           <View style={styles.logoRow}>
-            <View style={styles.logoCircle}>
-              <IconSymbol name="sun.max.fill" size={24} color="#FFD700" />
+            <View style={[styles.logoCircle, { shadowColor: '#FFD700', shadowOpacity: 0.5, shadowRadius: 10 }]}>
+              <IconSymbol name="sun.max.fill" size={28} color="#FFD700" />
             </View>
-            <ThemedText type="title" style={styles.logoText}>SolarHub</ThemedText>
+            <ThemedText type="title" style={[styles.logoText, { fontSize: 32, fontWeight: '900', letterSpacing: -1 }]}>SolarHub</ThemedText>
           </View>
-          <ThemedText style={styles.heroSubtitle}>
-            One-Step Solar Installation. Easy as WiFi.
+          <ThemedText style={[styles.heroSubtitle, { fontSize: 16, opacity: 0.8, marginTop: 8 }]}>
+            India's Leading Solar Ecosystem.
           </ThemedText>
         </View>
       </View>

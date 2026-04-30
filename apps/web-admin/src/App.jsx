@@ -259,42 +259,48 @@ function App() {
       )}
 
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center pt-20 overflow-hidden">
+      <section className="relative min-h-[90vh] flex items-center pt-24 pb-16 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?auto=format&fit=crop&q=80&w=2000" 
+            src="https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?auto=format&fit=crop&q=80&w=2500" 
             alt="Solar House" 
-            className="w-full h-full object-cover opacity-40 scale-105"
+            className="w-full h-full object-cover opacity-30 scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-bg-dark via-bg-dark/80 to-bg-dark"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent"></div>
         </div>
         
         <div className="container relative z-10">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 px-4 py-2 rounded-full mb-8 animate-fade-in">
-              <Zap size={16} className="text-primary" />
+          <div className="max-w-4xl mx-auto text-center md:text-left md:mx-0">
+            <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 px-5 py-2.5 rounded-full mb-8 animate-fade-in backdrop-blur-md shadow-lg shadow-primary/5">
+              <div className="bg-primary/20 p-1.5 rounded-full"><Zap size={14} className="text-primary animate-pulse" /></div>
               <span className="text-xs font-bold uppercase tracking-widest text-primary">India's Leading Solar Ecosystem</span>
             </div>
-            <h1 className="text-6xl md:text-8xl mb-8 leading-tight animate-fade-in">
-              {t.heroTitle}
+            <h1 className="text-5xl md:text-7xl lg:text-8xl mb-8 leading-[1.1] animate-fade-in font-extrabold tracking-tighter">
+              Powering Your Home <br className="hidden md:block"/>with the <span className="text-primary relative inline-block">Sun<div className="absolute -bottom-2 left-0 w-full h-2 bg-primary/30 blur-sm rounded-full"></div></span>
             </h1>
-            <p className="text-xl md:text-2xl text-text-dim mb-12 max-w-xl leading-relaxed animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              {t.heroSub}
+            <p className="text-lg md:text-2xl text-text-dim mb-12 max-w-2xl leading-relaxed animate-fade-in mx-auto md:mx-0" style={{ animationDelay: '0.2s' }}>
+              The ultimate destination for solar products, services, and smart savings. Discover verified vendors, secure financing, and seamless installation.
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-              <a href="#products" className="btn-primary text-lg px-12 py-5 group">
-                {t.marketplace} <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+            <div className="flex flex-col sm:flex-row gap-6 animate-fade-in justify-center md:justify-start" style={{ animationDelay: '0.4s' }}>
+              <a href="#products" className="btn-primary text-lg px-12 py-5 group shadow-primary/20 shadow-2xl hover:shadow-primary/40 relative overflow-hidden">
+                <span className="relative z-10 flex items-center gap-2">Explore Marketplace <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" /></span>
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
               </a>
-              <a href="#services" className="btn-secondary text-lg px-12 py-5">
-                {t.services}
+              <a href="#calculator" className="btn-secondary text-lg px-12 py-5 bg-white/5 backdrop-blur-md hover:bg-white/10 border-white/10">
+                Calculate Savings
               </a>
             </div>
           </div>
         </div>
+        
+        {/* Decorative elements */}
+        <div className="absolute top-1/4 right-[10%] w-96 h-96 bg-primary/20 rounded-full blur-[120px] mix-blend-screen pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 glass border-y border-white/5 relative z-10">
+      <section className="py-16 relative z-10 bg-black/40 backdrop-blur-md border-b border-white/5">
         <div className="container grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
           <div className="space-y-2">
             <h3 className="text-5xl font-extrabold text-primary tracking-tighter">5k+</h3>
@@ -316,24 +322,29 @@ function App() {
       </section>
 
       {/* Solar Calculator Section */}
-      <section id="calculator" className="py-24">
-        <div className="container">
-          <div className="glass-card grid md:grid-cols-2 gap-12 items-center">
+      <section id="calculator" className="py-24 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -z-10"></div>
+        <div className="container relative z-10">
+          <div className="glass-card grid md:grid-cols-2 gap-12 items-center p-8 md:p-12 shadow-2xl shadow-black">
             <div>
-              <h2 className="text-4xl mb-6">{t.savingsTitle}</h2>
-              <p className="text-text-dim mb-8">
-                Get a personalized solar recommendation in seconds.
+              <div className="inline-flex items-center gap-2 mb-4">
+                <Calculator size={20} className="text-primary" />
+                <span className="text-primary font-bold uppercase tracking-widest text-xs">AI Calculator</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl mb-6 font-extrabold tracking-tight">{t.savingsTitle}</h2>
+              <p className="text-text-dim mb-10 text-lg">
+                Get a personalized, data-driven solar recommendation in seconds based on your roof and usage.
               </p>
               
               <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-6">
                   <div>
                     <label className="block mb-2 text-xs text-text-dim uppercase font-bold tracking-widest">Monthly Bill (₹)</label>
                     <input 
                       type="number" 
                       value={calcInputs.bill}
                       onChange={(e) => setCalcInputs({...calcInputs, bill: e.target.value})}
-                      className="w-full"
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
                     />
                   </div>
                   <div>
@@ -343,18 +354,18 @@ function App() {
                       placeholder="e.g. 208001"
                       value={calcInputs.pincode}
                       onChange={(e) => setCalcInputs({...calcInputs, pincode: e.target.value})}
-                      className="w-full"
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-6">
                   <div>
                     <label className="block mb-2 text-xs text-text-dim uppercase font-bold tracking-widest">Roof Type</label>
                     <select 
                       value={calcInputs.roofType}
                       onChange={(e) => setCalcInputs({...calcInputs, roofType: e.target.value})}
-                      className="w-full"
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all appearance-none"
                     >
                       <option>Flat</option>
                       <option>Slanted</option>
@@ -367,30 +378,33 @@ function App() {
                       type="number" 
                       value={calcInputs.area}
                       onChange={(e) => setCalcInputs({...calcInputs, area: e.target.value})}
-                      className="w-full"
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
                     />
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-3 gap-4 pt-4">
-                  <div className="bg-white/5 p-4 rounded-xl border border-white/5 text-center">
-                    <p className="text-[10px] text-text-dim uppercase font-bold">Recommended</p>
-                    <p className="text-xl font-bold mt-1">{recommendedKW} kW</p>
+                <div className="grid grid-cols-3 gap-4 pt-6">
+                  <div className="bg-gradient-to-br from-white/10 to-white/5 p-5 rounded-2xl border border-white/10 text-center shadow-inner">
+                    <p className="text-[10px] text-text-dim uppercase font-bold tracking-tighter">Recommended</p>
+                    <p className="text-2xl font-bold mt-1 tracking-tight">{recommendedKW} <span className="text-sm">kW</span></p>
                   </div>
-                  <div className="bg-white/5 p-4 rounded-xl border border-white/5 text-center">
-                    <p className="text-[10px] text-text-dim uppercase font-bold">Monthly Saving</p>
-                    <p className="text-xl font-bold mt-1 text-secondary">₹{Number(estimatedSavings).toLocaleString()}</p>
+                  <div className="bg-gradient-to-br from-secondary/20 to-secondary/5 p-5 rounded-2xl border border-secondary/20 text-center shadow-inner">
+                    <p className="text-[10px] text-green-400/80 uppercase font-bold tracking-tighter">Monthly Saving</p>
+                    <p className="text-2xl font-bold mt-1 text-secondary tracking-tight">₹{Number(estimatedSavings).toLocaleString()}</p>
                   </div>
-                  <div className="bg-white/5 p-4 rounded-xl border border-white/5 text-center">
-                    <p className="text-[10px] text-text-dim uppercase font-bold">EMI Starts @</p>
-                    <p className="text-xl font-bold mt-1 text-primary">₹{(Number(recommendedKW) * 1500).toLocaleString()}</p>
+                  <div className="bg-gradient-to-br from-primary/20 to-primary/5 p-5 rounded-2xl border border-primary/20 text-center shadow-inner">
+                    <p className="text-[10px] text-primary/80 uppercase font-bold tracking-tighter">EMI Starts @</p>
+                    <p className="text-2xl font-bold mt-1 text-primary tracking-tight">₹{(Number(recommendedKW) * 1500).toLocaleString()}</p>
                   </div>
                 </div>
                 
-                <div className="mt-4 p-4 bg-primary/10 rounded-xl border border-primary/20">
-                  <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">Expert Match</p>
-                  <p className="text-sm font-semibold">
-                    We suggest the <span className="text-white">"{recommendedKW > 3 ? 'Premium On-Grid Kit 5kW' : 'Essential Hybrid Kit 3kW'}"</span> for your needs.
+                <div className="mt-6 p-5 bg-gradient-to-r from-primary/10 to-transparent rounded-2xl border-l-4 border-primary shadow-lg shadow-primary/5">
+                  <div className="flex gap-3 items-center mb-2">
+                    <Star size={16} fill="currentColor" className="text-primary" />
+                    <p className="text-xs font-bold text-primary uppercase tracking-widest">Expert Match Algorithm</p>
+                  </div>
+                  <p className="text-sm font-medium leading-relaxed">
+                    Based on your details, we highly recommend the <span className="text-white font-bold bg-white/10 px-2 py-0.5 rounded">"{recommendedKW > 3 ? 'Premium On-Grid Kit 5kW' : 'Essential Hybrid Kit 3kW'}"</span>. It maximizes ROI for your roof size.
                   </p>
                 </div>
                 
@@ -401,31 +415,40 @@ function App() {
                     if (product) handleAddToCart(product);
                     window.location.href = '#products';
                   }}
-                  className="btn-primary w-full py-4 justify-center"
+                  className="btn-primary w-full py-4 justify-center shadow-xl shadow-primary/20 hover:shadow-primary/40 text-lg transition-all transform hover:-translate-y-1"
                 >
-                  Buy Recommended Kit & Save
+                  Buy Recommended Kit & Lock Savings
                 </button>
               </div>
             </div>
             
-            <div className="relative">
-              <div className="bg-primary/20 absolute -inset-10 blur-[100px] rounded-full"></div>
-              <div className="relative z-10 glass-card p-8 text-center bg-white/[0.02]">
-                <Calculator size={64} className="mx-auto mb-6 text-primary" />
-                <h4 className="text-2xl mb-6">Why SolarHub?</h4>
-                <div className="space-y-6">
-                  <div className="flex gap-4 items-start text-left">
-                    <div className="bg-primary/20 p-2 rounded-lg"><Zap className="text-primary" size={20} /></div>
+            <div className="relative h-full flex flex-col justify-center pl-0 md:pl-12">
+              <div className="absolute inset-0 bg-primary/10 blur-[100px] rounded-full pointer-events-none"></div>
+              <div className="relative z-10 glass-card p-10 bg-white/[0.02] border-white/5 shadow-2xl">
+                <div className="bg-black/40 w-16 h-16 rounded-2xl flex items-center justify-center mb-8 border border-white/10 shadow-inner">
+                  <ShieldCheck size={32} className="text-primary" />
+                </div>
+                <h4 className="text-3xl font-bold mb-8 tracking-tighter">Why Choose SolarHub?</h4>
+                <div className="space-y-8">
+                  <div className="flex gap-5 items-start text-left group">
+                    <div className="bg-primary/10 p-3 rounded-xl border border-primary/20 group-hover:bg-primary/20 transition-colors"><Zap className="text-primary" size={24} /></div>
                     <div>
-                      <h5 className="font-bold">Instant Quotes</h5>
-                      <p className="text-sm text-text-dim">Real-time pricing from verified local vendors.</p>
+                      <h5 className="font-bold text-lg mb-1">Instant Vendor Quotes</h5>
+                      <p className="text-sm text-text-dim leading-relaxed">Real-time pricing algorithms match you with top-rated, verified local installers.</p>
                     </div>
                   </div>
-                  <div className="flex gap-4 items-start text-left">
-                    <div className="bg-secondary/20 p-2 rounded-lg"><ShieldCheck className="text-secondary" size={20} /></div>
+                  <div className="flex gap-5 items-start text-left group">
+                    <div className="bg-secondary/10 p-3 rounded-xl border border-secondary/20 group-hover:bg-secondary/20 transition-colors"><CheckCircle2 className="text-secondary" size={24} /></div>
                     <div>
-                      <h5 className="font-bold">End-to-End Service</h5>
-                      <p className="text-sm text-text-dim">From purchase to lifelong maintenance.</p>
+                      <h5 className="font-bold text-lg mb-1">Guaranteed Escrow Protection</h5>
+                      <p className="text-sm text-text-dim leading-relaxed">Your money is safe. We only release payments to vendors when project milestones are hit.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-5 items-start text-left group">
+                    <div className="bg-blue-500/10 p-3 rounded-xl border border-blue-500/20 group-hover:bg-blue-500/20 transition-colors"><Sun className="text-blue-400" size={24} /></div>
+                    <div>
+                      <h5 className="font-bold text-lg mb-1">Lifelong System Maintenance</h5>
+                      <p className="text-sm text-text-dim leading-relaxed">Book post-installation AMC services directly through the platform.</p>
                     </div>
                   </div>
                 </div>

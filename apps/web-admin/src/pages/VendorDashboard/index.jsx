@@ -78,7 +78,7 @@ export default function VendorDashboard({ onBack }) {
           {/* Main Management Area */}
           <div className="lg:col-span-3 space-y-8">
             <div className="flex gap-4 bg-white/5 p-1.5 rounded-2xl border border-white/10 w-fit">
-              {['products', 'orders', 'payouts'].map(tab => (
+              {['products', 'orders', 'quotes', 'payouts'].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -90,6 +90,52 @@ export default function VendorDashboard({ onBack }) {
                 </button>
               ))}
             </div>
+
+            {activeTab === 'quotes' && (
+              <div className="animate-fade-in space-y-6">
+                <div className="bg-primary/5 p-4 rounded-xl border border-primary/20 mb-6">
+                  <p className="text-xs text-primary font-bold uppercase tracking-widest mb-1 flex items-center gap-2"><ShieldCheck size={14} /> SolarHub Qualified Leads</p>
+                  <p className="text-sm text-text-dim">Submit quotes directly through the platform. Customers are protected by Escrow, ensuring you get paid securely upon milestone completion.</p>
+                </div>
+                {[
+                  { id: 'LD-4091', system: '5kW Residential', customer_pin: '208001', match_score: '92%', status: 'New Request' },
+                  { id: 'LD-4092', system: '3kW Hybrid', customer_pin: '201301', match_score: '85%', status: 'Quote Sent' }
+                ].map(lead => (
+                  <div key={lead.id} className="glass-card p-6 flex flex-col gap-6 bg-white/[0.03] border-white/5">
+                    <div className="flex justify-between items-center">
+                      <div className="flex gap-6 items-center">
+                        <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center">
+                          <CheckCircle2 className="text-secondary" size={24} />
+                        </div>
+                        <div>
+                          <p className="text-xs text-text-dim uppercase font-bold tracking-widest">Lead {lead.id} • Match: <span className="text-green-400">{lead.match_score}</span></p>
+                          <h4 className="font-bold">{lead.system} System</h4>
+                          <p className="text-sm text-text-dim">Pincode: {lead.customer_pin}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className={`text-[10px] font-bold px-3 py-1 rounded-full uppercase ${
+                          lead.status === 'Quote Sent' ? 'bg-secondary/10 text-secondary' : 'bg-primary/10 text-primary'
+                        }`}>
+                          {lead.status}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="pt-4 border-t border-white/5 flex gap-4">
+                      {lead.status === 'New Request' ? (
+                         <>
+                           <input type="number" placeholder="Your Quote (₹)" className="bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-sm w-40 outline-none focus:border-primary" />
+                           <button className="btn-primary py-2 px-6 text-xs font-bold" onClick={() => alert('Quote submitted via /api/quotes API')}>Submit Quote Securely</button>
+                         </>
+                      ) : (
+                         <p className="text-sm text-text-dim italic">Awaiting customer approval through SolarHub Escrow. (Workflow Engine)</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {activeTab === 'products' && (
               <div className="animate-fade-in space-y-6">
