@@ -16,6 +16,15 @@ export const Colors = {
     icon: '#687076',
     tabIconDefault: '#687076',
     tabIconSelected: '#FFB800',
+    // Premium Accents
+    primary: '#FFD700',
+    secondary: '#4CAF50',
+    accent: '#00E5FF',
+    card: '#F5F5F5',
+    border: 'rgba(0,0,0,0.05)',
+    error: '#FF5252',
+    success: '#4CAF50',
+    dimText: '#666666',
   },
   dark: {
     text: '#FFFFFF',
@@ -24,6 +33,15 @@ export const Colors = {
     icon: '#9BA1A6',
     tabIconDefault: '#9BA1A6',
     tabIconSelected: '#FFD700',
+    // Premium Accents
+    primary: '#FFD700',
+    secondary: '#4CAF50',
+    accent: '#00E5FF',
+    card: '#121212',
+    border: 'rgba(255,255,255,0.08)',
+    error: '#FF5252',
+    success: '#4CAF50',
+    dimText: '#A0A0A0',
   },
 };
 

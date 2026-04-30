@@ -288,12 +288,21 @@ app.post('/api/quotes', async (req, res) => {
   res.status(201).json(quote);
 });
 
+// --- Notification Store (In-Memory for Demo) ---
+const notifications = [
+  { id: '1', user_id: 'u1', title: 'System Ready', message: 'Your Solar System is performing at 98% efficiency today.', type: 'health', created_at: new Date().toISOString() },
+  { id: '2', user_id: 'u1', title: 'Subsidy Approved', message: 'Good news! Your PM Surya Ghar subsidy has been verified.', type: 'finance', created_at: new Date().toISOString() }
+];
+
+app.get('/api/notifications/:userId', (req, res) => {
+  const userNotifications = notifications.filter(n => n.user_id === req.params.userId || n.user_id === 'all');
+  res.json(userNotifications);
+});
+
 // Phase 3: Workflow Engine (State Machine & Escrow Release)
 app.put('/api/orders/:id/status', async (req, res) => {
   const { id } = req.params;
-  const { status, milestone_completed } = req.body;
-  
-  // Valid States: processing -> site_survey_done -> material_dispatched -> installation_done -> net_metering_done -> completed
+  const { status, milestone_completed, user_id } = req.body;
   
   try {
     // 1. Update Order Status
@@ -306,6 +315,16 @@ app.put('/api/orders/:id/status', async (req, res) => {
       // await paymentService.releaseEscrow(id, milestone_completed);
     }
     
+    // Add to in-memory notification store
+    notifications.unshift({
+      id: randomUUID(),
+      user_id: user_id || 'u1',
+      title: 'Order Update',
+      message: `Your order #${id.substring(0,6)} is now: ${status.replace('_', ' ').toUpperCase()}`,
+      type: 'order',
+      created_at: new Date().toISOString()
+    });
+    
     // 3. Dispatch Background Job (Simulation of BullMQ)
     setTimeout(() => {
       console.log(`[BullMQ Worker] Processed state transition for ${id} to ${status}`);
@@ -315,6 +334,14 @@ app.put('/api/orders/:id/status', async (req, res) => {
     res.json({ success: true, id, status });
   } catch (err) {
     if (USE_MOCK) {
+      notifications.unshift({
+        id: randomUUID(),
+        user_id: user_id || 'u1',
+        title: 'Order Update (Mock)',
+        message: `Order status changed to ${status}`,
+        type: 'order',
+        created_at: new Date().toISOString()
+      });
       // Mock State Machine Execution
       setTimeout(() => {
         console.log(`[BullMQ Worker Mock] Processed state transition for ${id} to ${status} and released escrow for ${milestone_completed || 'none'}`);

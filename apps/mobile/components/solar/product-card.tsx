@@ -1,6 +1,15 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Pressable } from 'react-native';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withSpring,
+  interpolate,
+  Extrapolation
+} from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
@@ -17,21 +26,47 @@ interface Product {
   description: string;
 }
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
 export function ProductCard({ product }: { product: Product }) {
   const colorScheme = useColorScheme() ?? 'light';
   const themeColors = Colors[colorScheme];
+  
+  const pressed = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { scale: withSpring(interpolate(pressed.value, [0, 1], [1, 0.95], Extrapolation.CLAMP)) }
+      ],
+      opacity: withSpring(interpolate(pressed.value, [0, 1], [1, 0.9], Extrapolation.CLAMP)),
+    };
+  });
+
+  const handlePressIn = () => {
+    pressed.value = 1;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const handlePressOut = () => {
+    pressed.value = 0;
+  };
 
   return (
-    <TouchableOpacity style={[styles.container, { backgroundColor: colorScheme === 'dark' ? '#121212' : '#F5F5F5' }]}>
+    <AnimatedPressable 
+      style={[styles.container, animatedStyle, { backgroundColor: themeColors.card }]}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+    >
       <Image
         source={{ uri: product.image_url }}
         style={styles.image}
         contentFit="cover"
-        transition={200}
+        transition={300}
       />
       
       <LinearGradient 
-        colors={['transparent', 'rgba(0,0,0,0.8)']} 
+        colors={['transparent', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.9)']} 
         style={StyleSheet.absoluteFill} 
       />
 
@@ -53,15 +88,18 @@ export function ProductCard({ product }: { product: Product }) {
         </View>
 
         <View style={styles.footer}>
-          <ThemedText type="subtitle" style={styles.price}>
-            ₹{product.price.toLocaleString()}
-          </ThemedText>
+          <View>
+            <ThemedText style={styles.priceLabel}>From</ThemedText>
+            <ThemedText type="subtitle" style={styles.price}>
+              ₹{product.price.toLocaleString()}
+            </ThemedText>
+          </View>
           <View style={styles.addButton}>
-            <IconSymbol name="chevron.right" size={14} color="#000" />
+            <IconSymbol name="cart.fill" size={16} color="#000" />
           </View>
         </View>
       </View>
-    </TouchableOpacity>
+    </AnimatedPressable>
   );
 }
 
@@ -139,17 +177,28 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  priceLabel: {
+    fontSize: 9,
+    textTransform: 'uppercase',
+    color: 'rgba(255,255,255,0.5)',
+    fontWeight: 'bold',
+  },
   price: {
-    fontSize: 20,
+    fontSize: 18,
     color: '#fff',
     fontWeight: '900',
   },
   addButton: {
     backgroundColor: '#FFD700',
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
 });

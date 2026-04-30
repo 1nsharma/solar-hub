@@ -14,12 +14,16 @@ import Animated, {
   withRepeat, 
   withTiming, 
   withSequence 
+  withSequence,
+  FadeInDown 
 } from 'react-native-reanimated';
 
 import { CustomerTools } from '@/components/persona/customer-tools';
 import { AdminDashboard } from '@/components/persona/admin-dashboard';
 import { VendorDashboard } from '@/components/persona/vendor-dashboard';
 import { TechnicianDashboard } from '@/components/persona/technician-dashboard';
+import { NotificationCenter } from '@/components/solar/notification-center';
+import * as Haptics from 'expo-haptics';
 
 const { width } = Dimensions.get('window');
 
@@ -38,6 +42,7 @@ export default function HomeScreen() {
   const [featuredKits, setFeaturedKits] = useState<Kit[]>([]);
   const [orderStatus, setOrderStatus] = useState('idle'); // idle, ordered
   const [demoRole, setDemoRole] = useState<'customer' | 'vendor' | 'technician' | 'admin' | null>(Constants.expoConfig?.extra?.isDemoMode ? null : (Constants.expoConfig?.extra?.appVariant as any));
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const pulse = useSharedValue(1);
 
@@ -77,64 +82,80 @@ export default function HomeScreen() {
   if (!demoRole) {
     return (
       <View style={[styles.container, { justifyContent: 'center', padding: 24 }]}>
-        <LinearGradient colors={['#050505', '#121212']} style={StyleSheet.absoluteFill} />
+        <LinearGradient colors={['#050505', '#0A0A0A', '#121212']} style={StyleSheet.absoluteFill} />
         
-        <Animated.View style={{ alignItems: 'center', marginBottom: 48, opacity: 1 }}>
-          <View style={[styles.logoCircle, { width: 100, height: 100, borderRadius: 50, backgroundColor: 'rgba(255, 215, 0, 0.1)' }]}>
-             <IconSymbol name="sun.max.fill" size={50} color="#FFD700" />
+        <Animated.View entering={FadeInDown.duration(800)} style={{ alignItems: 'center', marginBottom: 48 }}>
+          <View style={[styles.logoCircle, { width: 120, height: 120, borderRadius: 60, backgroundColor: 'rgba(255, 215, 0, 0.05)', borderWidth: 1, borderColor: 'rgba(255, 215, 0, 0.2)' }]}>
+             <IconSymbol name="sun.max.fill" size={60} color="#FFD700" />
           </View>
-          <ThemedText type="title" style={{ fontSize: 48, marginTop: 24, fontWeight: '900', color: '#fff' }}>SolarHub</ThemedText>
-          <ThemedText style={{ opacity: 0.5, letterSpacing: 2, fontSize: 12, marginTop: 8 }}>PREMIUM ECOSYSTEM</ThemedText>
+          <ThemedText type="title" style={{ fontSize: 56, marginTop: 24, fontWeight: '900', color: '#fff', letterSpacing: -2 }}>SolarHub</ThemedText>
+          <ThemedText style={{ color: '#FFD700', letterSpacing: 4, fontSize: 10, fontWeight: '900', marginTop: 4 }}>PREMIUM ECOSYSTEM</ThemedText>
         </Animated.View>
 
-        <View style={{ gap: 20 }}>
+        <View style={{ gap: 16 }}>
           <LauncherCard 
             title="Customer" 
-            desc="Marketplace, Gen Monitoring & Savings" 
+            desc="Marketplace & Energy Monitoring" 
             icon="person.fill" 
             color="#FFD700" 
-            onPress={() => setDemoRole('customer')} 
+            delay={200}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              setDemoRole('customer');
+            }} 
           />
           <LauncherCard 
             title="Vendor" 
-            desc="Storefront, Lead CRM & Inventory" 
+            desc="Storefront & Lead Management" 
             icon="storefront.fill" 
-            color="#FFA500" 
-            onPress={() => setDemoRole('vendor')} 
+            color="#FFB800" 
+            delay={300}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              setDemoRole('vendor');
+            }} 
           />
           <LauncherCard 
             title="Technician" 
-            desc="Field Ops, Toolbox & Training Hub" 
+            desc="Field Ops & Training Toolbox" 
             icon="wrench.fill" 
             color="#4CAF50" 
-            onPress={() => setDemoRole('technician')} 
+            delay={400}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              setDemoRole('technician');
+            }} 
           />
           <LauncherCard 
             title="Admin" 
-            desc="Ecosystem Pulse, Partners & Health" 
-            icon="shield.lefthalf.filled" 
+            desc="Ecosystem Pulse & Health" 
+            icon="shield.fill" 
             color="#2196F3" 
-            onPress={() => setDemoRole('admin')} 
+            delay={500}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              setDemoRole('admin');
+            }} 
           />
         </View>
 
         <View style={{ position: 'absolute', bottom: 40, alignSelf: 'center' }}>
-          <ThemedText style={{ opacity: 0.3, fontSize: 10 }}>V1.0.0 • MARKET DEMO</ThemedText>
+          <ThemedText style={{ opacity: 0.3, fontSize: 10, fontWeight: 'bold', letterSpacing: 1 }}>V1.2.0 • ADVANCED MARKET DEMO</ThemedText>
         </View>
       </View>
     );
   }
 
   if (demoRole === 'vendor') {
-    return <VendorDashboard onBack={() => setDemoRole(Constants.expoConfig?.extra?.isDemoMode ? null : 'vendor')} />;
+    return <VendorDashboard onBack={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setDemoRole(Constants.expoConfig?.extra?.isDemoMode ? null : 'vendor'); }} />;
   }
 
   if (demoRole === 'technician') {
-    return <TechnicianDashboard onBack={() => setDemoRole(Constants.expoConfig?.extra?.isDemoMode ? null : 'technician')} />;
+    return <TechnicianDashboard onBack={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setDemoRole(Constants.expoConfig?.extra?.isDemoMode ? null : 'technician'); }} />;
   }
 
   if (demoRole === 'admin') {
-    return <AdminDashboard onBack={() => setDemoRole(Constants.expoConfig?.extra?.isDemoMode ? null : 'admin')} />;
+    return <AdminDashboard onBack={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setDemoRole(Constants.expoConfig?.extra?.isDemoMode ? null : 'admin'); }} />;
   }
 
   if (orderStatus === 'ordered') {
@@ -327,43 +348,52 @@ function FlowItem({ icon, label, color }: { icon: string; label: string; color: 
   );
 }
 
-function LauncherCard({ title, desc, icon, color, onPress }: { title: string; desc: string; icon: string; color: string; onPress: () => void }) {
+function LauncherCard({ title, desc, icon, color, onPress, delay = 0 }: { title: string; desc: string; icon: string; color: string; onPress: () => void; delay?: number }) {
+  const pressed = useSharedValue(0);
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: withSpring(interpolate(pressed.value, [0, 1], [1, 0.98])) }],
+  }));
+
   return (
-    <TouchableOpacity 
-      onPress={onPress}
-      activeOpacity={0.8}
-    >
-      <LinearGradient
-        colors={['#1A1A1A', '#0D0D0D']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={{
-          borderRadius: 24,
-          padding: 20,
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 20,
-          borderWidth: 1,
-          borderColor: 'rgba(255,255,255,0.08)',
-          shadowColor: color,
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.1,
-          shadowRadius: 12,
-          elevation: 5,
-        }}
+    <Animated.View entering={FadeInRight.delay(delay).duration(600)} style={animatedStyle}>
+      <TouchableOpacity 
+        onPress={onPress}
+        onPressIn={() => (pressed.value = 1)}
+        onPressOut={() => (pressed.value = 0)}
+        activeOpacity={0.9}
       >
-        <View style={{ backgroundColor: color + '15', padding: 18, borderRadius: 20 }}>
-          <IconSymbol name={icon as any} size={36} color={color} />
-        </View>
-        <View style={{ flex: 1 }}>
-          <ThemedText style={{ fontSize: 20, fontWeight: '900', color: '#fff' }}>{title}</ThemedText>
-          <ThemedText style={{ fontSize: 13, opacity: 0.5, marginTop: 2 }}>{desc}</ThemedText>
-        </View>
-        <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: 8, borderRadius: 12 }}>
-          <IconSymbol name="chevron.right" size={18} color="#666" />
-        </View>
-      </LinearGradient>
-    </TouchableOpacity>
+        <LinearGradient
+          colors={['#1A1A1A', '#0D0D0D']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{
+            borderRadius: 28,
+            padding: 24,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 20,
+            borderWidth: 1,
+            borderColor: 'rgba(255,255,255,0.08)',
+            shadowColor: color,
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.1,
+            shadowRadius: 12,
+            elevation: 5,
+          }}
+        >
+          <View style={{ backgroundColor: color + '15', padding: 20, borderRadius: 22 }}>
+            <IconSymbol name={icon as any} size={40} color={color} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <ThemedText style={{ fontSize: 22, fontWeight: '900', color: '#fff', letterSpacing: -0.5 }}>{title}</ThemedText>
+            <ThemedText style={{ fontSize: 13, opacity: 0.5, marginTop: 4, lineHeight: 18 }}>{desc}</ThemedText>
+          </View>
+          <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: 12, borderRadius: 14 }}>
+            <IconSymbol name="chevron.right" size={20} color="#666" />
+          </View>
+        </LinearGradient>
+      </TouchableOpacity>
+    </Animated.View>
   );
 }
 
@@ -409,17 +439,6 @@ function TimelineItem({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  hero: {
-    height: 240,
-    justifyContent: 'flex-end',
-    padding: 20,
-    paddingBottom: 60,
-  },
-  headerContent: {
-    zIndex: 1,
-  },
-  logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,

@@ -148,6 +148,34 @@ export function VendorDashboard({ onBack }: VendorDashboardProps) {
             </View>
           ))}
 
+          {/* NEW ADVANCED FEATURE: Market Opportunities (Bidding System) */}
+          <View style={[styles.section, { marginTop: 20 }]}>
+            <View style={styles.sectionHeader}>
+               <ThemedText type="subtitle">Market Opportunities</ThemedText>
+               <View style={styles.liveBadge}>
+                  <View style={styles.pulseDot} />
+                  <ThemedText style={styles.liveText}>8 LIVE LEADS</ThemedText>
+               </View>
+            </View>
+
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -20, paddingHorizontal: 20 }}>
+               <LeadCard 
+                  name="Vijay Malviya" 
+                  load="5.5 kW" 
+                  location="Indira Nagar, Sector 14" 
+                  bids={3} 
+                  onBid={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)} 
+               />
+               <LeadCard 
+                  name="S.K. Enterprises" 
+                  load="12 kW" 
+                  location="Industrial Area, Phase II" 
+                  bids={7} 
+                  onBid={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)} 
+               />
+            </ScrollView>
+          </View>
+
           <ThemedText type="subtitle" style={{ marginTop: 24, marginBottom: 16 }}>Business Tools</ThemedText>
           <VendorTools />
        </View>
@@ -166,27 +194,149 @@ function QuickStat({ label, value, sub, color }: { label: string; value: string;
   );
 }
 
+function LeadCard({ name, load, location, bids, onBid }: { name: string; load: string; location: string; bids: number; onBid: () => void }) {
+  return (
+    <View style={styles.leadCard}>
+      <View style={styles.leadHeader}>
+        <View>
+          <ThemedText style={styles.leadName}>{name}</ThemedText>
+          <ThemedText style={styles.leadMeta}>{location}</ThemedText>
+        </View>
+        <View style={styles.loadBadge}>
+          <ThemedText style={styles.loadText}>{load}</ThemedText>
+        </View>
+      </View>
+      
+      <View style={styles.bidSection}>
+        <View>
+          <ThemedText style={styles.bidCount}>{bids} Bids</ThemedText>
+          <ThemedText style={styles.bidSub}>Active Competition</ThemedText>
+        </View>
+        <TouchableOpacity style={styles.bidButton} onPress={onBid}>
+          <ThemedText style={styles.bidButtonText}>SUBMIT QUOTE</ThemedText>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#050505',
   },
   section: {
-    padding: 20,
+    padding: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   backButtonRound: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.05)',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   vendorOrderCard: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: 'rgba(255,255,255,0.03)',
     padding: 20,
-    borderRadius: 24,
+    borderRadius: 28,
     marginBottom: 16,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.05)',
+  },
+  liveBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(255,82,82,0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  pulseDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#FF5252',
+  },
+  liveText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#FF5252',
+    letterSpacing: 1,
+  },
+  leadCard: {
+    width: 280,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 32,
+    padding: 24,
+    marginRight: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+  },
+  leadHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 24,
+  },
+  leadName: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: '#fff',
+  },
+  leadMeta: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.4)',
+    marginTop: 4,
+  },
+  loadBadge: {
+    backgroundColor: 'rgba(255,215,0,0.1)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  loadText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#FFD700',
+  },
+  bidSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.05)',
+  },
+  bidCount: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#fff',
+  },
+  bidSub: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.3)',
+    fontWeight: 'bold',
+    marginTop: 2,
+  },
+  bidButton: {
+    backgroundColor: '#FFD700',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 14,
+  },
+  bidButtonText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#000',
   },
 });

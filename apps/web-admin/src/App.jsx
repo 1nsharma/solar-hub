@@ -150,63 +150,63 @@ function App() {
       )}
 
       {/* Navigation */}
-      <nav className="glass fixed top-0 w-full z-50">
-        <div className="container py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="bg-primary p-2 rounded-lg">
+      <nav className="fixed top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-7xl z-50">
+        <div className="glass rounded-3xl px-8 py-4 flex justify-between items-center shadow-2xl shadow-black/50 border border-white/10">
+          <div className="flex items-center gap-3 group cursor-pointer">
+            <div className="bg-primary p-2.5 rounded-xl group-hover:rotate-12 transition-transform shadow-lg shadow-primary/20">
               <Sun className="text-black" size={24} />
             </div>
-            <span className="text-2xl font-extrabold tracking-tighter">SolarHub</span>
+            <span className="text-3xl font-black tracking-tighter bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">SolarHub</span>
           </div>
           
-          <div className="hidden md:flex gap-8 font-medium">
-            <a href="#products" className="hover:text-primary transition-colors">{t.marketplace}</a>
-            <a href="#services" className="hover:text-primary transition-colors">{t.services}</a>
-            <a href="#calculator" className="hover:text-primary transition-colors">{t.calculator}</a>
-            <a href="#audience" className="hover:text-primary transition-colors">{t.forBusiness}</a>
-            <button 
-                onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
-                className="bg-white/5 px-3 py-1 rounded-lg text-xs font-bold text-primary border border-primary/20"
-              >
-                {language === 'en' ? 'HI' : 'EN'}
-              </button>
+          <div className="hidden md:flex gap-10 font-bold text-sm uppercase tracking-widest">
+            <a href="#products" className="hover:text-primary transition-colors py-2 relative group">
+              {t.marketplace}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+            </a>
+            <a href="#services" className="hover:text-primary transition-colors py-2 relative group">
+              {t.services}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+            </a>
+            <a href="#calculator" className="hover:text-primary transition-colors py-2 relative group">
+              {t.calculator}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+            </a>
           </div>
 
-          <div className="flex items-center gap-4">
-            <PwaInstallButton />
+          <div className="flex items-center gap-6">
+            <button 
+              onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
+              className="bg-white/5 w-10 h-10 rounded-full flex items-center justify-center text-[10px] font-black border border-white/10 hover:border-primary/50 transition-all"
+            >
+              {language === 'en' ? 'HI' : 'EN'}
+            </button>
             <button 
               onClick={() => setIsCartOpen(true)}
-              className="relative p-3 hover:bg-white/5 rounded-full transition-all group"
+              className="relative p-2 hover:bg-white/5 rounded-full transition-all group"
             >
               <ShoppingCart size={24} className="group-hover:text-primary" />
               {cart.length > 0 && (
-                <span className="absolute top-1 right-1 bg-primary text-black text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-bg-dark">
+                <span className="absolute -top-1 -right-1 bg-primary text-black text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-bg-dark">
                   {cart.length}
                 </span>
               )}
             </button>
             
             {user ? (
-              <div className="hidden md:flex items-center gap-3 bg-white/5 px-4 py-2 rounded-full border border-white/10 group relative cursor-pointer">
-                <div 
-                  onClick={() => setCurrentPage('dashboard')}
-                  className="flex items-center gap-3"
-                >
-                  <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                    <User className="text-primary" size={16} />
-                  </div>
-                  <span className="text-sm font-semibold">{user.name}</span>
-                </div>
-                <button onClick={handleLogout} className="text-text-dim hover:text-red-400 ml-2 transition-colors">
-                  <LogOut size={16} />
-                </button>
+              <div 
+                onClick={() => setCurrentPage('dashboard')}
+                className="hidden md:flex items-center gap-3 bg-primary text-black px-5 py-2.5 rounded-2xl font-bold cursor-pointer hover:shadow-lg hover:shadow-primary/30 transition-all active:scale-95"
+              >
+                <User size={18} />
+                <span className="text-sm">{user.name}</span>
               </div>
             ) : (
               <button 
                 onClick={() => setIsAuthModalOpen(true)}
-                className="hidden md:block btn-primary"
+                className="hidden md:block btn-primary px-8 py-3.5"
               >
-                Login / Sign Up
+                Sign In
               </button>
             )}
 
@@ -261,44 +261,44 @@ function App() {
       )}
 
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center pt-24 pb-16 overflow-hidden">
+      <section className="relative min-h-screen flex items-center pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
             src="https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?auto=format&fit=crop&q=80&w=2500" 
             alt="Solar House" 
-            className="w-full h-full object-cover opacity-30 scale-105"
+            className="w-full h-full object-cover opacity-20 scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-bg-dark via-bg-dark/80 to-bg-dark"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-[#050505]/90 to-[#050505]"></div>
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,215,0,0.05)_0%,transparent_50%)]"></div>
         </div>
         
         <div className="container relative z-10">
-          <div className="max-w-4xl mx-auto text-center md:text-left md:mx-0">
-            <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 px-5 py-2.5 rounded-full mb-8 animate-fade-in backdrop-blur-md shadow-lg shadow-primary/5">
-              <div className="bg-primary/20 p-1.5 rounded-full"><Zap size={14} className="text-primary animate-pulse" /></div>
-              <span className="text-xs font-bold uppercase tracking-widest text-primary">India's Leading Solar Ecosystem</span>
+          <div className="max-w-5xl mx-auto text-center md:text-left md:mx-0">
+            <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 px-6 py-3 rounded-2xl mb-10 animate-fade-in backdrop-blur-xl shadow-2xl shadow-primary/5">
+              <div className="bg-primary/20 p-2 rounded-lg"><Zap size={16} className="text-primary animate-pulse" /></div>
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-primary">Next-Gen Solar Ecosystem</span>
             </div>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl mb-8 leading-[1.1] animate-fade-in font-extrabold tracking-tighter">
-              Powering Your Home <br className="hidden md:block"/>with the <span className="text-primary relative inline-block">Sun<div className="absolute -bottom-2 left-0 w-full h-2 bg-primary/30 blur-sm rounded-full"></div></span>
+            <h1 className="text-6xl md:text-8xl lg:text-[100px] mb-10 leading-[0.9] animate-fade-in font-black tracking-tighter">
+              Energy for <br className="hidden md:block"/> the <span className="text-primary relative inline-block">Future<div className="absolute -bottom-4 left-0 w-full h-4 bg-primary/20 blur-xl rounded-full"></div></span>
             </h1>
-            <p className="text-lg md:text-2xl text-text-dim mb-12 max-w-2xl leading-relaxed animate-fade-in mx-auto md:mx-0" style={{ animationDelay: '0.2s' }}>
-              The ultimate destination for solar products, services, and smart savings. Discover verified vendors, secure financing, and seamless installation.
+            <p className="text-xl md:text-3xl text-text-dim mb-14 max-w-3xl leading-relaxed animate-fade-in mx-auto md:mx-0" style={{ animationDelay: '0.2s' }}>
+              The ultimate platform for premium solar products, certified services, and AI-driven smart savings. 
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 animate-fade-in justify-center md:justify-start" style={{ animationDelay: '0.4s' }}>
-              <a href="#products" className="btn-primary text-lg px-12 py-5 group shadow-primary/20 shadow-2xl hover:shadow-primary/40 relative overflow-hidden">
-                <span className="relative z-10 flex items-center gap-2">Explore Marketplace <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" /></span>
+            <div className="flex flex-col sm:flex-row gap-8 animate-fade-in justify-center md:justify-start" style={{ animationDelay: '0.4s' }}>
+              <a href="#products" className="btn-primary text-xl px-14 py-6 group shadow-2xl shadow-primary/20 hover:shadow-primary/40 relative overflow-hidden transition-all">
+                <span className="relative z-10 flex items-center gap-3">Shop Marketplace <ChevronRight size={24} className="group-hover:translate-x-2 transition-transform" /></span>
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
               </a>
-              <a href="#calculator" className="btn-secondary text-lg px-12 py-5 bg-white/5 backdrop-blur-md hover:bg-white/10 border-white/10">
-                Calculate Savings
+              <a href="#calculator" className="btn-secondary text-xl px-14 py-6 bg-white/5 backdrop-blur-xl hover:bg-white/10 border-white/10 rounded-[40px] font-black transition-all">
+                Savings Calculator
               </a>
             </div>
           </div>
         </div>
         
-        {/* Decorative elements */}
-        <div className="absolute top-1/4 right-[10%] w-96 h-96 bg-primary/20 rounded-full blur-[120px] mix-blend-screen pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+        {/* Animated Background Orbs */}
+        <div className="absolute top-1/4 -right-20 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[160px] animate-float pointer-events-none"></div>
+        <div className="absolute -bottom-20 -left-20 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[140px] animate-float pointer-events-none" style={{ animationDelay: '2s' }}></div>
       </section>
 
       {/* Trust Bar (Marquee) */}
@@ -696,18 +696,24 @@ function ProductCard({ product, onAdd }) {
       </div>
       
       <div className="flex-1">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-[10px] font-bold text-primary uppercase tracking-widest px-2 py-1 bg-primary/10 rounded">{product.category}</span>
-          <div className="flex items-center gap-1 text-sm text-yellow-500 font-bold">
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-[10px] font-black text-primary uppercase tracking-[0.15em] px-3 py-1 bg-primary/10 rounded-lg border border-primary/20">{product.category}</span>
+          <div className="flex items-center gap-1 text-sm text-yellow-500 font-black bg-yellow-500/10 px-2 py-0.5 rounded-lg">
             <Star size={14} fill="currentColor" />
             <span>{product.rating}</span>
           </div>
         </div>
         
-        <h3 className="text-xl mb-1 font-bold group-hover:text-primary transition-colors">{product.title}</h3>
-        <p className="text-xs text-text-dim mb-4 flex items-center gap-1">
-          <ShieldCheck size={12} className="text-secondary" /> Sold by <span className="text-white/80">{product.vendor}</span>
-        </p>
+        <h3 className="text-2xl mb-1 font-black group-hover:text-primary transition-colors tracking-tighter">{product.title}</h3>
+        <div className="flex justify-between items-center mb-6">
+          <p className="text-[10px] text-text-dim flex items-center gap-1 font-bold uppercase tracking-widest">
+            <ShieldCheck size={12} className="text-secondary" /> {product.vendor}
+          </p>
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+            <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Only {Math.floor(Math.random() * 5) + 2} Left</span>
+          </div>
+        </div>
         {/* Kit Contents / Features */}
         <div className="bg-white/5 rounded-xl p-4 mb-6 border border-white/5 group-hover:border-primary/20 transition-all">
           <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-text-dim mb-3 font-bold">
@@ -730,17 +736,22 @@ function ProductCard({ product, onAdd }) {
         </div>
       </div>
 
-      <div className="flex justify-between items-center pt-4 border-t border-white/5 mt-auto">
+      <div className="flex justify-between items-center pt-6 border-t border-white/5 mt-auto">
         <div>
-          <span className="text-xs text-text-dim block">Starting from</span>
-          <span className="text-2xl font-bold">₹{product.price.toLocaleString()}</span>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-2xl font-black">₹{product.price.toLocaleString()}</span>
+            {product.category === 'Kits' && (
+              <span className="text-[10px] text-secondary font-bold bg-secondary/10 px-2 py-0.5 rounded">SAVE ₹15,000</span>
+            )}
+          </div>
+          <span className="text-[10px] text-text-dim uppercase font-bold tracking-widest block">EMI starts @ ₹{Math.round(product.price/36).toLocaleString()}/mo</span>
         </div>
         <button 
           onClick={() => onAdd(product)}
-          className="bg-primary text-black p-3 rounded-xl hover:shadow-[0_0_20px_rgba(255,215,0,0.4)] transition-all transform active:scale-95"
+          className="bg-primary text-black p-4 rounded-2xl hover:shadow-[0_0_30px_rgba(255,215,0,0.4)] transition-all transform active:scale-90 shadow-xl shadow-primary/10"
           title="Add to Cart"
         >
-          <ShoppingCart size={22} />
+          <ShoppingCart size={24} strokeWidth={3} />
         </button>
       </div>
     </div>
