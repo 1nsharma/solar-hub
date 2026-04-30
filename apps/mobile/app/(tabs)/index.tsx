@@ -27,7 +27,7 @@ type Kit = {
 export default function HomeScreen() {
   const [featuredKits, setFeaturedKits] = useState<Kit[]>([]);
   const [orderStatus, setOrderStatus] = useState('idle'); // idle, ordered
-  const [demoRole, setDemoRole] = useState<'customer' | 'vendor' | 'technician'>(APP_VARIANT as any);
+  const [demoRole, setDemoRole] = useState<'customer' | 'vendor' | 'technician' | null>(IS_FIXED_VARIANT ? (APP_VARIANT as any) : null);
 
   useEffect(() => {
     fetch(apiUrl('/api/products'))
@@ -36,7 +36,6 @@ export default function HomeScreen() {
         setFeaturedKits(data.products.filter((p: Kit) => p.category === 'Kits'));
       })
       .catch(err => {
-        console.log('Using mock data for featured kits');
         setFeaturedKits([
           { id: 101, title: 'Premium On-Grid Kit 5kW', price: 285000, category: 'Kits', vendor: 'Tata Power', rating: 4.9, image_url: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d', description: '5kW on-grid kit' },
           { id: 102, title: 'Essential Hybrid Kit 3kW', price: 195000, category: 'Kits', vendor: 'Luminous', rating: 4.8, image_url: 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d', description: '3kW hybrid kit' }
@@ -44,13 +43,55 @@ export default function HomeScreen() {
       });
   }, []);
 
+  // ROLE SELECTION OVERLAY (For the Demo Launch)
+  if (!demoRole && !IS_FIXED_VARIANT) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', padding: 20 }]}>
+        <LinearGradient colors={['#000', '#1A1A1A']} style={StyleSheet.absoluteFill} />
+        <View style={{ alignItems: 'center', marginBottom: 50 }}>
+          <View style={[styles.logoCircle, { width: 80, height: 80, borderRadius: 40 }]}>
+             <IconSymbol name="sun.max.fill" size={40} color="#FFD700" />
+          </View>
+          <ThemedText type="title" style={{ fontSize: 40, marginTop: 20 }}>SolarHub</ThemedText>
+          <ThemedText style={{ opacity: 0.6 }}>Select Demo Persona</ThemedText>
+        </View>
+
+        <View style={{ gap: 16 }}>
+          <LauncherCard 
+            title="Customer App" 
+            desc="Marketplace, Calculator & Subsidy" 
+            icon="person.fill" 
+            color="#FFD700" 
+            onPress={() => setDemoRole('customer')} 
+          />
+          <LauncherCard 
+            title="Vendor App" 
+            desc="Orders, Inventory & Dispatch" 
+            icon="storefront.fill" 
+            color="#FFA500" 
+            onPress={() => setDemoRole('vendor')} 
+          />
+          <LauncherCard 
+            title="Technician App" 
+            desc="Field Jobs & Installation" 
+            icon="wrench.fill" 
+            color="#4CAF50" 
+            onPress={() => setDemoRole('technician')} 
+          />
+        </View>
+      </View>
+    );
+  }
+
   if (demoRole === 'vendor') {
-    return <VendorDashboard onBack={() => setDemoRole('customer')} />;
+    return <VendorDashboard onBack={() => setDemoRole(IS_FIXED_VARIANT ? 'vendor' : null)} />;
   }
 
   if (demoRole === 'technician') {
-    return <TechnicianDashboard onBack={() => setDemoRole('customer')} />;
+    return <TechnicianDashboard onBack={() => setDemoRole(IS_FIXED_VARIANT ? 'technician' : null)} />;
   }
+
+  // ... (rest of the customer view logic)
 
   if (orderStatus === 'ordered') {
     return (
@@ -111,10 +152,20 @@ export default function HomeScreen() {
         <View style={{...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(255, 215, 0, 0.05)'}} />
         <View style={styles.headerContent}>
           <View style={styles.logoRow}>
-            <View style={[styles.logoCircle, { shadowColor: '#FFD700', shadowOpacity: 0.5, shadowRadius: 10 }]}>
-              <IconSymbol name="sun.max.fill" size={28} color="#FFD700" />
+            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+              <View style={[styles.logoCircle, { shadowColor: '#FFD700', shadowOpacity: 0.5, shadowRadius: 10 }]}>
+                <IconSymbol name="sun.max.fill" size={28} color="#FFD700" />
+              </View>
+              <ThemedText type="title" style={[styles.logoText, { fontSize: 32, fontWeight: '900', letterSpacing: -1, marginLeft: 12 }]}>SolarHub</ThemedText>
             </View>
-            <ThemedText type="title" style={[styles.logoText, { fontSize: 32, fontWeight: '900', letterSpacing: -1 }]}>SolarHub</ThemedText>
+            {!IS_FIXED_VARIANT && (
+              <TouchableOpacity 
+                onPress={() => setDemoRole(null)}
+                style={{ backgroundColor: 'rgba(255,255,255,0.1)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 }}
+              >
+                <ThemedText style={{ fontSize: 10, fontWeight: 'bold', color: '#FFD700' }}>SWITCH ROLE</ThemedText>
+              </TouchableOpacity>
+            )}
           </View>
           <ThemedText style={[styles.heroSubtitle, { fontSize: 16, opacity: 0.8, marginTop: 8 }]}>
             India's Leading Solar Ecosystem.
@@ -210,6 +261,33 @@ function FlowItem({ icon, label, color }: { icon: string; label: string; color: 
       </View>
       <ThemedText style={styles.flowLabel}>{label}</ThemedText>
     </View>
+  );
+}
+
+function LauncherCard({ title, desc, icon, color, onPress }: { title: string; desc: string; icon: string; color: string; onPress: () => void }) {
+  return (
+    <TouchableOpacity 
+      onPress={onPress}
+      style={{
+        backgroundColor: '#1A1A1A',
+        borderRadius: 20,
+        padding: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.05)',
+      }}
+    >
+      <View style={{ backgroundColor: color + '20', padding: 16, borderRadius: 16 }}>
+        <IconSymbol name={icon as any} size={32} color={color} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <ThemedText style={{ fontSize: 18, fontWeight: 'bold' }}>{title}</ThemedText>
+        <ThemedText style={{ fontSize: 12, opacity: 0.6 }}>{desc}</ThemedText>
+      </View>
+      <IconSymbol name="chevron.right" size={20} color="#444" />
+    </TouchableOpacity>
   );
 }
 
