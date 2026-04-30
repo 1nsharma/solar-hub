@@ -1,14 +1,12 @@
-const baseConfig = require('./app.json');
-
 const variant = process.env.APP_VARIANT || 'customer';
 const isVendor = variant === 'vendor';
 const isTechnician = variant === 'technician';
 
-module.exports = () => {
-  let name = baseConfig.expo.name;
-  let slug = baseConfig.expo.slug;
-  let scheme = baseConfig.expo.scheme;
-  let packageId = baseConfig.expo.android.package;
+module.exports = ({ config }) => {
+  let name = config.name;
+  let slug = config.slug;
+  let scheme = config.scheme;
+  let packageId = config.android?.package || 'in.solarhub.app';
 
   if (isVendor) {
     name = 'SolarHub Vendor';
@@ -23,16 +21,16 @@ module.exports = () => {
   }
 
   return {
-    ...baseConfig.expo,
+    ...config,
     name,
     slug,
     scheme,
     android: {
-      ...baseConfig.expo.android,
+      ...config.android,
       package: packageId,
     },
     extra: {
-      ...baseConfig.expo.extra,
+      ...config.extra,
       appVariant: variant,
       defaultRole: variant,
       isDemoMode: !process.env.APP_VARIANT || process.env.APP_VARIANT === 'customer'
