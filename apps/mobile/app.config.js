@@ -34,7 +34,8 @@ module.exports = () => {
     extra: {
       ...baseConfig.expo.extra,
       appVariant: variant,
-      defaultRole: variant
+      defaultRole: variant,
+      isDemoMode: !process.env.APP_VARIANT || process.env.APP_VARIANT === 'customer'
     }
   };
 };

@@ -25,15 +25,36 @@ app.use(express.json());
 const USE_MOCK = process.env.USE_MOCK === 'true';
 
 const mockProducts = [
-  { id: 101, title: 'Premium On-Grid Kit 5kW', price: 285000, category: 'Kits', vendor: 'Tata Power', rating: 4.9, description: '10 Panels + 5kW Inverter + Structure + Net Metering. Perfect for large homes.', image_url: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&q=80&w=800' },
-  { id: 102, title: 'Essential Hybrid Kit 3kW', price: 195000, category: 'Kits', vendor: 'Luminous', rating: 4.8, description: '6 Panels + 3kW Inverter + 2 Batteries. Ideal for areas with power cuts.', image_url: 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d?auto=format&fit=crop&q=80&w=800' },
-  { id: 103, title: 'Micro Off-Grid Kit 1kW', price: 78000, category: 'Kits', vendor: 'Loom Solar', rating: 4.7, description: '2 Panels + 1kW Inverter + 1 Battery. Best for remote cabins or shops.', image_url: 'https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?auto=format&fit=crop&q=80&w=800' },
-  { id: 104, title: 'Industrial Grade 10kW Kit', price: 540000, category: 'Kits', vendor: 'Adani Solar', rating: 4.9, description: '20 High-Efficiency Panels + 10kW Inverter. Suitable for small factories and large offices.', image_url: 'https://images.unsplash.com/photo-1497440001374-f26997328c1b?auto=format&fit=crop&q=80&w=800' },
-  { id: 201, title: 'Monocrystalline Panel 550W', price: 18500, category: 'Panels', vendor: 'Waaree', rating: 4.8, description: 'High efficiency solar panel with 25 years warranty.', image_url: 'https://images.unsplash.com/photo-1497440001374-f26997328c1b?auto=format&fit=crop&q=80&w=800' },
-  { id: 202, title: 'Bifacial Solar Panel 540W', price: 21000, category: 'Panels', vendor: 'Vikram Solar', rating: 4.9, description: 'Double-sided power generation for maximum yield.', image_url: 'https://images.unsplash.com/photo-1548516173-3cabfa4607e9?auto=format&fit=crop&q=80&w=800' },
-  { id: 301, title: 'Smart Solar Inverter 5kVA', price: 52000, category: 'Inverters', vendor: 'Microtek', rating: 4.6, description: 'Pure sine wave inverter with MPPT charge controller.', image_url: 'https://images.unsplash.com/photo-1558444479-c84851218670?auto=format&fit=crop&q=80&w=800' },
-  { id: 302, title: 'Hybrid Inverter 3kVA', price: 38000, category: 'Inverters', vendor: 'Luminous', rating: 4.7, description: 'Supports both solar and grid charging with UPS mode.', image_url: 'https://images.unsplash.com/photo-1558444479-c84851218670?auto=format&fit=crop&q=80&w=800' },
-  { id: 401, title: 'Smart Water Heater', price: 12500, category: 'Eco-Home', vendor: 'Havells', rating: 4.5, description: 'Energy efficient water heater with mobile app control.', image_url: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&q=80&w=800' }
+  { 
+    id: 1, title: 'Titan 5kW Industrial Kit', price: 345000, category: 'Kits', vendor: 'Tata Power', rating: 4.9, 
+    image_url: 'https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?q=80&w=800', 
+    description: 'High-efficiency industrial grade solar kit with 25 years warranty.' 
+  },
+  { 
+    id: 2, title: 'Bifacial Double-Glass 550W', price: 18500, category: 'Panels', vendor: 'Waaree', rating: 4.8, 
+    image_url: 'https://images.unsplash.com/photo-1548337138-e87d889cc369?q=80&w=800', 
+    description: 'Captures sunlight from both sides, increasing yield by up to 25%.' 
+  },
+  { 
+    id: 3, title: 'Apex 10kW On-Grid System', price: 620000, category: 'Kits', vendor: 'Adani Solar', rating: 5.0, 
+    image_url: 'https://images.unsplash.com/photo-1611365892117-00ac5ef43759?q=80&w=800', 
+    description: 'Complete 10kW solution for large estates and commercial buildings.' 
+  },
+  { 
+    id: 4, title: 'Aura 3kW Smart Hybrid', price: 215000, category: 'Kits', vendor: 'Luminous', rating: 4.7, 
+    image_url: 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d?q=80&w=800', 
+    description: 'Intelligent hybrid system with lithium battery storage for 24/7 power.' 
+  },
+  { 
+    id: 5, title: 'Blue-Tech Mono Perc 400W', price: 12500, category: 'Panels', vendor: 'Vikram Solar', rating: 4.6, 
+    image_url: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?q=80&w=800', 
+    description: 'Next-gen mono perc technology for superior low-light performance.' 
+  },
+  { 
+    id: 6, title: 'Hybrid Inverter 3kVA', price: 38000, category: 'Inverters', vendor: 'Luminous', rating: 4.7, 
+    description: 'Supports both solar and grid charging with UPS mode.', 
+    image_url: 'https://images.unsplash.com/photo-1558444479-c84851218670?auto=format&fit=crop&q=80&w=800' 
+  }
 ];
 
 

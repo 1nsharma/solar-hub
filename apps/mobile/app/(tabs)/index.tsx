@@ -18,7 +18,7 @@ import Animated, {
 
 const { width } = Dimensions.get('window');
 const APP_VARIANT = Constants.expoConfig?.extra?.appVariant || 'customer';
-const IS_FIXED_VARIANT = !!Constants.expoConfig?.extra?.appVariant;
+const IS_DEMO_MODE = Constants.expoConfig?.extra?.isDemoMode;
 
 type Kit = {
   id: string | number;
@@ -34,7 +34,7 @@ type Kit = {
 export default function HomeScreen() {
   const [featuredKits, setFeaturedKits] = useState<Kit[]>([]);
   const [orderStatus, setOrderStatus] = useState('idle'); // idle, ordered
-  const [demoRole, setDemoRole] = useState<'customer' | 'vendor' | 'technician' | null>(IS_FIXED_VARIANT ? (APP_VARIANT as any) : null);
+  const [demoRole, setDemoRole] = useState<'customer' | 'vendor' | 'technician' | null>(IS_DEMO_MODE ? null : (APP_VARIANT as any));
 
   const pulse = useSharedValue(1);
 
@@ -69,52 +69,58 @@ export default function HomeScreen() {
   }, []);
 
   // ROLE SELECTION OVERLAY (For the Demo Launch)
-  if (!demoRole && !IS_FIXED_VARIANT) {
+  if (!demoRole) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', padding: 20 }]}>
-        <LinearGradient colors={['#000', '#1A1A1A']} style={StyleSheet.absoluteFill} />
-        <View style={{ alignItems: 'center', marginBottom: 50 }}>
-          <View style={[styles.logoCircle, { width: 80, height: 80, borderRadius: 40 }]}>
-             <IconSymbol name="sun.max.fill" size={40} color="#FFD700" />
+      <View style={[styles.container, { justifyContent: 'center', padding: 24 }]}>
+        <LinearGradient colors={['#050505', '#121212']} style={StyleSheet.absoluteFill} />
+        
+        <Animated.View style={{ alignItems: 'center', marginBottom: 48, opacity: 1 }}>
+          <View style={[styles.logoCircle, { width: 100, height: 100, borderRadius: 50, backgroundColor: 'rgba(255, 215, 0, 0.1)' }]}>
+             <IconSymbol name="sun.max.fill" size={50} color="#FFD700" />
           </View>
-          <ThemedText type="title" style={{ fontSize: 40, marginTop: 20 }}>SolarHub</ThemedText>
-          <ThemedText style={{ opacity: 0.6 }}>Select Demo Persona</ThemedText>
-        </View>
+          <ThemedText type="title" style={{ fontSize: 48, marginTop: 24, fontWeight: '900', color: '#fff' }}>SolarHub</ThemedText>
+          <ThemedText style={{ opacity: 0.5, letterSpacing: 2, fontSize: 12, marginTop: 8 }}>PREMIUM ECOSYSTEM</ThemedText>
+        </Animated.View>
 
-        <View style={{ gap: 16 }}>
+        <View style={{ gap: 20 }}>
           <LauncherCard 
-            title="Customer App" 
-            desc="Marketplace, Calculator & Subsidy" 
+            title="Customer" 
+            desc="Solar marketplace, calculators & govt. subsidy" 
             icon="person.fill" 
             color="#FFD700" 
             onPress={() => setDemoRole('customer')} 
           />
           <LauncherCard 
-            title="Vendor App" 
-            desc="Orders, Inventory & Dispatch" 
+            title="Vendor" 
+            desc="Orders, dispatch & inventory management" 
             icon="storefront.fill" 
             color="#FFA500" 
             onPress={() => setDemoRole('vendor')} 
           />
           <LauncherCard 
-            title="Technician App" 
-            desc="Field Jobs & Installation" 
+            title="Technician" 
+            desc="Field service, installation & maintenance" 
             icon="wrench.fill" 
             color="#4CAF50" 
             onPress={() => setDemoRole('technician')} 
           />
+        </View>
+
+        <View style={{ position: 'absolute', bottom: 40, alignSelf: 'center' }}>
+          <ThemedText style={{ opacity: 0.3, fontSize: 10 }}>V1.0.0 • MARKET DEMO</ThemedText>
         </View>
       </View>
     );
   }
 
   if (demoRole === 'vendor') {
-    return <VendorDashboard onBack={() => setDemoRole(IS_FIXED_VARIANT ? 'vendor' : null)} />;
+    return <VendorDashboard onBack={() => setDemoRole(IS_DEMO_MODE ? null : 'vendor')} />;
   }
 
   if (demoRole === 'technician') {
-    return <TechnicianDashboard onBack={() => setDemoRole(IS_FIXED_VARIANT ? 'technician' : null)} />;
+    return <TechnicianDashboard onBack={() => setDemoRole(IS_DEMO_MODE ? null : 'technician')} />;
   }
+
 
   // ... (rest of the customer view logic)
 
@@ -178,28 +184,29 @@ export default function HomeScreen() {
         <View style={styles.headerContent}>
           <View style={styles.logoRow}>
             <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-              <View style={[styles.logoCircle, { shadowColor: '#FFD700', shadowOpacity: 0.5, shadowRadius: 10 }]}>
+              <View style={[styles.logoCircle, { shadowColor: '#FFD700', shadowOpacity: 0.8, shadowRadius: 15 }]}>
                 <IconSymbol name="sun.max.fill" size={28} color="#FFD700" />
               </View>
-              <ThemedText type="title" style={[styles.logoText, { fontSize: 32, fontWeight: '900', letterSpacing: -1, marginLeft: 12 }]}>SolarHub</ThemedText>
+              <View style={{ marginLeft: 16 }}>
+                <ThemedText type="title" style={[styles.logoText, { fontSize: 32, fontWeight: '900', letterSpacing: -1.5 }]}>SolarHub</ThemedText>
+                <ThemedText style={{ color: '#FFD700', fontSize: 10, fontWeight: '900', letterSpacing: 2 }}>PREMIUM EDITION</ThemedText>
+              </View>
             </View>
-            {!IS_FIXED_VARIANT && (
-              <TouchableOpacity 
-                onPress={() => setDemoRole(null)}
-                style={{ backgroundColor: 'rgba(255,255,255,0.1)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 }}
-              >
-                <ThemedText style={{ fontSize: 10, fontWeight: 'bold', color: '#FFD700' }}>SWITCH ROLE</ThemedText>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity 
+              onPress={() => setDemoRole(null)}
+              style={{ backgroundColor: 'rgba(255,255,255,0.08)', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' }}
+            >
+              <ThemedText style={{ fontSize: 10, fontWeight: '900', color: '#FFD700' }}>EXIT DEMO</ThemedText>
+            </TouchableOpacity>
           </View>
-          <ThemedText style={[styles.heroSubtitle, { fontSize: 16, opacity: 0.8, marginTop: 8 }]}>
-            India's Leading Solar Ecosystem.
+          <ThemedText style={[styles.heroSubtitle, { fontSize: 16, opacity: 0.6, marginTop: 12, lineHeight: 24 }]}>
+            Experience the future of renewable energy with India's most advanced solar ecosystem.
           </ThemedText>
         </View>
       </View>
 
       {/* Demo Role Switcher (Visible for Market Showcase) */}
-      {!IS_FIXED_VARIANT && (
+      {IS_DEMO_MODE && (
         <View style={styles.roleSwitcher}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
             <Animated.View style={[
@@ -211,10 +218,11 @@ export default function HomeScreen() {
           <View style={styles.roleRow}>
             <RoleTab active={demoRole === 'customer'} label="Customer" icon="person.fill" onPress={() => setDemoRole('customer')} />
             <RoleTab active={demoRole === 'vendor'} label="Vendor" icon="storefront.fill" onPress={() => setDemoRole('vendor')} />
-            <RoleTab active={demoRole === 'technician'} label="Maintenance" icon="wrench.fill" onPress={() => setDemoRole('technician')} />
+            <RoleTab active={demoRole === 'technician'} label="Service" icon="wrench.fill" onPress={() => setDemoRole('technician')} />
           </View>
         </View>
       )}
+
 
       {/* Calculator Section */}
       <View style={styles.calculatorWrapper}>
@@ -236,31 +244,32 @@ export default function HomeScreen() {
       {/* Govt Schemes Section (New) */}
       <ThemedView style={[styles.section, { paddingTop: 0 }]}>
         <LinearGradient 
-          colors={['#1A237E', '#0D47A1']} 
-          style={{ borderRadius: 24, padding: 20, borderLeftWidth: 4, borderLeftColor: '#FFD700' }}
+          colors={['#050505', '#1A1A1A']} 
+          style={{ borderRadius: 32, padding: 24, borderWidth: 1, borderColor: 'rgba(255,215,0,0.1)' }}
         >
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <View>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                <ThemedText style={{ color: '#fff', fontSize: 18, fontWeight: '900' }}>Govt. Schemes & Subsidy</ThemedText>
-                <View style={{ backgroundColor: '#FF5252', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
-                  <ThemedText style={{ color: '#fff', fontSize: 8, fontWeight: 'bold' }}>LIVE</ThemedText>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <ThemedText style={{ color: '#fff', fontSize: 20, fontWeight: '900' }}>Govt. Subsidy</ThemedText>
+                <View style={{ backgroundColor: '#FF5252', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
+                  <ThemedText style={{ color: '#fff', fontSize: 9, fontWeight: '900' }}>LIVE</ThemedText>
                 </View>
               </View>
-              <ThemedText style={{ color: '#fff', opacity: 0.7, fontSize: 12 }}>Get up to ₹78,000 Subsidy</ThemedText>
+              <ThemedText style={{ color: '#FFD700', fontSize: 12, fontWeight: 'bold' }}>PM SURYA GHAR YOJANA</ThemedText>
             </View>
-            <View style={{ backgroundColor: 'rgba(255,215,0,0.2)', padding: 8, borderRadius: 12 }}>
-              <IconSymbol name="sun.max.fill" size={24} color="#FFD700" />
+            <View style={{ backgroundColor: 'rgba(255,215,0,0.1)', padding: 12, borderRadius: 16 }}>
+              <IconSymbol name="checkmark.seal.fill" size={24} color="#FFD700" />
             </View>
           </View>
-          <ThemedText style={{ color: '#fff', fontSize: 13, marginBottom: 16, lineHeight: 18 }}>
-            PM Surya Ghar: Muft Bijli Yojana is now live! Apply today and get instant approval help from our certified agents.
+          <ThemedText style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, marginBottom: 20, lineHeight: 20 }}>
+            Get up to ₹78,000 direct subsidy in your bank account. Our certified agents handle the paperwork for you.
           </ThemedText>
-          <TouchableOpacity style={{ backgroundColor: '#FFD700', borderRadius: 12, paddingVertical: 12, alignItems: 'center' }}>
-            <ThemedText style={{ color: '#000', fontWeight: 'bold' }}>Talk to Subsidy Agent</ThemedText>
+          <TouchableOpacity style={{ backgroundColor: '#FFD700', borderRadius: 16, paddingVertical: 14, alignItems: 'center', shadowColor: '#FFD700', shadowOpacity: 0.3, shadowRadius: 10 }}>
+            <ThemedText style={{ color: '#000', fontWeight: '900' }}>Check Eligibility</ThemedText>
           </TouchableOpacity>
         </LinearGradient>
       </ThemedView>
+
 
       {/* Featured Kits */}
       <View style={styles.section}>
@@ -356,8 +365,8 @@ function RoleTab({ active, label, icon, onPress }: { active: boolean; label: str
 // Full Operational Vendor Dashboard
 function VendorDashboard({ onBack }: { onBack: () => void }) {
   const [orders, setOrders] = useState([
-    { id: '101', customer: 'Amit Sharma', items: '5kW Tata Solar Kit', status: 'pending', price: '₹2,85,000' },
-    { id: '102', customer: 'Rahul Verma', items: '3kW Luminous Hybrid', status: 'accepted', price: '₹1,95,000' }
+    { id: '101', customer: 'Amit Sharma', items: '5kW Tata Solar Kit', status: 'pending', price: '₹2,85,000', location: 'Kanpur', date: 'Today' },
+    { id: '102', customer: 'Rahul Verma', items: '3kW Luminous Hybrid', status: 'accepted', price: '₹1,95,000', location: 'Lucknow', date: 'Yesterday' }
   ]);
 
   const handleAccept = (id: string) => {
@@ -366,80 +375,125 @@ function VendorDashboard({ onBack }: { onBack: () => void }) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-       <LinearGradient colors={['#FFD700', '#FFA500']} style={{ height: 220, padding: 20, justifyContent: 'flex-end', borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+       <LinearGradient 
+         colors={['#121212', '#0A0A0A']} 
+         style={{ height: 260, padding: 24, justifyContent: 'flex-end' }}
+       >
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
             <View>
-              <ThemedText type="title" style={{ color: '#000', fontSize: 32 }}>Vendor Hub</ThemedText>
-              <ThemedText style={{ color: '#000', opacity: 0.7, fontWeight: 'bold' }}>TATA POWER AUTHORIZED</ThemedText>
+              <ThemedText style={{ color: '#FFD700', fontSize: 12, fontWeight: '900', letterSpacing: 2 }}>VENDOR HUB</ThemedText>
+              <ThemedText type="title" style={{ color: '#fff', fontSize: 36, fontWeight: '900', marginTop: 4 }}>Tata Power</ThemedText>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#4CAF50' }} />
+                <ThemedText style={{ color: '#4CAF50', fontSize: 12, fontWeight: 'bold' }}>Active Storefront</ThemedText>
+              </View>
             </View>
-            <View style={{ backgroundColor: 'rgba(0,0,0,0.1)', padding: 12, borderRadius: 20 }}>
-              <IconSymbol name="storefront.fill" size={32} color="#000" />
-            </View>
+            <TouchableOpacity onPress={onBack} style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: 12, borderRadius: 16 }}>
+              <IconSymbol name="xmark" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+          
+          <View style={{ flexDirection: 'row', gap: 12 }}>
+            <QuickStat label="Revenue" value="₹12.4L" sub="+14% this week" color="#FFD700" />
+            <QuickStat label="Orders" value="48" sub="12 pending" color="#FFA500" />
           </View>
        </LinearGradient>
 
-       <View style={[styles.section, { marginTop: -30 }]}>
-          <View style={{ flexDirection: 'row', gap: 12, marginBottom: 20 }}>
-            <View style={[styles.glassPlaceholder, { flex: 1, padding: 16 }]}>
-              <ThemedText style={{ fontSize: 24, fontWeight: '900', color: '#FFD700' }}>₹8.4L</ThemedText>
-              <ThemedText style={{ fontSize: 10, color: '#888' }}>TOTAL SALES</ThemedText>
-            </View>
-            <View style={[styles.glassPlaceholder, { flex: 1, padding: 16 }]}>
-              <ThemedText style={{ fontSize: 24, fontWeight: '900', color: '#4CAF50' }}>12</ThemedText>
-              <ThemedText style={{ fontSize: 10, color: '#888' }}>ACTIVE ORDERS</ThemedText>
-            </View>
+       <View style={[styles.section, { marginTop: 0 }]}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <ThemedText type="subtitle">Active Inquiries</ThemedText>
+            <TouchableOpacity>
+              <ThemedText style={{ color: '#FFD700', fontSize: 12, fontWeight: 'bold' }}>VIEW HISTORY</ThemedText>
+            </TouchableOpacity>
           </View>
 
-          <ThemedText type="subtitle" style={{ marginBottom: 16 }}>New Inquiries</ThemedText>
-          {orders.filter(o => o.status === 'pending').map(order => (
-            <View key={order.id} style={[styles.glassPlaceholder, { marginBottom: 12, alignItems: 'stretch' }]}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
-                <View>
-                  <ThemedText style={{ fontWeight: 'bold' }}>{order.customer}</ThemedText>
-                  <ThemedText style={{ fontSize: 12, color: '#888' }}>{order.items}</ThemedText>
+          {orders.map(order => (
+            <View key={order.id} style={styles.vendorOrderCard}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 }}>
+                <View style={{ flexDirection: 'row', gap: 12 }}>
+                  <View style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: 'rgba(255,215,0,0.1)', alignItems: 'center', justifyContent: 'center' }}>
+                    <ThemedText style={{ color: '#FFD700', fontWeight: 'bold' }}>{order.customer[0]}</ThemedText>
+                  </View>
+                  <View>
+                    <ThemedText style={{ fontWeight: 'bold', fontSize: 16 }}>{order.customer}</ThemedText>
+                    <ThemedText style={{ fontSize: 12, opacity: 0.5 }}>{order.location} • {order.date}</ThemedText>
+                  </View>
                 </View>
-                <ThemedText style={{ color: '#FFD700', fontWeight: 'bold' }}>{order.price}</ThemedText>
+                <ThemedText style={{ color: '#FFD700', fontWeight: '900' }}>{order.price}</ThemedText>
               </View>
-              <View style={{ flexDirection: 'row', gap: 10 }}>
-                <TouchableOpacity 
-                  onPress={() => handleAccept(order.id)}
-                  style={{ flex: 1, backgroundColor: '#FFD700', padding: 12, borderRadius: 12, alignItems: 'center' }}
-                >
-                  <ThemedText style={{ color: '#000', fontWeight: 'bold', fontSize: 12 }}>Accept Order</ThemedText>
-                </TouchableOpacity>
-                <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.05)', padding: 12, borderRadius: 12, alignItems: 'center' }}>
-                  <ThemedText style={{ color: '#888', fontWeight: 'bold', fontSize: 12 }}>Decline</ThemedText>
-                </TouchableOpacity>
+              
+              <View style={{ backgroundColor: 'rgba(255,255,255,0.03)', padding: 12, borderRadius: 12, marginBottom: 16 }}>
+                <ThemedText style={{ fontSize: 13, opacity: 0.8 }}>{order.items}</ThemedText>
               </View>
+
+              {order.status === 'pending' ? (
+                <View style={{ flexDirection: 'row', gap: 10 }}>
+                  <TouchableOpacity 
+                    onPress={() => handleAccept(order.id)}
+                    style={{ flex: 2, backgroundColor: '#FFD700', padding: 14, borderRadius: 14, alignItems: 'center' }}
+                  >
+                    <ThemedText style={{ color: '#000', fontWeight: '900' }}>Accept Order</ThemedText>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.05)', padding: 14, borderRadius: 14, alignItems: 'center' }}>
+                    <ThemedText style={{ color: '#FF5252', fontWeight: 'bold' }}>Reject</ThemedText>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <IconSymbol name="checkmark.circle.fill" size={18} color="#4CAF50" />
+                    <ThemedText style={{ color: '#4CAF50', fontWeight: 'bold', fontSize: 14 }}>Accepted</ThemedText>
+                  </View>
+                  <TouchableOpacity style={{ backgroundColor: 'rgba(76,175,80,0.1)', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 }}>
+                    <ThemedText style={{ color: '#4CAF50', fontSize: 12, fontWeight: 'bold' }}>DISPATCH KIT</ThemedText>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           ))}
 
-          <ThemedText type="subtitle" style={{ marginTop: 20, marginBottom: 16 }}>Delivery Status</ThemedText>
-          <View style={styles.glassPlaceholder}>
-            <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
-              <View style={{ backgroundColor: 'rgba(76,175,80,0.1)', padding: 10, borderRadius: 12 }}>
-                <IconSymbol name="checkmark.circle.fill" size={20} color="#4CAF50" />
-              </View>
-              <View>
-                <ThemedText style={{ fontWeight: 'bold' }}>Kit Dispatched</ThemedText>
-                <ThemedText style={{ fontSize: 12, color: '#888' }}>Technician: Sumit Kumar picked up.</ThemedText>
-              </View>
-            </View>
+          <ThemedText type="subtitle" style={{ marginTop: 24, marginBottom: 16 }}>Inventory Health</ThemedText>
+          <View style={styles.inventoryCard}>
+             <InventoryItem label="5kW Inverters" count={8} total={10} color="#FFD700" />
+             <InventoryItem label="330W Mono Panels" count={142} total={200} color="#4CAF50" />
+             <InventoryItem label="Structure Sets" count={2} total={15} color="#FF5252" />
           </View>
-
-          <TouchableOpacity style={[styles.button, { marginTop: 40, backgroundColor: '#333' }]} onPress={onBack}>
-            <ThemedText style={[styles.buttonText, { color: '#FFD700' }]}>Exit Vendor Mode</ThemedText>
-          </TouchableOpacity>
        </View>
+       <View style={{ height: 100 }} />
     </ScrollView>
+  );
+}
+
+function QuickStat({ label, value, sub, color }: { label: string; value: string; sub: string; color: string }) {
+  return (
+    <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.03)', padding: 16, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' }}>
+      <ThemedText style={{ fontSize: 12, opacity: 0.5, marginBottom: 4 }}>{label}</ThemedText>
+      <ThemedText style={{ fontSize: 24, fontWeight: '900', color }}>{value}</ThemedText>
+      <ThemedText style={{ fontSize: 10, color, opacity: 0.8, marginTop: 2 }}>{sub}</ThemedText>
+    </View>
+  );
+}
+
+function InventoryItem({ label, count, total, color }: { label: string; count: number; total: number; color: string }) {
+  const percent = (count / total) * 100;
+  return (
+    <View style={{ marginBottom: 16 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
+        <ThemedText style={{ fontSize: 13, opacity: 0.8 }}>{label}</ThemedText>
+        <ThemedText style={{ fontSize: 13, fontWeight: 'bold' }}>{count}/{total}</ThemedText>
+      </View>
+      <View style={{ height: 4, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        <View style={{ width: `${percent}%`, height: 4, backgroundColor: color, borderRadius: 2 }} />
+      </View>
+    </View>
   );
 }
 
 // Full Operational Technician Dashboard
 function TechnicianDashboard({ onBack }: { onBack: () => void }) {
   const [tasks, setTasks] = useState([
-    { id: 'T1', type: 'Pickup', location: 'Tata Power Warehouse', status: 'pending', customer: 'Amit Sharma' },
-    { id: 'T2', type: 'Install', location: 'Civil Lines, Kanpur', status: 'upcoming', customer: 'Rahul Verma' }
+    { id: 'T1', type: 'Site Survey', customer: 'Amit Sharma', address: '12/A, Civil Lines, Kanpur', status: 'pending', priority: 'High' },
+    { id: 'T2', type: 'Installation', customer: 'Rahul Verma', address: 'Indira Nagar, Sector 14', status: 'upcoming', priority: 'Medium' }
   ]);
 
   const handleComplete = (id: string) => {
@@ -448,64 +502,86 @@ function TechnicianDashboard({ onBack }: { onBack: () => void }) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-       <LinearGradient colors={['#4CAF50', '#2E7D32']} style={{ height: 220, padding: 20, justifyContent: 'flex-end', borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+       <LinearGradient 
+         colors={['#0D47A1', '#1A237E']} 
+         style={{ height: 260, padding: 24, justifyContent: 'flex-end' }}
+       >
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
             <View>
-              <ThemedText type="title" style={{ color: '#fff', fontSize: 32 }}>Field Ops</ThemedText>
-              <ThemedText style={{ color: '#fff', opacity: 0.7, fontWeight: 'bold' }}>CERTIFIED INSTALLER</ThemedText>
+              <ThemedText style={{ color: '#64B5F6', fontSize: 12, fontWeight: '900', letterSpacing: 2 }}>FIELD SERVICE</ThemedText>
+              <ThemedText type="title" style={{ color: '#fff', fontSize: 36, fontWeight: '900', marginTop: 4 }}>Installer Pro</ThemedText>
+              <ThemedText style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, marginTop: 4 }}>Welcome back, Sumit</ThemedText>
             </View>
-            <View style={{ backgroundColor: 'rgba(255,255,255,0.1)', padding: 12, borderRadius: 20 }}>
-              <IconSymbol name="wrench.fill" size={32} color="#fff" />
+            <TouchableOpacity onPress={onBack} style={{ backgroundColor: 'rgba(255,255,255,0.1)', padding: 12, borderRadius: 16 }}>
+              <IconSymbol name="xmark" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+          
+          <View style={{ backgroundColor: '#FFD700', borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.1)', alignItems: 'center', justifyContent: 'center' }}>
+              <IconSymbol name="clock.fill" size={20} color="#000" />
+            </View>
+            <View>
+              <ThemedText style={{ color: '#000', fontWeight: 'bold' }}>Next: {tasks[0].type}</ThemedText>
+              <ThemedText style={{ color: '#000', opacity: 0.6, fontSize: 12 }}>Arrive by 10:30 AM (In 45 mins)</ThemedText>
             </View>
           </View>
        </LinearGradient>
 
-       <View style={[styles.section, { marginTop: -30 }]}>
-          <View style={{ backgroundColor: '#1A1A1A', borderRadius: 24, padding: 20, marginBottom: 24, borderLeftWidth: 4, borderLeftColor: '#4CAF50' }}>
-            <ThemedText style={{ color: '#4CAF50', fontSize: 10, fontWeight: '900', marginBottom: 4 }}>CURRENT STATUS</ThemedText>
-            <ThemedText style={{ fontSize: 18, fontWeight: 'bold' }}>On Duty - Kanpur Sector 1</ThemedText>
+       <View style={styles.section}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <ThemedText type="subtitle">Today's Jobs</ThemedText>
+            <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
+              <ThemedText style={{ fontSize: 10, color: '#64B5F6', fontWeight: 'bold' }}>2 JOBS LEFT</ThemedText>
+            </View>
           </View>
 
-          <ThemedText type="subtitle" style={{ marginBottom: 16 }}>Today's Schedule</ThemedText>
           {tasks.map(task => (
-            <View key={task.id} style={[styles.glassPlaceholder, { marginBottom: 16, alignItems: 'stretch' }]}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
-                <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
-                  <View style={{ backgroundColor: task.status === 'completed' ? '#4CAF5020' : '#FF980020', padding: 8, borderRadius: 10 }}>
-                    <IconSymbol name={task.type === 'Pickup' ? 'cart.fill' : 'wrench.fill'} size={20} color={task.status === 'completed' ? '#4CAF50' : '#FF9800'} />
-                  </View>
-                  <View>
-                    <ThemedText style={{ fontWeight: 'bold' }}>{task.type}: {task.customer}</ThemedText>
-                    <ThemedText style={{ fontSize: 12, color: '#888' }}>{task.location}</ThemedText>
-                  </View>
+            <View key={task.id} style={styles.techJobCard}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 }}>
+                <View style={{ backgroundColor: task.priority === 'High' ? '#FF525220' : '#4CAF5020', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 }}>
+                  <ThemedText style={{ color: task.priority === 'High' ? '#FF5252' : '#4CAF50', fontSize: 10, fontWeight: 'bold' }}>{task.priority} Priority</ThemedText>
                 </View>
-                {task.status === 'completed' && <IconSymbol name="checkmark.circle.fill" size={20} color="#4CAF50" />}
+                <ThemedText style={{ fontSize: 12, opacity: 0.5 }}>#{task.id}</ThemedText>
               </View>
 
-              {task.status !== 'completed' && (
-                <TouchableOpacity 
-                  onPress={() => handleComplete(task.id)}
-                  style={{ backgroundColor: '#4CAF50', padding: 14, borderRadius: 12, alignItems: 'center', marginTop: 8 }}
-                >
-                  <ThemedText style={{ color: '#fff', fontWeight: 'bold' }}>
-                    {task.type === 'Pickup' ? 'Confirm Pickup' : 'Complete Installation'}
-                  </ThemedText>
-                </TouchableOpacity>
+              <View style={{ flexDirection: 'row', gap: 16, marginBottom: 20 }}>
+                <View style={{ width: 56, height: 56, borderRadius: 16, backgroundColor: '#121212', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' }}>
+                  <IconSymbol name={task.type === 'Installation' ? 'wrench.fill' : 'doc.text.fill'} size={24} color="#64B5F6" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <ThemedText style={{ fontSize: 18, fontWeight: 'bold' }}>{task.type}</ThemedText>
+                  <ThemedText style={{ fontSize: 14, opacity: 0.7, marginTop: 2 }}>{task.customer}</ThemedText>
+                  <ThemedText style={{ fontSize: 12, opacity: 0.5, marginTop: 4 }}>{task.address}</ThemedText>
+                </View>
+              </View>
+
+              {task.status !== 'completed' ? (
+                <View style={{ flexDirection: 'row', gap: 10 }}>
+                  <TouchableOpacity 
+                    onPress={() => handleComplete(task.id)}
+                    style={{ flex: 2, backgroundColor: '#64B5F6', padding: 14, borderRadius: 14, alignItems: 'center' }}
+                  >
+                    <ThemedText style={{ color: '#fff', fontWeight: 'bold' }}>Start Job</ThemedText>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.05)', padding: 14, borderRadius: 14, alignItems: 'center' }}>
+                    <IconSymbol name="location.fill" size={18} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(76,175,80,0.1)', padding: 12, borderRadius: 12 }}>
+                  <IconSymbol name="checkmark.circle.fill" size={20} color="#4CAF50" />
+                  <ThemedText style={{ color: '#4CAF50', fontWeight: 'bold' }}>Job Completed</ThemedText>
+                </View>
               )}
             </View>
           ))}
-
-          <View style={[styles.glassPlaceholder, { marginTop: 10, borderStyle: 'dashed' }]}>
-            <ThemedText style={{ color: '#888', fontSize: 12 }}>+ Job Confirmation requires Site Photos</ThemedText>
-          </View>
-
-          <TouchableOpacity style={[styles.button, { marginTop: 40, backgroundColor: '#333' }]} onPress={onBack}>
-            <ThemedText style={[styles.buttonText, { color: '#4CAF50' }]}>Exit Field Mode</ThemedText>
-          </TouchableOpacity>
        </View>
+       <View style={{ height: 100 }} />
     </ScrollView>
   );
 }
+
 
 function TimelineItem({
   status,
@@ -707,5 +783,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.05)',
+  },
+  vendorOrderCard: {
+    backgroundColor: '#121212',
+    borderRadius: 24,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+  },
+  inventoryCard: {
+    backgroundColor: 'rgba(255,255,255,0.02)',
+    borderRadius: 24,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.03)',
+  },
+  techJobCard: {
+    backgroundColor: '#121212',
+    borderRadius: 24,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
   }
 });
+
