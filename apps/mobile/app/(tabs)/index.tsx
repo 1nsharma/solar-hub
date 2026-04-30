@@ -8,6 +8,13 @@ import { ProductCard } from '@/components/solar/product-card';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { apiUrl } from '@/constants/api';
 import Constants from 'expo-constants';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withRepeat, 
+  withTiming, 
+  withSequence 
+} from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
 const APP_VARIANT = Constants.expoConfig?.extra?.appVariant || 'customer';
@@ -28,6 +35,24 @@ export default function HomeScreen() {
   const [featuredKits, setFeaturedKits] = useState<Kit[]>([]);
   const [orderStatus, setOrderStatus] = useState('idle'); // idle, ordered
   const [demoRole, setDemoRole] = useState<'customer' | 'vendor' | 'technician' | null>(IS_FIXED_VARIANT ? (APP_VARIANT as any) : null);
+
+  const pulse = useSharedValue(1);
+
+  useEffect(() => {
+    pulse.value = withRepeat(
+      withSequence(
+        withTiming(1.1, { duration: 1000 }),
+        withTiming(1, { duration: 1000 })
+      ),
+      -1,
+      true
+    );
+  }, []);
+
+  const animatedPulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulse.value }],
+    opacity: pulse.value * 0.8,
+  }));
 
   useEffect(() => {
     fetch(apiUrl('/api/products'))
@@ -176,7 +201,13 @@ export default function HomeScreen() {
       {/* Demo Role Switcher (Visible for Market Showcase) */}
       {!IS_FIXED_VARIANT && (
         <View style={styles.roleSwitcher}>
-          <ThemedText style={styles.roleTitle}>MARKET DEMO MODE</ThemedText>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
+            <Animated.View style={[
+              { width: 8, height: 8, borderRadius: 4, backgroundColor: '#FFD700' },
+              animatedPulseStyle
+            ]} />
+            <ThemedText style={[styles.roleTitle, { marginBottom: 0 }]}>MARKET DEMO MODE</ThemedText>
+          </View>
           <View style={styles.roleRow}>
             <RoleTab active={demoRole === 'customer'} label="Customer" icon="person.fill" onPress={() => setDemoRole('customer')} />
             <RoleTab active={demoRole === 'vendor'} label="Vendor" icon="storefront.fill" onPress={() => setDemoRole('vendor')} />
@@ -210,7 +241,12 @@ export default function HomeScreen() {
         >
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <View>
-              <ThemedText style={{ color: '#fff', fontSize: 18, fontWeight: '900' }}>Govt. Schemes & Subsidy</ThemedText>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                <ThemedText style={{ color: '#fff', fontSize: 18, fontWeight: '900' }}>Govt. Schemes & Subsidy</ThemedText>
+                <View style={{ backgroundColor: '#FF5252', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                  <ThemedText style={{ color: '#fff', fontSize: 8, fontWeight: 'bold' }}>LIVE</ThemedText>
+                </View>
+              </View>
               <ThemedText style={{ color: '#fff', opacity: 0.7, fontSize: 12 }}>Get up to ₹78,000 Subsidy</ThemedText>
             </View>
             <View style={{ backgroundColor: 'rgba(255,215,0,0.2)', padding: 8, borderRadius: 12 }}>
@@ -268,28 +304,42 @@ function LauncherCard({ title, desc, icon, color, onPress }: { title: string; de
   return (
     <TouchableOpacity 
       onPress={onPress}
-      style={{
-        backgroundColor: '#1A1A1A',
-        borderRadius: 20,
-        padding: 20,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 20,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.05)',
-      }}
+      activeOpacity={0.8}
     >
-      <View style={{ backgroundColor: color + '20', padding: 16, borderRadius: 16 }}>
-        <IconSymbol name={icon as any} size={32} color={color} />
-      </View>
-      <View style={{ flex: 1 }}>
-        <ThemedText style={{ fontSize: 18, fontWeight: 'bold' }}>{title}</ThemedText>
-        <ThemedText style={{ fontSize: 12, opacity: 0.6 }}>{desc}</ThemedText>
-      </View>
-      <IconSymbol name="chevron.right" size={20} color="#444" />
+      <LinearGradient
+        colors={['#1A1A1A', '#0D0D0D']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{
+          borderRadius: 24,
+          padding: 20,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 20,
+          borderWidth: 1,
+          borderColor: 'rgba(255,255,255,0.08)',
+          shadowColor: color,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.1,
+          shadowRadius: 12,
+          elevation: 5,
+        }}
+      >
+        <View style={{ backgroundColor: color + '15', padding: 18, borderRadius: 20 }}>
+          <IconSymbol name={icon as any} size={36} color={color} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <ThemedText style={{ fontSize: 20, fontWeight: '900', color: '#fff' }}>{title}</ThemedText>
+          <ThemedText style={{ fontSize: 13, opacity: 0.5, marginTop: 2 }}>{desc}</ThemedText>
+        </View>
+        <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: 8, borderRadius: 12 }}>
+          <IconSymbol name="chevron.right" size={18} color="#666" />
+        </View>
+      </LinearGradient>
     </TouchableOpacity>
   );
 }
+
 
 function RoleTab({ active, label, icon, onPress }: { active: boolean; label: string; icon: string; onPress: () => void }) {
   return (

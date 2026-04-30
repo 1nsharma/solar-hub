@@ -16,7 +16,7 @@ const auditService = require('./services/audit');
 
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 app.use(cors());
 app.use(express.json());
@@ -28,10 +28,14 @@ const mockProducts = [
   { id: 101, title: 'Premium On-Grid Kit 5kW', price: 285000, category: 'Kits', vendor: 'Tata Power', rating: 4.9, description: '10 Panels + 5kW Inverter + Structure + Net Metering. Perfect for large homes.', image_url: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&q=80&w=800' },
   { id: 102, title: 'Essential Hybrid Kit 3kW', price: 195000, category: 'Kits', vendor: 'Luminous', rating: 4.8, description: '6 Panels + 3kW Inverter + 2 Batteries. Ideal for areas with power cuts.', image_url: 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d?auto=format&fit=crop&q=80&w=800' },
   { id: 103, title: 'Micro Off-Grid Kit 1kW', price: 78000, category: 'Kits', vendor: 'Loom Solar', rating: 4.7, description: '2 Panels + 1kW Inverter + 1 Battery. Best for remote cabins or shops.', image_url: 'https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?auto=format&fit=crop&q=80&w=800' },
+  { id: 104, title: 'Industrial Grade 10kW Kit', price: 540000, category: 'Kits', vendor: 'Adani Solar', rating: 4.9, description: '20 High-Efficiency Panels + 10kW Inverter. Suitable for small factories and large offices.', image_url: 'https://images.unsplash.com/photo-1497440001374-f26997328c1b?auto=format&fit=crop&q=80&w=800' },
   { id: 201, title: 'Monocrystalline Panel 550W', price: 18500, category: 'Panels', vendor: 'Waaree', rating: 4.8, description: 'High efficiency solar panel with 25 years warranty.', image_url: 'https://images.unsplash.com/photo-1497440001374-f26997328c1b?auto=format&fit=crop&q=80&w=800' },
+  { id: 202, title: 'Bifacial Solar Panel 540W', price: 21000, category: 'Panels', vendor: 'Vikram Solar', rating: 4.9, description: 'Double-sided power generation for maximum yield.', image_url: 'https://images.unsplash.com/photo-1548516173-3cabfa4607e9?auto=format&fit=crop&q=80&w=800' },
   { id: 301, title: 'Smart Solar Inverter 5kVA', price: 52000, category: 'Inverters', vendor: 'Microtek', rating: 4.6, description: 'Pure sine wave inverter with MPPT charge controller.', image_url: 'https://images.unsplash.com/photo-1558444479-c84851218670?auto=format&fit=crop&q=80&w=800' },
+  { id: 302, title: 'Hybrid Inverter 3kVA', price: 38000, category: 'Inverters', vendor: 'Luminous', rating: 4.7, description: 'Supports both solar and grid charging with UPS mode.', image_url: 'https://images.unsplash.com/photo-1558444479-c84851218670?auto=format&fit=crop&q=80&w=800' },
   { id: 401, title: 'Smart Water Heater', price: 12500, category: 'Eco-Home', vendor: 'Havells', rating: 4.5, description: 'Energy efficient water heater with mobile app control.', image_url: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&q=80&w=800' }
 ];
+
 
 const mockServices = [
   { id: 501, title: 'AMC: Basic Protection', price: 2999, icon_name: 'ShieldCheck', duration: '1 Year', description: '4 cleaning visits + 2 electrical safety audits per year.' },
@@ -721,6 +725,11 @@ app.get('/api/dev/seed', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`SolarHub API running on port ${PORT}`);
 });
+
+// Keep-alive for dev environment
+if (process.env.NODE_ENV !== 'production') {
+  setInterval(() => {}, 1000 * 60 * 60);
+}

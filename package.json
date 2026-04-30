@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "dev": "npm run dev -ws",
+    "start": "concurrently -n \"BACKEND,WEB,MOBILE\" -c \"bgBlue,bgGreen,bgYellow\" --kill-others \"npm run dev:backend\" \"wait-on http://localhost:5001/api/health && npm run dev:web\" \"wait-on http://localhost:5001/api/health && npm run dev:mobile\"",
     "dev:web": "npm run dev -w @solar-hub/web-admin",
     "dev:backend": "npm run dev -w @solar-hub/backend",
     "dev:mobile": "npm run start -w mobile",
@@ -27,5 +28,9 @@
     "expo": "~54.0.34",
     "react": "19.1.0",
     "react-native": "0.81.5"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "wait-on": "^9.0.5"
   }
 }
