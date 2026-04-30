@@ -1,11 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator, RefreshControl } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Animated, RefreshControl } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { LinearGradient } from 'expo-linear-gradient';
 import { apiUrl } from '@/constants/api';
 
 const { width } = Dimensions.get('window');
+
+// Designer Token: High-fidelity HSL Colors
+const THEME = {
+  primary: 'hsla(51, 100%, 50%, 1)', // Gold
+  secondary: 'hsla(145, 63%, 49%, 1)', // Emerald
+  bgGlass: 'hsla(0, 0%, 100%, 0.05)',
+  bgGlassDeep: 'hsla(0, 0%, 100%, 0.02)',
+  textDim: 'hsla(0, 0%, 100%, 0.4)',
+};
 
 export function AdminTools() {
   const [stats, setStats] = useState<any>(null);
@@ -42,68 +51,76 @@ export function AdminTools() {
     fetchData();
   };
 
-  if (loading && !refreshing) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#FFD700" />
-      </View>
-    );
-  }
-
   return (
     <ScrollView 
       style={styles.container}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFD700" />}
+      contentContainerStyle={{ paddingBottom: 40 }}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={THEME.primary} />}
     >
       {/* Ecosystem Pulse */}
       <View style={styles.headerRow}>
         <ThemedText type="subtitle" style={styles.sectionTitle}>Ecosystem Pulse</ThemedText>
         <TouchableOpacity onPress={onRefresh}>
-          <IconSymbol name="arrow.clockwise" size={16} color="rgba(255,255,255,0.4)" />
+          <IconSymbol name="arrow.clockwise" size={16} color={THEME.textDim} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.pulseGrid}>
-        <PulseCard 
-          label="Active Users" 
-          value={stats?.activeUsers || '0'} 
-          sub="+12% today" 
-          color="#2196F3" 
-          icon="person.2.fill" 
-        />
-        <PulseCard 
-          label="Total Gen" 
-          value={stats?.totalGeneration || '0 GWh'} 
-          sub="Saving 2.4k tons CO2" 
-          color="#4CAF50" 
-          icon="leaf.fill" 
-        />
-        <PulseCard 
-          label="System Revenue" 
-          value={stats?.systemRevenue || '₹0'} 
-          sub="MTD Target: 85%" 
-          color="#FFD700" 
-          icon="indianrupeesign.circle.fill" 
-        />
-        <PulseCard 
-          label="Open Support" 
-          value={stats?.openSupport || '0'} 
-          sub="Avg. response: 12m" 
-          color="#FF5252" 
-          icon="headphones" 
-        />
+        {loading && !refreshing ? (
+          <>
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </>
+        ) : (
+          <>
+            <PulseCard 
+              label="Active Users" 
+              value={stats?.activeUsers || '0'} 
+              sub="+12% today" 
+              color="#2196F3" 
+              icon="person.2.fill" 
+            />
+            <PulseCard 
+              label="Total Gen" 
+              value={stats?.totalGeneration || '0 GWh'} 
+              sub="Saving 2.4k tons CO2" 
+              color={THEME.secondary} 
+              icon="leaf.fill" 
+            />
+            <PulseCard 
+              label="System Revenue" 
+              value={stats?.systemRevenue || '₹0'} 
+              sub="MTD Target: 85%" 
+              color={THEME.primary} 
+              icon="indianrupeesign.circle.fill" 
+            />
+            <PulseCard 
+              label="Open Support" 
+              value={stats?.openSupport || '0'} 
+              sub="Avg. response: 12m" 
+              color="#FF5252" 
+              icon="headphones" 
+            />
+          </>
+        )}
       </View>
 
       {/* Partner Onboarding */}
       <View style={styles.headerRow}>
         <ThemedText type="subtitle" style={styles.sectionTitle}>Partner Approvals</ThemedText>
-        <View style={styles.badge}>
-          <ThemedText style={styles.badgeText}>{partners.length}</ThemedText>
-        </View>
+        {!loading && (
+          <View style={styles.badge}>
+            <ThemedText style={styles.badgeText}>{partners.length}</ThemedText>
+          </View>
+        )}
       </View>
 
       <View style={styles.partnerList}>
-        {partners.length > 0 ? (
+        {loading && !refreshing ? (
+          <SkeletonRow />
+        ) : partners.length > 0 ? (
           partners.map((partner, index) => (
             <PartnerRow 
               key={partner.id || index}
@@ -118,17 +135,24 @@ export function AdminTools() {
       </View>
 
       {/* Service Health */}
-      <ThemedText type="subtitle" style={[styles.sectionTitle, { marginTop: 24, marginBottom: 16 }]}>Infrastructure</ThemedText>
+      <ThemedText type="subtitle" style={[styles.sectionTitle, { marginTop: 32, marginBottom: 16 }]}>Infrastructure</ThemedText>
       <View style={styles.healthCard}>
-        {stats?.infrastructure?.map((item: any, index: number) => (
-          <HealthItem 
-            key={index}
-            label={item.label} 
-            status={item.status} 
-            latency={item.latency} 
-            color={item.color} 
-          />
-        ))}
+        {loading && !refreshing ? (
+          <View style={{ gap: 12 }}>
+             <View style={styles.skeletonLine} />
+             <View style={styles.skeletonLine} />
+          </View>
+        ) : (
+          stats?.infrastructure?.map((item: any, index: number) => (
+            <HealthItem 
+              key={index}
+              label={item.label} 
+              status={item.status} 
+              latency={item.latency} 
+              color={item.color} 
+            />
+          ))
+        )}
       </View>
     </ScrollView>
   );
@@ -137,7 +161,7 @@ export function AdminTools() {
 function PulseCard({ label, value, sub, color, icon }: any) {
   return (
     <LinearGradient
-      colors={['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.01)']}
+      colors={['hsla(0, 0%, 100%, 0.07)', 'hsla(0, 0%, 100%, 0.01)']}
       style={styles.pulseCard}
     >
       <View style={[styles.pulseIcon, { backgroundColor: color + '20' }]}>
@@ -153,11 +177,38 @@ function PulseCard({ label, value, sub, color, icon }: any) {
   );
 }
 
+function SkeletonCard() {
+  const opacity = useRef(new Animated.Value(0.3)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, { toValue: 0.7, duration: 800, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0.3, duration: 800, useNativeDriver: true }),
+      ])
+    ).start();
+  }, []);
+
+  return (
+    <Animated.View style={[styles.pulseCard, { opacity, backgroundColor: 'hsla(0,0%,100%,0.05)' }]}>
+      <View style={[styles.pulseIcon, { backgroundColor: 'hsla(0,0%,100%,0.1)' }]} />
+      <View style={{ height: 10, width: '60%', backgroundColor: 'hsla(0,0%,100%,0.1)', borderRadius: 4, marginBottom: 8 }} />
+      <View style={{ height: 20, width: '80%', backgroundColor: 'hsla(0,0%,100%,0.1)', borderRadius: 4 }} />
+    </Animated.View>
+  );
+}
+
+function SkeletonRow() {
+  return (
+    <View style={[styles.partnerRow, { height: 80, backgroundColor: 'hsla(0,0%,100%,0.03)', opacity: 0.5 }]} />
+  );
+}
+
 function PartnerRow({ name, type, status }: any) {
   return (
     <TouchableOpacity style={styles.partnerRow}>
       <LinearGradient
-        colors={['rgba(255,255,255,0.03)', 'transparent']}
+        colors={['hsla(0, 0%, 100%, 0.04)', 'transparent']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.partnerGradient}
@@ -169,7 +220,7 @@ function PartnerRow({ name, type, status }: any) {
         <View style={styles.statusBadge}>
           <ThemedText style={styles.statusText}>{status}</ThemedText>
         </View>
-        <IconSymbol name="chevron.right" size={16} color="rgba(255,255,255,0.3)" />
+        <IconSymbol name="chevron.right" size={16} color={THEME.textDim} />
       </LinearGradient>
     </TouchableOpacity>
   );
@@ -192,12 +243,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: 300,
-  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -206,13 +251,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: '900',
     color: '#fff',
-    letterSpacing: 0.5,
+    letterSpacing: -0.5,
   },
   badge: {
-    backgroundColor: '#FFD700',
+    backgroundColor: THEME.primary,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
@@ -220,7 +265,7 @@ const styles = StyleSheet.create({
   badgeText: {
     color: '#000',
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: 'black',
   },
   pulseGrid: {
     flexDirection: 'row',
@@ -230,29 +275,31 @@ const styles = StyleSheet.create({
   pulseCard: {
     width: (width - 52) / 2,
     padding: 20,
-    borderRadius: 28,
+    borderRadius: 32,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'hsla(0, 0%, 100%, 0.08)',
   },
   pulseIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 14,
+    width: 44,
+    height: 44,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
   },
   pulseLabel: {
-    fontSize: 12,
-    opacity: 0.5,
+    fontSize: 10,
+    color: THEME.textDim,
     marginBottom: 4,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 1.5,
+    fontWeight: 'bold',
   },
   pulseValue: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '900',
     color: '#fff',
+    letterSpacing: -1,
   },
   subRow: {
     flexDirection: 'row',
@@ -261,9 +308,9 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   trendDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
   },
   pulseSub: {
     fontSize: 10,
@@ -273,77 +320,86 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   partnerRow: {
-    borderRadius: 24,
+    borderRadius: 28,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
+    borderColor: 'hsla(0, 0%, 100%, 0.05)',
   },
   partnerGradient: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 18,
+    padding: 20,
     gap: 12,
   },
   partnerName: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: 'bold',
     color: '#fff',
   },
   partnerType: {
     fontSize: 12,
-    opacity: 0.4,
+    color: THEME.textDim,
     marginTop: 2,
+    fontWeight: '600',
   },
   statusBadge: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'hsla(0, 0%, 100%, 0.08)',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 12,
+    borderRadius: 14,
   },
   statusText: {
     fontSize: 10,
     fontWeight: 'bold',
-    color: '#ccc',
+    color: '#eee',
+    textTransform: 'uppercase',
   },
   emptyText: {
     textAlign: 'center',
-    opacity: 0.3,
-    paddingVertical: 20,
-    fontStyle: 'italic',
+    color: THEME.textDim,
+    paddingVertical: 30,
+    fontWeight: 'bold',
   },
   healthCard: {
-    backgroundColor: 'rgba(255,255,255,0.02)',
-    borderRadius: 32,
-    padding: 24,
+    backgroundColor: 'hsla(0, 0%, 100%, 0.02)',
+    borderRadius: 36,
+    padding: 28,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
+    borderColor: 'hsla(0, 0%, 100%, 0.05)',
   },
   healthItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
     gap: 14,
   },
   healthDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
   },
   healthLabel: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.8)',
-    fontWeight: '500',
+    fontSize: 15,
+    color: 'rgba(255,255,255,0.9)',
+    fontWeight: '700',
   },
   healthStatus: {
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: '900',
+    textTransform: 'uppercase',
   },
   healthLatency: {
     fontSize: 10,
-    opacity: 0.3,
+    color: THEME.textDim,
     marginTop: 2,
+    fontWeight: 'bold',
+  },
+  skeletonLine: {
+    height: 12,
+    width: '100%',
+    backgroundColor: 'hsla(0,0%,100%,0.05)',
+    borderRadius: 6,
   }
 });
+
 

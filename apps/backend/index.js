@@ -17,6 +17,7 @@ const auditService = require('./services/audit');
 
 const adminRoutes = require('./routes/admin');
 const productRoutes = require('./routes/products');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -32,6 +33,7 @@ const USE_MOCK = process.env.USE_MOCK === 'true';
 // Routes
 app.use('/api/admin', adminRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/auth', authRoutes);
 
 app.get('/api/health', async (req, res) => {
   let database = 'unavailable';
