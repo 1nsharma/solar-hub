@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withDelay } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
 
@@ -16,10 +17,10 @@ export function CustomerTools() {
           colors={['rgba(255,215,0,0.1)', 'transparent']} 
           style={styles.chartBg}
         >
-          {/* Mock Chart Visualization */}
+          {/* Animated Chart Visualization */}
           <View style={styles.chartBars}>
             {[40, 60, 45, 80, 95, 70, 50].map((h, i) => (
-              <View key={i} style={[styles.bar, { height: h, opacity: i === 4 ? 1 : 0.5 }]} />
+              <AnimatedBar key={i} height={h} index={i} active={i === 4} />
             ))}
           </View>
         </LinearGradient>
@@ -62,6 +63,21 @@ export function CustomerTools() {
       </View>
     </View>
   );
+}
+
+function AnimatedBar({ height, index, active }: any) {
+  const animatedHeight = useSharedValue(0);
+
+  useEffect(() => {
+    animatedHeight.value = withDelay(index * 100, withSpring(height));
+  }, [height]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    height: animatedHeight.value,
+    opacity: active ? 1 : 0.5,
+  }));
+
+  return <Animated.View style={[styles.bar, animatedStyle]} />;
 }
 
 function VaultItem({ title, type, icon }: any) {

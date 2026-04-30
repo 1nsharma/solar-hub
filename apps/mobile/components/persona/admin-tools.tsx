@@ -59,7 +59,15 @@ export function AdminTools() {
     >
       {/* Ecosystem Pulse */}
       <View style={styles.headerRow}>
-        <ThemedText type="subtitle" style={styles.sectionTitle}>Ecosystem Pulse</ThemedText>
+        <View style={{ flex: 1 }}>
+          <ThemedText type="subtitle" style={styles.sectionTitle}>Ecosystem Pulse</ThemedText>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
+             <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: stats?.mock_mode ? '#FFA500' : '#4CAF50' }} />
+             <ThemedText style={{ fontSize: 10, color: stats?.mock_mode ? '#FFA500' : '#4CAF50', fontWeight: 'bold', textTransform: 'uppercase' }}>
+               {stats?.mock_mode ? 'Demo Engine' : 'Production Engine'}
+             </ThemedText>
+          </View>
+        </View>
         <TouchableOpacity onPress={onRefresh}>
           <IconSymbol name="arrow.clockwise" size={16} color={THEME.textDim} />
         </TouchableOpacity>

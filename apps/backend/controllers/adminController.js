@@ -42,7 +42,8 @@ const getStats = async (req, res) => {
         { label: 'Primary API', status: 'Operational', latency: latency.api, color: '#4CAF50' },
         { label: 'Payment Gateway', status: 'Operational', latency: latency.payment, color: '#4CAF50' },
         { label: 'Storage (S3)', status: 'Operational', latency: latency.storage, color: '#4CAF50' }
-      ]
+      ],
+      mock_mode: process.env.USE_MOCK === 'true'
     });
   } catch (err) {
     console.error('Admin Stats Error:', err);

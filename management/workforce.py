@@ -19,16 +19,38 @@ def main():
         print(f"[{key}] {name}")
     
     print("[0] Run All Agents (Full Audit)")
+    print("[5] Autonomous Health Check & Self-Heal")
     
     choice = input("\nAction: ")
     
     if choice == "0":
         for key in agents:
             run_agent(agents[key][1])
+    elif choice == "5":
+        run_autonomous_check()
     elif choice in agents:
         run_agent(agents[choice][1])
     else:
         print("Invalid choice.")
+
+def run_autonomous_check():
+    print("\n--- [Autonomous Mode] Running System Sweep ---")
+    from agents.ai_engine import AIEngine
+    engine = AIEngine()
+    root = 'c:\\Users\\amits\\Desktop\\solar-hub'
+    
+    git = engine.get_git_context(root)
+    logs = engine.get_log_context(root)
+    
+    print(f"Git Status: {git['status'] or 'Clean'}")
+    print(f"Active Errors: {len(logs)}")
+    
+    if logs:
+        print("\nPROPOSED RESOLUTIONS:")
+        for log, error in logs.items():
+            print(f"[{log}] -> Suggestion: Check recently modified files in git log for this area.")
+    else:
+        print("\nAll systems operational. No auto-fixes required.")
 
 def run_agent(script_name):
     script_path = os.path.join(os.path.dirname(__file__), 'agents', script_name)
