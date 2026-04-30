@@ -23,6 +23,9 @@ const MAPPING = {
   'checklist': 'assignment',
   'cart.fill': 'shopping-cart',
   'wrench.fill': 'build',
+  'storefront.fill': 'store',
+  'person.2.fill': 'group',
+  'person.fill': 'person',
 } as IconMapping;
 
 /**

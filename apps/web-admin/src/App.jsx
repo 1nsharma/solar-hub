@@ -16,7 +16,8 @@ import {
   Calendar,
   CheckCircle2,
   User,
-  LogOut
+  LogOut,
+  Handshake
 } from 'lucide-react';
 import { useStore } from './store/useStore';
 import AuthModal from './components/AuthModal';
@@ -30,6 +31,7 @@ import AdminDashboard from './pages/AdminDashboard/index';
 import VendorDashboard from './pages/VendorDashboard/index';
 import PartnerDashboard from './pages/PartnerDashboard/index';
 import BookingModal from './components/BookingModal';
+import PartnerSection from './components/PartnerSection';
 import { translations } from './utils/translations';
 import { apiUrl } from './config/api';
 import PwaInstallButton from './components/PwaInstallButton';
@@ -299,6 +301,23 @@ function App() {
         <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
       </section>
 
+      {/* Trust Bar (Marquee) */}
+      <section className="py-10 bg-white/[0.02] border-y border-white/5 overflow-hidden">
+        <div className="animate-marquee whitespace-nowrap flex items-center gap-24">
+          {['Tata Power', 'Luminous', 'Microtek', 'Waaree', 'Adani Solar', 'Vikram Solar', 'Loom Solar', 'Havells'].map((brand, i) => (
+            <span key={i} className="text-2xl font-black text-white/20 uppercase tracking-[0.3em] hover:text-primary/40 transition-colors cursor-default">
+              {brand}
+            </span>
+          ))}
+          {/* Duplicate for seamless loop */}
+          {['Tata Power', 'Luminous', 'Microtek', 'Waaree', 'Adani Solar', 'Vikram Solar', 'Loom Solar', 'Havells'].map((brand, i) => (
+            <span key={i + 8} className="text-2xl font-black text-white/20 uppercase tracking-[0.3em] hover:text-primary/40 transition-colors cursor-default">
+              {brand}
+            </span>
+          ))}
+        </div>
+      </section>
+
       {/* Stats Section */}
       <section className="py-16 relative z-10 bg-black/40 backdrop-blur-md border-b border-white/5">
         <div className="container grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
@@ -565,6 +584,12 @@ function App() {
           </div>
         </div>
       </section>
+
+      {/* Partner Tracks Section (The "Separation" request) */}
+      <PartnerSection 
+        onVendorJoin={() => { setCurrentPage('vendor'); window.scrollTo(0,0); }}
+        onTechnicianJoin={() => { /* Could lead to a tech signup */ }}
+      />
 
       {/* Target Audience & Pitch Slide */}
       <AudiencePitch />

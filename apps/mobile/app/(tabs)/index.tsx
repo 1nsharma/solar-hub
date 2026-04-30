@@ -24,6 +24,7 @@ type Kit = {
 export default function HomeScreen() {
   const [featuredKits, setFeaturedKits] = useState<Kit[]>([]);
   const [orderStatus, setOrderStatus] = useState('idle'); // idle, ordered
+  const [demoRole, setDemoRole] = useState<'customer' | 'vendor' | 'technician'>('customer');
 
   useEffect(() => {
     fetch(apiUrl('/api/products'))
@@ -39,6 +40,14 @@ export default function HomeScreen() {
         ]);
       });
   }, []);
+
+  if (demoRole === 'vendor') {
+    return <VendorDashboard onBack={() => setDemoRole('customer')} />;
+  }
+
+  if (demoRole === 'technician') {
+    return <TechnicianDashboard onBack={() => setDemoRole('customer')} />;
+  }
 
   if (orderStatus === 'ordered') {
     return (
@@ -110,6 +119,16 @@ export default function HomeScreen() {
         </View>
       </View>
 
+      {/* Demo Role Switcher (Visible for Market Showcase) */}
+      <View style={styles.roleSwitcher}>
+        <ThemedText style={styles.roleTitle}>MARKET DEMO MODE</ThemedText>
+        <View style={styles.roleRow}>
+          <RoleTab active={demoRole === 'customer'} label="Customer" icon="person.fill" onPress={() => setDemoRole('customer')} />
+          <RoleTab active={demoRole === 'vendor'} label="Vendor" icon="storefront.fill" onPress={() => setDemoRole('vendor')} />
+          <RoleTab active={demoRole === 'technician'} label="Maintenance" icon="wrench.fill" onPress={() => setDemoRole('technician')} />
+        </View>
+      </View>
+
       {/* Calculator Section */}
       <View style={styles.calculatorWrapper}>
         <SolarCalculator onOrder={() => setOrderStatus('ordered')} />
@@ -162,6 +181,61 @@ function FlowItem({ icon, label, color }: { icon: string; label: string; color: 
       </View>
       <ThemedText style={styles.flowLabel}>{label}</ThemedText>
     </View>
+  );
+}
+
+function RoleTab({ active, label, icon, onPress }: { active: boolean; label: string; icon: string; onPress: () => void }) {
+  return (
+    <TouchableOpacity 
+      onPress={onPress}
+      style={[styles.roleTab, active && styles.roleTabActive]}
+    >
+      <IconSymbol name={icon as any} size={16} color={active ? '#000' : '#888'} />
+      <ThemedText style={[styles.roleLabel, { color: active ? '#000' : '#888' }]}>{label}</ThemedText>
+    </TouchableOpacity>
+  );
+}
+
+// Dummy Dashboards for Demo
+function VendorDashboard({ onBack }: { onBack: () => void }) {
+  return (
+    <ScrollView style={styles.container}>
+       <LinearGradient colors={['#FFD700', '#FFA500']} style={{ height: 200, padding: 20, justifyContent: 'flex-end' }}>
+          <ThemedText type="title" style={{ color: '#000' }}>Vendor Hub</ThemedText>
+          <ThemedText style={{ color: '#000', opacity: 0.7 }}>Manage your solar store.</ThemedText>
+       </LinearGradient>
+       <View style={styles.section}>
+          <ThemedText type="subtitle" style={{ marginBottom: 16 }}>Pending Orders</ThemedText>
+          <View style={styles.glassPlaceholder}>
+            <IconSymbol name="cart.fill" size={32} color="#FFD700" />
+            <ThemedText style={{ marginTop: 8 }}>3 New Inquiries from Kanpur</ThemedText>
+          </View>
+          <TouchableOpacity style={[styles.button, { marginTop: 40 }]} onPress={onBack}>
+            <ThemedText style={styles.buttonText}>Switch to Customer View</ThemedText>
+          </TouchableOpacity>
+       </View>
+    </ScrollView>
+  );
+}
+
+function TechnicianDashboard({ onBack }: { onBack: () => void }) {
+  return (
+    <ScrollView style={styles.container}>
+       <LinearGradient colors={['#4CAF50', '#2E7D32']} style={{ height: 200, padding: 20, justifyContent: 'flex-end' }}>
+          <ThemedText type="title" style={{ color: '#fff' }}>Maintenance Hub</ThemedText>
+          <ThemedText style={{ color: '#fff', opacity: 0.7 }}>Service tickets & AMC jobs.</ThemedText>
+       </LinearGradient>
+       <View style={styles.section}>
+          <ThemedText type="subtitle" style={{ marginBottom: 16 }}>Today's Tasks</ThemedText>
+          <View style={styles.glassPlaceholder}>
+            <IconSymbol name="wrench.fill" size={32} color="#4CAF50" />
+            <ThemedText style={{ marginTop: 8 }}>Cleaning Service @ Civil Lines (14:00)</ThemedText>
+          </View>
+          <TouchableOpacity style={[styles.button, { marginTop: 40, backgroundColor: '#4CAF50' }]} onPress={onBack}>
+            <ThemedText style={[styles.buttonText, { color: '#fff' }]}>Switch to Customer View</ThemedText>
+          </TouchableOpacity>
+       </View>
+    </ScrollView>
   );
 }
 
@@ -318,4 +392,52 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     marginTop: 4,
   },
+  roleSwitcher: {
+    margin: 16,
+    marginTop: -20,
+    backgroundColor: '#1A1A1A',
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.2)',
+    elevation: 5,
+  },
+  roleTitle: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#FFD700',
+    letterSpacing: 2,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  roleRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  roleTab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  roleTabActive: {
+    backgroundColor: '#FFD700',
+  },
+  roleLabel: {
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  glassPlaceholder: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 20,
+    padding: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+  }
 });
