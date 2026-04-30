@@ -1,0 +1,10 @@
+{
+  "android": {
+    "package": "com.anonymous.solarhub"
+  },
+  "extra": {
+    "eas": {
+      "projectId": "ad6cd925-c0b3-44ee-a717-f83b947990b5"
+    }
+  }
+}

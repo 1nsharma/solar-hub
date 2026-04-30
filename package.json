@@ -19,6 +19,13 @@
     "build:vendor:aab": "npm run build:vendor:aab -w mobile",
     "test:backend": "npm run test -w @solar-hub/backend",
     "lint": "npm run lint -w @solar-hub/web-admin && npm run lint -w mobile",
-    "release:check": "npm run lint && npm run build:web && npm run test:backend"
+    "release:check": "npm run lint && npm run build:web && npm run test:backend",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
+  },
+  "dependencies": {
+    "expo": "~54.0.34",
+    "react": "19.1.0",
+    "react-native": "0.81.5"
   }
 }
