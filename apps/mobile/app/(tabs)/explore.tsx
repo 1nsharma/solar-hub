@@ -11,7 +11,7 @@ import { apiUrl } from '@/constants/api';
 const CATEGORIES = ['All', 'Kits', 'Panels', 'Inverters', 'Eco-Home', 'Services'];
 
 export default function MarketplaceScreen() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const colorScheme = useColorScheme() ?? 'light';

@@ -4,7 +4,9 @@
   "main": "./index.js",
   "type": "module",
   "peerDependencies": {
-    "react": ">=18"
+    "react": "19.1.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "react-dom": "19.1.0"
+  }
 }

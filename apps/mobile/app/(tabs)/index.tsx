@@ -13,9 +13,11 @@ import Animated, {
   useAnimatedStyle, 
   withRepeat, 
   withTiming, 
-  withSequence 
   withSequence,
-  FadeInDown 
+  FadeInDown,
+  FadeInRight,
+  interpolate,
+  withSpring
 } from 'react-native-reanimated';
 
 import { CustomerTools } from '@/components/persona/customer-tools';
@@ -226,16 +228,27 @@ export default function HomeScreen() {
                 <ThemedText style={{ color: '#FFD700', fontSize: 10, fontWeight: '900', letterSpacing: 2 }}>PREMIUM EDITION</ThemedText>
               </View>
             </View>
-            <TouchableOpacity 
-              onPress={() => setDemoRole(null)}
-              style={styles.backButton}
-            >
-              <IconSymbol name="chevron.left" size={16} color="#FFD700" />
-              <ThemedText style={styles.backButtonText}>EXIT DEMO</ThemedText>
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
+              <TouchableOpacity 
+                onPress={() => {
+                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                  setShowNotifications(true);
+                }}
+                style={styles.backButton}
+              >
+                <IconSymbol name="bell.fill" size={16} color="#FFD700" />
+              </TouchableOpacity>
+              <TouchableOpacity 
+                onPress={() => setDemoRole(null)}
+                style={styles.backButton}
+              >
+                <IconSymbol name="chevron.left" size={16} color="#FFD700" />
+                <ThemedText style={styles.backButtonText}>EXIT DEMO</ThemedText>
+              </TouchableOpacity>
+            </View>
           </View>
           <ThemedText style={[styles.heroSubtitle, { fontSize: 16, opacity: 0.6, marginTop: 12, lineHeight: 24 }]}>
-            Experience the future of renewable energy with India's most advanced solar ecosystem.
+            Experience the future of renewable energy with India&apos;s most advanced solar ecosystem.
           </ThemedText>
         </View>
       </View>
@@ -251,10 +264,10 @@ export default function HomeScreen() {
             <ThemedText style={[styles.roleTitle, { marginBottom: 0 }]}>MARKET DEMO MODE</ThemedText>
           </View>
           <View style={styles.roleRow}>
-            <RoleTab active={demoRole === 'customer'} label="User" icon="person.fill" onPress={() => setDemoRole('customer')} />
-            <RoleTab active={demoRole === 'vendor'} label="Vendor" icon="storefront.fill" onPress={() => setDemoRole('vendor')} />
-            <RoleTab active={demoRole === 'technician'} label="Service" icon="wrench.fill" onPress={() => setDemoRole('technician')} />
-            <RoleTab active={demoRole === 'admin'} label="Admin" icon="shield.fill" onPress={() => setDemoRole('admin')} />
+            <RoleTab active={(demoRole as any) === 'customer'} label="User" icon="person.fill" onPress={() => setDemoRole('customer')} />
+            <RoleTab active={(demoRole as any) === 'vendor'} label="Vendor" icon="storefront.fill" onPress={() => setDemoRole('vendor')} />
+            <RoleTab active={(demoRole as any) === 'technician'} label="Service" icon="wrench.fill" onPress={() => setDemoRole('technician')} />
+            <RoleTab active={(demoRole as any) === 'admin'} label="Admin" icon="shield.fill" onPress={() => setDemoRole('admin')} />
           </View>
         </View>
       )}
@@ -331,6 +344,11 @@ export default function HomeScreen() {
       <View style={styles.section}>
         <CustomerTools />
       </View>
+
+      <NotificationCenter 
+        visible={showNotifications} 
+        onClose={() => setShowNotifications(false)} 
+      />
 
       <View style={{ height: 100 }} />
     </ScrollView>
@@ -457,6 +475,25 @@ const styles = StyleSheet.create({
   logoText: {
     color: '#fff',
     fontSize: 28,
+  },
+  hero: {
+    position: 'relative',
+    paddingTop: 60,
+    paddingBottom: 40,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+    overflow: 'hidden',
+  },
+  headerContent: {
+    paddingHorizontal: 24,
+    position: 'relative',
+    zIndex: 1,
+  },
+  logoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
   },
   heroSubtitle: {
     color: 'rgba(255, 255, 255, 0.7)',
