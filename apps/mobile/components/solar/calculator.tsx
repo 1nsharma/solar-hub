@@ -115,10 +115,19 @@ export function SolarCalculator({ onOrder }: { onOrder?: () => void }) {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={onOrder}>
-        <ThemedText style={styles.buttonText}>Order Now & Lock Installer</ThemedText>
-        <IconSymbol name="chevron.right" size={18} color="#000" />
-      </TouchableOpacity>
+      <View style={{ flexDirection: 'row', gap: 10 }}>
+        <TouchableOpacity style={[styles.button, { flex: 2 }]} onPress={onOrder}>
+          <ThemedText style={styles.buttonText}>Order Now</ThemedText>
+          <IconSymbol name="chevron.right" size={18} color="#000" />
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.button, { flex: 1, backgroundColor: 'transparent', borderWidth: 1, borderColor: '#FFD700' }]}
+          onPress={() => {/* Agent Help */}}
+        >
+          <IconSymbol name="person.fill" size={18} color="#FFD700" />
+          <ThemedText style={[styles.buttonText, { color: '#FFD700', fontSize: 12 }]}>Agent Help</ThemedText>
+        </TouchableOpacity>
+      </View>
       
       <ThemedText style={styles.footerNote}>
         *Includes solar kit + standard installation + net metering

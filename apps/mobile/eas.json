@@ -38,6 +38,24 @@
         "APP_VARIANT": "vendor",
         "EXPO_PUBLIC_API_URL": "https://api.solarhub.in"
       }
+    },
+    "technician-apk": {
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "APP_VARIANT": "technician",
+        "EXPO_PUBLIC_API_URL": "https://staging-api.solarhub.in"
+      }
+    },
+    "technician-production": {
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "env": {
+        "APP_VARIANT": "technician",
+        "EXPO_PUBLIC_API_URL": "https://api.solarhub.in"
+      }
     }
   },
   "submit": {

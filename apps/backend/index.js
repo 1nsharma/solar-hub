@@ -605,6 +605,41 @@ app.post('/api/vendors/apply', async (req, res) => {
   }
 });
 
+// 4.1 Government Subsidy & Agents
+app.post('/api/subsidy/apply', async (req, res) => {
+  const { user_id, scheme_name, documents } = req.body;
+  
+  const application = {
+    id: `sub_${randomUUID()}`,
+    user_id,
+    scheme_name,
+    status: 'pending_agent_review',
+    agent_assigned: 'SolarHub Agent - Vikram',
+    created_at: new Date().toISOString()
+  };
+
+  // Notify Admin/Agent
+  await auditService.log(user_id, 'SUBSIDY_APPLIED', 'subsidy', application.id, null, { scheme_name });
+  
+  // Notify Vendors (to prepare for potential orders)
+  await notificationService.sendSMS('VENDOR_PHONES', `New Subsidy Application for ${scheme_name} by user ${user_id}. Prepare for kit inquiry.`);
+
+  res.status(201).json(application);
+});
+
+app.get('/api/subsidy/status/:userId', (req, res) => {
+  // Mock status for demo
+  res.json([
+    { 
+      id: 'sub_demo_1', 
+      scheme_name: 'PM Surya Ghar Yojana', 
+      status: 'approved', 
+      amount: 78000, 
+      message: 'Your subsidy has been approved. Vendors have been notified to unlock special pricing.' 
+    }
+  ]);
+});
+
 // 4. Auth (Mock for now, but DB ready)
 app.post('/api/auth/verify-otp', async (req, res) => {
   const { phone, otp } = req.body;
