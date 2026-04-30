@@ -16,9 +16,11 @@ import Animated, {
   withSequence 
 } from 'react-native-reanimated';
 
+import { TechnicianTools } from '@/components/persona/technician-tools';
+import { VendorTools } from '@/components/persona/vendor-tools';
+import { CustomerTools } from '@/components/persona/customer-tools';
+
 const { width } = Dimensions.get('window');
-const APP_VARIANT = Constants.expoConfig?.extra?.appVariant || 'customer';
-const IS_DEMO_MODE = Constants.expoConfig?.extra?.isDemoMode;
 
 type Kit = {
   id: string | number;
@@ -34,7 +36,7 @@ type Kit = {
 export default function HomeScreen() {
   const [featuredKits, setFeaturedKits] = useState<Kit[]>([]);
   const [orderStatus, setOrderStatus] = useState('idle'); // idle, ordered
-  const [demoRole, setDemoRole] = useState<'customer' | 'vendor' | 'technician' | null>(IS_DEMO_MODE ? null : (APP_VARIANT as any));
+  const [demoRole, setDemoRole] = useState<'customer' | 'vendor' | 'technician' | null>(Constants.expoConfig?.extra?.isDemoMode ? null : (Constants.expoConfig?.extra?.appVariant as any));
 
   const pulse = useSharedValue(1);
 
@@ -85,21 +87,21 @@ export default function HomeScreen() {
         <View style={{ gap: 20 }}>
           <LauncherCard 
             title="Customer" 
-            desc="Solar marketplace, calculators & govt. subsidy" 
+            desc="Marketplace, Gen Monitoring & Savings" 
             icon="person.fill" 
             color="#FFD700" 
             onPress={() => setDemoRole('customer')} 
           />
           <LauncherCard 
             title="Vendor" 
-            desc="Orders, dispatch & inventory management" 
+            desc="Storefront, Lead CRM & Inventory" 
             icon="storefront.fill" 
             color="#FFA500" 
             onPress={() => setDemoRole('vendor')} 
           />
           <LauncherCard 
             title="Technician" 
-            desc="Field service, installation & maintenance" 
+            desc="Field Ops, Toolbox & Training Hub" 
             icon="wrench.fill" 
             color="#4CAF50" 
             onPress={() => setDemoRole('technician')} 
@@ -114,12 +116,13 @@ export default function HomeScreen() {
   }
 
   if (demoRole === 'vendor') {
-    return <VendorDashboard onBack={() => setDemoRole(IS_DEMO_MODE ? null : 'vendor')} />;
+    return <VendorDashboard onBack={() => setDemoRole(Constants.expoConfig?.extra?.isDemoMode ? null : 'vendor')} />;
   }
 
   if (demoRole === 'technician') {
-    return <TechnicianDashboard onBack={() => setDemoRole(IS_DEMO_MODE ? null : 'technician')} />;
+    return <TechnicianDashboard onBack={() => setDemoRole(Constants.expoConfig?.extra?.isDemoMode ? null : 'technician')} />;
   }
+
 
 
   // ... (rest of the customer view logic)
@@ -194,9 +197,10 @@ export default function HomeScreen() {
             </View>
             <TouchableOpacity 
               onPress={() => setDemoRole(null)}
-              style={{ backgroundColor: 'rgba(255,255,255,0.08)', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' }}
+              style={styles.backButton}
             >
-              <ThemedText style={{ fontSize: 10, fontWeight: '900', color: '#FFD700' }}>EXIT DEMO</ThemedText>
+              <IconSymbol name="chevron.left" size={16} color="#FFD700" />
+              <ThemedText style={styles.backButtonText}>EXIT DEMO</ThemedText>
             </TouchableOpacity>
           </View>
           <ThemedText style={[styles.heroSubtitle, { fontSize: 16, opacity: 0.6, marginTop: 12, lineHeight: 24 }]}>
@@ -206,7 +210,7 @@ export default function HomeScreen() {
       </View>
 
       {/* Demo Role Switcher (Visible for Market Showcase) */}
-      {IS_DEMO_MODE && (
+      {Constants.expoConfig?.extra?.isDemoMode && (
         <View style={styles.roleSwitcher}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
             <Animated.View style={[
@@ -216,12 +220,13 @@ export default function HomeScreen() {
             <ThemedText style={[styles.roleTitle, { marginBottom: 0 }]}>MARKET DEMO MODE</ThemedText>
           </View>
           <View style={styles.roleRow}>
-            <RoleTab active={demoRole === 'customer'} label="Customer" icon="person.fill" onPress={() => setDemoRole('customer')} />
+            <RoleTab active={demoRole === 'customer'} label="User" icon="person.fill" onPress={() => setDemoRole('customer')} />
             <RoleTab active={demoRole === 'vendor'} label="Vendor" icon="storefront.fill" onPress={() => setDemoRole('vendor')} />
             <RoleTab active={demoRole === 'technician'} label="Service" icon="wrench.fill" onPress={() => setDemoRole('technician')} />
           </View>
         </View>
       )}
+
 
 
       {/* Calculator Section */}
@@ -291,6 +296,11 @@ export default function HomeScreen() {
             </View>
           ))}
         </ScrollView>
+      </View>
+
+      {/* Customer Work Tools (New) */}
+      <View style={styles.section}>
+        <CustomerTools />
       </View>
 
       <View style={{ height: 100 }} />
@@ -365,8 +375,9 @@ function RoleTab({ active, label, icon, onPress }: { active: boolean; label: str
 // Full Operational Vendor Dashboard
 function VendorDashboard({ onBack }: { onBack: () => void }) {
   const [orders, setOrders] = useState([
-    { id: '101', customer: 'Amit Sharma', items: '5kW Tata Solar Kit', status: 'pending', price: '₹2,85,000', location: 'Kanpur', date: 'Today' },
-    { id: '102', customer: 'Rahul Verma', items: '3kW Luminous Hybrid', status: 'accepted', price: '₹1,95,000', location: 'Lucknow', date: 'Yesterday' }
+    { id: 'ORD-7721', customer: 'Amit Sharma', items: '5kW Tata Solar Kit + Smart Inverter', status: 'pending', price: '₹2,85,000', location: 'Civil Lines, Kanpur', date: 'Today, 10:30 AM' },
+    { id: 'ORD-7690', customer: 'Rahul Verma', items: '3kW Luminous Hybrid (Battery Incl.)', status: 'accepted', price: '₹1,95,000', location: 'Indira Nagar, Lucknow', date: 'Yesterday, 04:15 PM' },
+    { id: 'ORD-7688', customer: 'Sita Devi', items: '10kW Commercial Array (Bifacial)', status: 'dispatched', price: '₹6,40,000', location: 'Gomti Nagar, Lucknow', date: '28 Apr, 2026' }
   ]);
 
   const handleAccept = (id: string) => {
@@ -388,8 +399,8 @@ function VendorDashboard({ onBack }: { onBack: () => void }) {
                 <ThemedText style={{ color: '#4CAF50', fontSize: 12, fontWeight: 'bold' }}>Active Storefront</ThemedText>
               </View>
             </View>
-            <TouchableOpacity onPress={onBack} style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: 12, borderRadius: 16 }}>
-              <IconSymbol name="xmark" size={20} color="#fff" />
+            <TouchableOpacity onPress={onBack} style={styles.backButtonRound}>
+              <IconSymbol name="chevron.left" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
           
@@ -452,12 +463,8 @@ function VendorDashboard({ onBack }: { onBack: () => void }) {
             </View>
           ))}
 
-          <ThemedText type="subtitle" style={{ marginTop: 24, marginBottom: 16 }}>Inventory Health</ThemedText>
-          <View style={styles.inventoryCard}>
-             <InventoryItem label="5kW Inverters" count={8} total={10} color="#FFD700" />
-             <InventoryItem label="330W Mono Panels" count={142} total={200} color="#4CAF50" />
-             <InventoryItem label="Structure Sets" count={2} total={15} color="#FF5252" />
-          </View>
+          <ThemedText type="subtitle" style={{ marginTop: 24, marginBottom: 16 }}>Business Tools</ThemedText>
+          <VendorTools />
        </View>
        <View style={{ height: 100 }} />
     </ScrollView>
@@ -492,8 +499,9 @@ function InventoryItem({ label, count, total, color }: { label: string; count: n
 // Full Operational Technician Dashboard
 function TechnicianDashboard({ onBack }: { onBack: () => void }) {
   const [tasks, setTasks] = useState([
-    { id: 'T1', type: 'Site Survey', customer: 'Amit Sharma', address: '12/A, Civil Lines, Kanpur', status: 'pending', priority: 'High' },
-    { id: 'T2', type: 'Installation', customer: 'Rahul Verma', address: 'Indira Nagar, Sector 14', status: 'upcoming', priority: 'Medium' }
+    { id: 'JOB-902', type: 'Site Survey', customer: 'Amit Sharma', address: 'Plot 42, Civil Lines, Kanpur, UP', status: 'pending', priority: 'High', contact: '+91 98765 43210' },
+    { id: 'JOB-895', type: 'System Debug', customer: 'Sun Heights Apts', address: 'Block C, Sector 12, Kanpur', status: 'upcoming', priority: 'Medium', contact: '+91 88776 65544' },
+    { id: 'JOB-888', type: 'Installation', customer: 'Rahul Verma', address: 'H.No 12, Indira Nagar, Sector 14', status: 'upcoming', priority: 'High', contact: '+91 77665 54433' }
   ]);
 
   const handleComplete = (id: string) => {
@@ -512,8 +520,8 @@ function TechnicianDashboard({ onBack }: { onBack: () => void }) {
               <ThemedText type="title" style={{ color: '#fff', fontSize: 36, fontWeight: '900', marginTop: 4 }}>Installer Pro</ThemedText>
               <ThemedText style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, marginTop: 4 }}>Welcome back, Sumit</ThemedText>
             </View>
-            <TouchableOpacity onPress={onBack} style={{ backgroundColor: 'rgba(255,255,255,0.1)', padding: 12, borderRadius: 16 }}>
-              <IconSymbol name="xmark" size={20} color="#fff" />
+            <TouchableOpacity onPress={onBack} style={styles.backButtonRound}>
+              <IconSymbol name="chevron.left" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
           
@@ -576,6 +584,10 @@ function TechnicianDashboard({ onBack }: { onBack: () => void }) {
               )}
             </View>
           ))}
+       </View>
+       <View style={styles.section}>
+         <ThemedText type="subtitle" style={{ marginBottom: 16 }}>Operational Tools</ThemedText>
+         <TechnicianTools />
        </View>
        <View style={{ height: 100 }} />
     </ScrollView>
@@ -804,6 +816,32 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 20,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  backButtonText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#FFD700',
+  },
+  backButtonRound: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.05)',
   }
