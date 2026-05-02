@@ -105,4 +105,26 @@ export interface ServiceBooking {
   created_at?: string;
 }
 
-export const TYPES_VERSION = "1.1.0";
+export interface Subscription {
+  id: string;
+  user_id: string;
+  plan_id: string;
+  plan_name: string;
+  status: 'active' | 'expired' | 'cancelled' | 'pending_payment';
+  start_date: string;
+  end_date: string;
+  recurring_amount: number;
+  last_service_date?: string;
+  next_service_date?: string;
+  created_at?: string;
+}
+
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  description: string;
+  price_yearly: number;
+  features: string[];
+}
+
+export const TYPES_VERSION = "1.2.0";

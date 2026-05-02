@@ -15,6 +15,7 @@ const leadRoutes = require('./routes/leads');
 const subsidyRoutes = require('./routes/subsidy');
 const systemRoutes = require('./routes/system');
 const technicianRoutes = require('./routes/technician');
+const amcRoutes = require('./routes/amc');
 
 // Service Imports for index-level routes
 const paymentService = require('./services/payment');
@@ -37,6 +38,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/leads', leadRoutes);
 app.use('/api/subsidy', subsidyRoutes);
 app.use('/api/technician', technicianRoutes);
+app.use('/api/amc', amcRoutes);
 app.use('/api', systemRoutes); // health, seed, external-deals
 
 // Platform Info Routes
