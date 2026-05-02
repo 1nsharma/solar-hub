@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity, Pressable } from 'react-native';
+import { StyleSheet, View, Pressable } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { 
@@ -14,17 +14,8 @@ import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-
-interface Product {
-  id: string | number;
-  title: string;
-  price: number;
-  category: string;
-  vendor: string;
-  rating: number;
-  image_url: string;
-  description: string;
-}
+import { Product } from '@solar-hub/types';
+import { StatusBadge } from '@solar-hub/ui';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -71,7 +62,7 @@ export function ProductCard({ product }: { product: Product }) {
       />
 
       <View style={styles.badge}>
-        <ThemedText style={styles.badgeText}>PREMIUM</ThemedText>
+        <StatusBadge status="ACTIVE" className="bg-[#FFD700] text-black" />
       </View>
 
       <View style={styles.content}>
@@ -120,16 +111,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 16,
     left: 16,
-    backgroundColor: '#FFD700',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  badgeText: {
-    color: '#000',
-    fontSize: 9,
-    fontWeight: '900',
-    letterSpacing: 1,
   },
   content: {
     flex: 1,

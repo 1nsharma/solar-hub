@@ -1,13 +1,13 @@
 import React from 'react';
-import { ScrollView, View, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { ScrollView, View, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { AdminTools } from './admin-tools';
+import { Card, StatusBadge } from '@solar-hub/ui';
 
-const { width } = Dimensions.get('window');
 const BENTO_SPACING = 12;
 
 interface AdminDashboardProps {
@@ -40,7 +40,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
             <ThemedText style={styles.overhead}>SYSTEM ROOT</ThemedText>
             <ThemedText type="title" style={styles.title}>Ops Center</ThemedText>
             <View style={styles.statusRow}>
-               <IconSymbol name="shield.fill" size={16} color="#4CAF50" />
+               <StatusBadge status="ACTIVE" className="bg-green-500/20 text-green-400 border-green-500/30" />
                <ThemedText style={styles.statusText}>ALL SYSTEMS OPERATIONAL</ThemedText>
             </View>
           </Animated.View>
@@ -48,27 +48,27 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
 
        <View style={styles.bentoContainer}>
           <View style={styles.bentoRow}>
-             <Animated.View entering={FadeInRight.delay(400)} style={[styles.bentoCard, styles.bentoHalf, { backgroundColor: '#1A237E' }]}>
+             <Card className="flex-1 aspect-[1.1] bg-[#1A237E] border-blue-400/20 p-5">
                 <ThemedText style={styles.bentoLabel}>TOTAL REVENUE</ThemedText>
                 <ThemedText style={styles.bentoValue}>₹84.2L</ThemedText>
                 <ThemedText style={styles.bentoSub}>+22% Growth</ThemedText>
-             </Animated.View>
-             <Animated.View entering={FadeInRight.delay(500)} style={[styles.bentoCard, styles.bentoHalf, { backgroundColor: '#1A1A1A' }]}>
+             </Card>
+             <Card className="flex-1 aspect-[1.1] bg-[#1A1A1A] border-gray-800 p-5">
                 <ThemedText style={styles.bentoLabel}>ACTIVE USERS</ThemedText>
                 <ThemedText style={styles.bentoValue}>1,240</ThemedText>
                 <ThemedText style={styles.bentoSub}>84 Live Now</ThemedText>
-             </Animated.View>
+             </Card>
           </View>
 
-          <Animated.View entering={FadeInDown.delay(600)} style={styles.pulseCard}>
+          <Card className="mb-8 p-6 bg-white/5">
              <View style={styles.pulseHeader}>
                 <ThemedText style={styles.pulseTitle}>System Pulse</ThemedText>
-                <View style={styles.liveTag}><ThemedText style={styles.liveTagText}>LIVE</ThemedText></View>
+                <StatusBadge status="ACTIVE" className="bg-red-500 text-white" />
              </View>
              <PulseItem time="02:14 AM" event="New Vendor Application: SolarFlow" />
              <PulseItem time="02:08 AM" event="Order #8821 Milestone: Site Survey Done" />
              <PulseItem time="01:55 AM" event="Global Sync: 12.5 kWh Gen Reported" />
-          </Animated.View>
+          </Card>
 
           <ThemedText type="subtitle" style={styles.sectionHeader}>Administrative Tools</ThemedText>
           <AdminTools />
@@ -158,10 +158,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     marginTop: 12,
-    backgroundColor: 'rgba(76,175,80,0.1)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
   },
   statusText: {
     fontSize: 10,
@@ -177,16 +173,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: BENTO_SPACING,
     marginBottom: BENTO_SPACING,
-  },
-  bentoCard: {
-    flex: 1,
-    borderRadius: 28,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-  },
-  bentoHalf: {
-    aspectRatio: 1.1,
   },
   bentoLabel: {
     fontSize: 10,
@@ -206,14 +192,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 4,
   },
-  pulseCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    borderRadius: 32,
-    padding: 24,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-    marginBottom: 32,
-  },
   pulseHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -222,17 +200,6 @@ const styles = StyleSheet.create({
   },
   pulseTitle: {
     fontSize: 18,
-    fontWeight: '900',
-    color: '#fff',
-  },
-  liveTag: {
-    backgroundColor: '#FF5252',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  liveTagText: {
-    fontSize: 8,
     fontWeight: '900',
     color: '#fff',
   },

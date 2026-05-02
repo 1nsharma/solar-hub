@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withDelay } from 'react-native-reanimated';
+import { Card, Button } from '@solar-hub/ui';
 
 const { width } = Dimensions.get('window');
 
@@ -12,18 +13,15 @@ export function CustomerTools() {
     <View style={styles.container}>
       {/* Live Savings Monitor */}
       <ThemedText type="subtitle" style={styles.sectionTitle}>Solar Generation (Live)</ThemedText>
-      <View style={styles.chartBox}>
-        <LinearGradient 
-          colors={['rgba(255,215,0,0.1)', 'transparent']} 
-          style={styles.chartBg}
-        >
+      <Card className="mt-4">
+        <View style={styles.chartBg}>
           {/* Animated Chart Visualization */}
           <View style={styles.chartBars}>
             {[40, 60, 45, 80, 95, 70, 50].map((h, i) => (
               <AnimatedBar key={i} height={h} index={i} active={i === 4} />
             ))}
           </View>
-        </LinearGradient>
+        </View>
         <View style={styles.chartInfo}>
           <View>
             <ThemedText style={styles.chartValue}>4.2 kWh</ThemedText>
@@ -34,7 +32,7 @@ export function CustomerTools() {
             <ThemedText style={styles.chartLabel}>Saved this mo</ThemedText>
           </View>
         </View>
-      </View>
+      </Card>
 
       {/* Doc Vault */}
       <ThemedText type="subtitle" style={[styles.sectionTitle, { marginTop: 24, marginBottom: 16 }]}>Document Vault</ThemedText>
@@ -47,20 +45,26 @@ export function CustomerTools() {
       {/* Service & Maintenance */}
       <View style={styles.sectionHeader}>
         <ThemedText type="subtitle" style={styles.sectionTitle}>Maintenance</ThemedText>
-        <TouchableOpacity>
-          <ThemedText style={styles.actionText}>BOOK CLEANING</ThemedText>
-        </TouchableOpacity>
+        <Button 
+          variant="outline" 
+          onClick={() => console.log('Booking cleaning')}
+          className="py-1 px-3 text-[10px]"
+        >
+          BOOK CLEANING
+        </Button>
       </View>
-      <View style={styles.serviceCard}>
-        <View style={styles.serviceIcon}>
-          <IconSymbol name="sparkles" size={20} color="#FFD700" />
+      <Card>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+          <View style={styles.serviceIcon}>
+            <IconSymbol name="sparkles" size={20} color="#FFD700" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <ThemedText style={styles.serviceTitle}>Next Panel Cleaning</ThemedText>
+            <ThemedText style={styles.serviceDate}>Scheduled: 15 May, 2026</ThemedText>
+          </View>
+          <IconSymbol name="calendar" size={20} color="#888" />
         </View>
-        <View style={{ flex: 1 }}>
-          <ThemedText style={styles.serviceTitle}>Next Panel Cleaning</ThemedText>
-          <ThemedText style={styles.serviceDate}>Scheduled: 15 May, 2026</ThemedText>
-        </View>
-        <IconSymbol name="calendar" size={20} color="#888" />
-      </View>
+      </Card>
     </View>
   );
 }
@@ -82,13 +86,13 @@ function AnimatedBar({ height, index, active }: any) {
 
 function VaultItem({ title, type, icon }: any) {
   return (
-    <TouchableOpacity style={styles.vaultItem}>
+    <Card className="flex-1 items-center p-4">
       <View style={styles.vaultIcon}>
         <IconSymbol name={icon} size={24} color="#FFD700" />
       </View>
       <ThemedText style={styles.vaultTitle}>{title}</ThemedText>
       <ThemedText style={styles.vaultType}>{type}</ThemedText>
-    </TouchableOpacity>
+    </Card>
   );
 }
 
@@ -107,18 +111,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
-  },
-  actionText: {
-    color: '#FFD700',
-    fontSize: 12,
-    fontWeight: '900',
-  },
-  chartBox: {
-    backgroundColor: '#121212',
-    borderRadius: 24,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255,215,0,0.1)',
   },
   chartBg: {
     height: 120,
@@ -155,15 +147,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
   },
-  vaultItem: {
-    flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    borderRadius: 20,
-    padding: 16,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-  },
   vaultIcon: {
     width: 48,
     height: 48,
@@ -184,14 +167,6 @@ const styles = StyleSheet.create({
     opacity: 0.4,
     marginTop: 4,
     fontWeight: '900',
-  },
-  serviceCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-    backgroundColor: 'rgba(255,255,255,0.02)',
-    padding: 16,
-    borderRadius: 20,
   },
   serviceIcon: {
     width: 44,

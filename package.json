@@ -9,10 +9,10 @@
   ],
   "scripts": {
     "dev": "npm run dev -ws",
-    "start": "concurrently -n \"BACKEND,WEB,MOBILE\" -c \"bgBlue,bgGreen,bgYellow\" --kill-others \"npm run dev:backend\" \"wait-on http://localhost:5001/api/health && npm run dev:web\" \"wait-on http://localhost:5001/api/health && npm run dev:mobile\"",
+    "start": "concurrently -n \"BACKEND,WEB,MOBILE\" -c \"bgBlue,bgGreen,bgYellow\" --kill-others \"npm run dev:backend\" \"wait-on http://localhost:5000/api/health && npm run dev:web\" \"wait-on http://localhost:5000/api/health && npm run dev:mobile\"",
     "dev:web": "npm run dev -w @solar-hub/web-admin",
     "dev:backend": "npm run dev -w @solar-hub/backend",
-    "dev:mobile": "npm run start -w mobile",
+    "dev:mobile": "npm run start -w mobile -- --port 8082",
     "build:web": "npm run build -w @solar-hub/web-admin",
     "build:mobile:web": "npm run web -w mobile",
     "build:apk": "npm run build:apk -w mobile",

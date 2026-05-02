@@ -1,9 +1,8 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-
-const { width } = Dimensions.get('window');
+import { Card, Button, StatusBadge } from '@solar-hub/ui';
 
 export function VendorTools() {
   return (
@@ -11,9 +10,13 @@ export function VendorTools() {
       {/* Storefront Management */}
       <View style={styles.sectionHeader}>
         <ThemedText type="subtitle" style={styles.sectionTitle}>Storefront Manager</ThemedText>
-        <TouchableOpacity>
-          <ThemedText style={styles.actionText}>+ ADD PRODUCT</ThemedText>
-        </TouchableOpacity>
+        <Button 
+          variant="primary" 
+          onClick={() => console.log('Add product')}
+          className="py-1 px-3 text-[10px]"
+        >
+          + ADD PRODUCT
+        </Button>
       </View>
       
       <View style={styles.inventoryList}>
@@ -22,14 +25,12 @@ export function VendorTools() {
           stock={8} 
           price="₹2,85,000" 
           status="In Stock"
-          image="https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?q=80&w=200"
         />
         <InventoryCard 
           name="Luminous Hybrid" 
           stock={0} 
           price="₹1,95,000" 
           status="Out of Stock"
-          image="https://images.unsplash.com/photo-1613665813446-82a78c468a1d?q=80&w=200"
         />
       </View>
 
@@ -49,40 +50,42 @@ export function VendorTools() {
       {/* Business Intelligence */}
       <ThemedText type="subtitle" style={[styles.sectionTitle, { marginTop: 24, marginBottom: 16 }]}>Insights</ThemedText>
       <View style={styles.statsGrid}>
-        <View style={styles.statBox}>
+        <Card className="flex-1 bg-yellow-900/10 border-yellow-500/20">
           <ThemedText style={styles.statLabel}>Conversion Rate</ThemedText>
           <ThemedText style={styles.statValue}>24%</ThemedText>
           <ThemedText style={[styles.statChange, { color: '#4CAF50' }]}>+2.4% vs last mo</ThemedText>
-        </View>
-        <View style={styles.statBox}>
+        </Card>
+        <Card className="flex-1 bg-yellow-900/10 border-yellow-500/20">
           <ThemedText style={styles.statLabel}>Avg. Order Value</ThemedText>
           <ThemedText style={styles.statValue}>₹2.1L</ThemedText>
           <ThemedText style={[styles.statChange, { color: '#FFA500' }]}>-5% vs last mo</ThemedText>
-        </View>
+        </Card>
       </View>
     </View>
   );
 }
 
-function InventoryCard({ name, stock, price, status, image }: any) {
+function InventoryCard({ name, stock, price, status }: any) {
   const isOutOfStock = stock === 0;
   return (
-    <View style={styles.inventoryCard}>
+    <Card className="p-4">
       <View style={{ flexDirection: 'row', gap: 12 }}>
         <View style={styles.prodThumb} />
         <View style={{ flex: 1 }}>
           <ThemedText style={styles.prodName}>{name}</ThemedText>
           <ThemedText style={styles.prodPrice}>{price}</ThemedText>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
-            <View style={[styles.stockDot, { backgroundColor: isOutOfStock ? '#FF5252' : '#4CAF50' }]} />
-            <ThemedText style={[styles.stockText, { color: isOutOfStock ? '#FF5252' : '#4CAF50' }]}>{status} ({stock})</ThemedText>
+            <StatusBadge status={isOutOfStock ? 'FAILED' : 'ACTIVE'} />
+            <ThemedText style={[styles.stockText, { color: isOutOfStock ? '#FF5252' : '#4CAF50' }]}>
+              {status} ({stock})
+            </ThemedText>
           </View>
         </View>
         <TouchableOpacity style={styles.editBtn}>
           <IconSymbol name="pencil" size={16} color="#888" />
         </TouchableOpacity>
       </View>
-    </View>
+    </Card>
   );
 }
 
@@ -99,7 +102,7 @@ function LeadTab({ label, count, active }: any) {
 
 function LeadCard({ name, type, value, time }: any) {
   return (
-    <TouchableOpacity style={styles.leadCard}>
+    <Card className="flex-row items-center gap-3 p-3">
       <View style={styles.leadAvatar}>
         <ThemedText style={{ fontWeight: 'bold', color: '#FFD700' }}>{name[0]}</ThemedText>
       </View>
@@ -108,7 +111,7 @@ function LeadCard({ name, type, value, time }: any) {
         <ThemedText style={styles.leadType}>{type} • {value}</ThemedText>
       </View>
       <ThemedText style={styles.leadTime}>{time}</ThemedText>
-    </TouchableOpacity>
+    </Card>
   );
 }
 
@@ -127,20 +130,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
-  actionText: {
-    color: '#FFD700',
-    fontSize: 12,
-    fontWeight: '900',
-  },
   inventoryList: {
     gap: 12,
-  },
-  inventoryCard: {
-    backgroundColor: '#121212',
-    padding: 16,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
   },
   prodThumb: {
     width: 60,
@@ -158,11 +149,6 @@ const styles = StyleSheet.create({
     color: '#FFD700',
     fontWeight: '900',
     marginTop: 2,
-  },
-  stockDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
   },
   stockText: {
     fontSize: 11,
@@ -213,14 +199,6 @@ const styles = StyleSheet.create({
   leadList: {
     gap: 10,
   },
-  leadCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: 'rgba(255,255,255,0.02)',
-    padding: 12,
-    borderRadius: 16,
-  },
   leadAvatar: {
     width: 40,
     height: 40,
@@ -245,14 +223,6 @@ const styles = StyleSheet.create({
   statsGrid: {
     flexDirection: 'row',
     gap: 12,
-  },
-  statBox: {
-    flex: 1,
-    backgroundColor: 'rgba(255,215,0,0.03)',
-    padding: 16,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255,215,0,0.1)',
   },
   statLabel: {
     fontSize: 11,
