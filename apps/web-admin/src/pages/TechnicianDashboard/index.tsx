@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Wrench, 
   MapPin, 
@@ -11,19 +11,25 @@ import {
   Zap,
   Calendar,
   Filter,
-  Plus
+  Plus,
+  Play
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { Card, Button, StatusBadge } from '@solar-hub/ui';
+// @ts-ignore
+import { generateSprintNudge, defaultUserPsyche } from '@solar-hub/shared';
 
 export default function TechnicianDashboard({ onBack }: { onBack: () => void }) {
   const { bookings } = useStore();
   const [activeJob, setActiveJob] = useState<any>(null);
+  const [nudge, setNudge] = useState<any>(null);
+  const [isSprintActive, setIsSprintActive] = useState(false);
 
   // Mock assigned jobs if none in store
   const jobs = bookings.length > 0 ? bookings : [
     {
       id: 'SRV-88291',
+      title: 'Panel Cleaning', // Mapped to title for nudge compatibility
       service: 'Panel Cleaning',
       date: 'Today',
       slot: '09:00 AM',
@@ -35,6 +41,7 @@ export default function TechnicianDashboard({ onBack }: { onBack: () => void }) 
     },
     {
       id: 'SRV-99302',
+      title: 'Health Checkup',
       service: 'Health Checkup',
       date: 'Tomorrow',
       slot: '11:00 AM',
@@ -45,6 +52,23 @@ export default function TechnicianDashboard({ onBack }: { onBack: () => void }) 
       description: 'Annual maintenance visit. Check inverter wiring and battery health.'
     }
   ];
+
+  useEffect(() => {
+    // Technician Profile: Focused on Gamification & Flow
+    const profile = {
+      ...defaultUserPsyche,
+      status: 'Flow',
+      tendencies: ['GAMIFICATION_DRIVEN']
+    };
+    const nextNudge = generateSprintNudge(jobs, profile);
+    setNudge(nextNudge);
+  }, []);
+
+  const handleStartSprint = () => {
+    setIsSprintActive(true);
+    setActiveJob(jobs[0]);
+    if (navigator.vibrate) navigator.vibrate([30, 80, 30]);
+  };
 
   return (
     <div className="min-h-screen bg-[#050505] pt-32 pb-20 text-white px-6">
@@ -70,6 +94,36 @@ export default function TechnicianDashboard({ onBack }: { onBack: () => void }) 
           </div>
         </div>
 
+        {/* 🧠 Behavioral Nudge Engine Widget */}
+        {nudge && !isSprintActive && (
+          <div className="mb-8 animate-in slide-in-from-top-8 fade-in duration-1000">
+            <Card className="relative overflow-hidden p-6 border-blue-500/40 bg-gradient-to-r from-blue-500/10 via-[#050505] to-transparent shadow-[0_0_40px_rgba(59,130,246,0.1)] group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/20 rounded-full blur-[80px] -mr-32 -mt-32"></div>
+              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-5">
+                  <div className="w-14 h-14 rounded-2xl bg-blue-500/20 border border-blue-500/50 flex items-center justify-center animate-pulse">
+                    <Zap className="text-blue-400" size={28} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-white flex items-center gap-2">
+                      Flow State Coach <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 text-[10px] uppercase tracking-widest">Active</span>
+                    </h3>
+                    <p className="text-white/70 text-sm font-medium mt-1 max-w-xl leading-relaxed">
+                      {nudge.message.replace('tasks right now', 'jobs today')}
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  onClick={handleStartSprint}
+                  className="shrink-0 px-8 py-4 rounded-xl bg-blue-500 text-white font-black uppercase tracking-widest text-sm flex items-center gap-3 hover:scale-105 transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)]"
+                >
+                  {nudge.actionButton || "Start Job"} <Play fill="currentColor" size={16} />
+                </button>
+              </div>
+            </Card>
+          </div>
+        )}
+
         <div className="grid lg:grid-cols-3 gap-10">
           {/* Job List */}
           <div className="lg:col-span-1 space-y-6">
@@ -82,12 +136,12 @@ export default function TechnicianDashboard({ onBack }: { onBack: () => void }) 
               </button>
             </div>
 
-            {jobs.map((job: any) => (
+            {(isSprintActive ? [jobs[0]] : jobs).map((job: any) => (
               <Card 
                 key={job.id}
                 onClick={() => setActiveJob(job)}
                 className={`p-8 cursor-pointer border-l-4 transition-all group relative overflow-hidden ${
-                  activeJob?.id === job.id ? 'border-primary bg-white/5' : 'border-transparent hover:bg-white/[0.03]'
+                  activeJob?.id === job.id || isSprintActive ? 'border-primary bg-white/5 shadow-[0_0_20px_rgba(255,215,0,0.1)]' : 'border-transparent hover:bg-white/[0.03]'
                 }`}
               >
                 {activeJob?.id === job.id && <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-12 -mt-12"></div>}

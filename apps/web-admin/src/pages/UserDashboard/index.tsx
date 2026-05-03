@@ -1,12 +1,39 @@
-import React, { useState } from 'react';
-import { Package, Truck, CheckCircle2, Clock, MapPin, ChevronRight, ArrowLeft, Sun, Zap, Wrench, ShieldCheck, Star } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Package, Truck, CheckCircle2, Clock, MapPin, ChevronRight, ArrowLeft, Sun, Zap, Wrench, ShieldCheck, Star, Trophy } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { Card, Button, StatusBadge } from '@solar-hub/ui';
+// @ts-ignore
+import { generateSprintNudge, defaultUserPsyche } from '@solar-hub/shared';
 
 export default function UserDashboard({ onBack }: { onBack: () => void }) {
   const { user, orders, subscriptions, bookings } = useStore();
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'bookings', 'subscriptions', or 'systems'
+  const [nudge, setNudge] = useState<any>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  useEffect(() => {
+    // Customer Profile: Gamification & Rewards
+    const profile = {
+      ...defaultUserPsyche,
+      tendencies: ['GAMIFICATION_DRIVEN']
+    };
+    
+    // Virtual Tasks for Customer
+    const userTasks = [
+      { id: 1, title: "Upload this month's electricity bill to unlock 500 Watts of virtual energy." },
+      { id: 2, title: "Book annual maintenance to extend warranty." }
+    ];
+
+    const nextNudge = generateSprintNudge(userTasks, profile);
+    setNudge(nextNudge);
+  }, []);
+
+  const handleClaimBadge = () => {
+    setShowConfetti(true);
+    if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
+    setTimeout(() => setShowConfetti(false), 3000);
+  };
 
   const renderTimeline = (item: any) => {
     const timeline = item.timeline || [
@@ -66,6 +93,36 @@ export default function UserDashboard({ onBack }: { onBack: () => void }) {
             ))}
           </div>
         </div>
+
+        {/* 🧠 Behavioral Nudge Engine Gamification Widget */}
+        {nudge && (
+          <div className={`mb-8 animate-in slide-in-from-top-8 fade-in duration-1000 ${showConfetti ? 'scale-105 transition-transform' : ''}`}>
+            <Card className="relative overflow-hidden p-6 border-purple-500/40 bg-gradient-to-r from-purple-500/10 via-[#050505] to-transparent shadow-[0_0_40px_rgba(168,85,247,0.1)] group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/20 rounded-full blur-[80px] -mr-32 -mt-32"></div>
+              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-5">
+                  <div className="w-14 h-14 rounded-2xl bg-purple-500/20 border border-purple-500/50 flex items-center justify-center animate-pulse">
+                    <Trophy className="text-purple-400" size={28} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-white flex items-center gap-2">
+                      Eco-Warrior Challenge <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[10px] uppercase tracking-widest">Daily Quest</span>
+                    </h3>
+                    <p className="text-white/70 text-sm font-medium mt-1 max-w-xl leading-relaxed">
+                      {nudge.message.replace('tasks right now', 'eco-actions today')}
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  onClick={handleClaimBadge}
+                  className="shrink-0 px-8 py-4 rounded-xl bg-purple-500 text-white font-black uppercase tracking-widest text-sm flex items-center gap-3 hover:scale-105 transition-all shadow-[0_0_20px_rgba(168,85,247,0.4)]"
+                >
+                  {nudge.actionButton} <Star fill="currentColor" size={16} />
+                </button>
+              </div>
+            </Card>
+          </div>
+        )}
 
         <div className="grid lg:grid-cols-3 gap-10">
           {/* List Section */}

@@ -12,6 +12,7 @@ import * as Haptics from 'expo-haptics';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { TechnicianTools } from './technician-tools';
+import { TrainingModule } from './training-module';
 import { apiUrl } from '@/constants/api';
 
 const { width } = Dimensions.get('window');
@@ -25,6 +26,8 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
   const [tasks, setTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [showTraining, setShowTraining] = useState(false);
+  const [trainingCompleted, setTrainingCompleted] = useState(false);
 
   const fetchTasks = async () => {
     try {
@@ -148,6 +151,39 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
              </Animated.View>
           </View>
 
+          {/* Training & Certification Ecosystem */}
+          <Animated.View entering={FadeInDown.delay(750)} style={[styles.bentoCard, { backgroundColor: '#121212', borderWidth: 1, borderColor: trainingCompleted ? '#4CAF50' : '#FFD700' }]}>
+             <View style={styles.bentoHeader}>
+                <ThemedText style={[styles.bentoLabel, { color: trainingCompleted ? '#4CAF50' : '#FFD700' }]}>TRAINING HUB</ThemedText>
+                <View style={[styles.timeBadge, { backgroundColor: trainingCompleted ? 'rgba(76,175,80,0.1)' : 'rgba(255,215,0,0.1)' }]}>
+                   <ThemedText style={[styles.timeText, { color: trainingCompleted ? '#4CAF50' : '#FFD700' }]}>
+                     {trainingCompleted ? 'Level 1 Certified' : 'Level 1 Incomplete'}
+                   </ThemedText>
+                </View>
+             </View>
+             <ThemedText style={[styles.bentoTitleDark, { color: '#fff', fontSize: 22 }]}>Solar Safety & SOPs</ThemedText>
+             <ThemedText style={[styles.bentoSubtitleDark, { color: 'rgba(255,255,255,0.6)' }]}>Micro-Course • 5 Mins • Required for AMC</ThemedText>
+             
+             {!trainingCompleted && (
+               <View style={styles.progressBarBg}>
+                  <View style={[styles.progressBarFill, { width: '10%' }]} />
+               </View>
+             )}
+
+             <TouchableOpacity 
+               onPress={() => {
+                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                 setShowTraining(true);
+               }}
+               style={[styles.bentoButtonDark, { backgroundColor: trainingCompleted ? 'rgba(255,255,255,0.1)' : '#FFD700' }]}
+             >
+                <ThemedText style={[styles.buttonTextDark, { color: trainingCompleted ? '#fff' : '#000' }]}>
+                  {trainingCompleted ? 'REVIEW MATERIAL' : 'START MODULE'}
+                </ThemedText>
+                <IconSymbol name={trainingCompleted ? "checkmark" : "play.fill"} size={16} color={trainingCompleted ? "#fff" : "#000"} />
+             </TouchableOpacity>
+          </Animated.View>
+
           {/* Workflow Section: NEW ADVANCED FEATURE */}
           <View style={[styles.section, { marginTop: 20 }]}>
             <View style={styles.sectionHeader}>
@@ -202,6 +238,15 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
        </View>
        
        <View style={{ height: 120 }} />
+
+       <TrainingModule 
+         visible={showTraining} 
+         onClose={() => setShowTraining(false)} 
+         onComplete={() => {
+           setShowTraining(false);
+           setTrainingCompleted(true);
+         }} 
+       />
     </ScrollView>
   );
 }

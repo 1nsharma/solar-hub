@@ -33,3 +33,6 @@ export const formatCurrency = (amount) => {
     maximumFractionDigits: 0
   }).format(amount);
 };
+
+export * from './behavioral.js';
+export * from './supply-chain.js';

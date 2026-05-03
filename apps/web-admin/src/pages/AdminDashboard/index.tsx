@@ -21,7 +21,8 @@ import {
   User,
   MapPin,
   Activity,
-  RefreshCw
+  RefreshCw,
+  Link
 } from 'lucide-react';
 import { 
   AreaChart, 
@@ -34,6 +35,7 @@ import {
 import { useStore } from '../../store/useStore';
 import { apiUrl } from '../../config/api';
 import { Card, StatusBadge, Button } from '@solar-hub/ui';
+import { InventoryManager, SupplyChainRiskManager } from '@solar-hub/shared';
 
 // Designer Tokens: High-Fidelity HSL System
 const COLORS = {
@@ -76,6 +78,8 @@ export default function AdminDashboard({ onBack }: { onBack: () => void }) {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
+  const [supplyChainReport, setSupplyChainReport] = useState<any>(null);
+  const [riskAssessment, setRiskAssessment] = useState<any>(null);
 
   const fetchStats = async () => {
     setLoading(true);
@@ -109,6 +113,25 @@ export default function AdminDashboard({ onBack }: { onBack: () => void }) {
 
   useEffect(() => {
     fetchStats();
+
+    // Generate Supply Chain Metrics
+    const inventoryMgr = new (InventoryManager as any)({
+      annualDemand: 15000,
+      orderCost: 2500,
+      holdingCostRate: 0.15,
+      unitPrice: 12500,
+      leadTimeDays: 21,
+      demandStdDev: 120,
+      serviceLevel: 0.95
+    });
+    setSupplyChainReport(inventoryMgr.getStrategyReport());
+
+    const riskMgr = new (SupplyChainRiskManager as any)();
+    setRiskAssessment(riskMgr.assessRisk({
+      spendShare: 0.35,
+      alternativeSuppliers: 1,
+      creditScore: 45
+    }));
   }, []);
 
   const statCards = [
@@ -160,7 +183,9 @@ export default function AdminDashboard({ onBack }: { onBack: () => void }) {
           <div className="lg:col-span-3 space-y-3">
             {[
               { id: 'overview', label: 'Ecosystem Pulse', icon: <Activity size={20} /> },
+              { id: 'supply-chain', label: 'Supply Chain Intel', icon: <Link size={20} /> },
               { id: 'vendors', label: 'Partner Matrix', icon: <ShieldCheck size={20} /> },
+              { id: 'training', label: 'O2O Certifications', icon: <User size={20} /> },
               { id: 'orders', label: 'Flow Control', icon: <ShoppingBag size={20} /> },
               { id: 'infrastructure', label: 'Grid Health', icon: <Truck size={20} /> }
             ].map(item => (
@@ -326,6 +351,94 @@ export default function AdminDashboard({ onBack }: { onBack: () => void }) {
               </div>
             )}
 
+            {activeTab === 'supply-chain' && (
+              <div className="animate-in slide-in-from-right-8 duration-700 space-y-8">
+                <Card className="flex justify-between items-center p-8 backdrop-blur-3xl bg-white/[0.03]">
+                  <div>
+                    <h3 className="text-3xl font-black tracking-tight text-white">Supply Chain Intelligence</h3>
+                    <p className="text-sm text-primary font-bold uppercase tracking-widest mt-1">Strategic Sourcing & Risk Matrix</p>
+                  </div>
+                  <Button variant="primary" className="px-6 py-3 bg-primary text-black border-none shadow-[0_0_20px_rgba(255,215,0,0.3)]">
+                    Generate TCO Report
+                  </Button>
+                </Card>
+
+                <div className="grid md:grid-cols-2 gap-8">
+                  <Card className="p-8 bg-white/[0.02] relative overflow-hidden group">
+                    <h4 className="text-xl font-black text-white mb-6 flex items-center gap-3">
+                      <ShoppingBag className="text-secondary" /> Inventory Optimization
+                    </h4>
+                    {supplyChainReport ? (
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center p-4 bg-white/5 rounded-2xl">
+                          <span className="text-white/50 font-bold uppercase tracking-wider text-xs">Economic Order Qty (EOQ)</span>
+                          <span className="text-xl font-black text-white">{supplyChainReport.eoq} units</span>
+                        </div>
+                        <div className="flex justify-between items-center p-4 bg-white/5 rounded-2xl">
+                          <span className="text-white/50 font-bold uppercase tracking-wider text-xs">Reorder Point (ROP)</span>
+                          <span className="text-xl font-black text-secondary">{supplyChainReport.reorderPoint} units</span>
+                        </div>
+                        <div className="flex justify-between items-center p-4 bg-white/5 rounded-2xl">
+                          <span className="text-white/50 font-bold uppercase tracking-wider text-xs">Safety Stock Level</span>
+                          <span className="text-xl font-black text-white">{supplyChainReport.safetyStock} units</span>
+                        </div>
+                        <div className="flex justify-between items-center p-4 bg-white/5 rounded-2xl">
+                          <span className="text-white/50 font-bold uppercase tracking-wider text-xs">Avg. Inventory Turns</span>
+                          <span className="text-xl font-black text-white">{supplyChainReport.inventoryTurns}x</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="h-48 bg-white/5 rounded-2xl animate-pulse" />
+                    )}
+                  </Card>
+
+                  <Card className="p-8 bg-white/[0.02] relative overflow-hidden group">
+                    <h4 className="text-xl font-black text-white mb-6 flex items-center gap-3">
+                      <ShieldCheck className="text-danger" /> Supplier Risk Profile
+                    </h4>
+                    {riskAssessment ? (
+                      <div className="space-y-6">
+                        <div className="p-4 rounded-2xl border border-danger/30 bg-danger/10">
+                          <p className="text-danger font-black uppercase tracking-widest text-xs mb-1">Overall Assessment</p>
+                          <p className="text-lg font-black text-white">{riskAssessment.overallRisk}</p>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-white/50 text-sm font-bold">Concentration Risk</span>
+                            <StatusBadge status={riskAssessment.detailScores.concentrationRisk} />
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-white/50 text-sm font-bold">Single-Source Risk</span>
+                            <StatusBadge status={riskAssessment.detailScores.singleSourceRisk} />
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-white/50 text-sm font-bold">Financial Health</span>
+                            <StatusBadge status={riskAssessment.detailScores.financialRisk} />
+                          </div>
+                        </div>
+
+                        {riskAssessment.recommendedActions.length > 0 && (
+                          <div className="mt-4 p-4 bg-white/5 rounded-2xl">
+                            <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-3">Mitigation Actions</p>
+                            <ul className="space-y-2">
+                              {riskAssessment.recommendedActions.map((action: string, i: number) => (
+                                <li key={i} className="text-sm text-white/80 flex items-start gap-2">
+                                  <span className="text-primary mt-1">•</span> {action}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="h-48 bg-white/5 rounded-2xl animate-pulse" />
+                    )}
+                  </Card>
+                </div>
+              </div>
+            )}
+
             {activeTab === 'vendors' && (
               <div className="animate-in slide-in-from-right-8 duration-700 space-y-8">
                 <Card className="flex justify-between items-center p-8 backdrop-blur-3xl bg-white/[0.03]">
@@ -408,7 +521,64 @@ export default function AdminDashboard({ onBack }: { onBack: () => void }) {
               </div>
             )}
 
-            {activeTab !== 'overview' && activeTab !== 'vendors' && (
+            {activeTab === 'training' && (
+              <div className="animate-in slide-in-from-right-8 duration-700 space-y-8">
+                <Card className="flex justify-between items-center p-8 backdrop-blur-3xl bg-white/[0.03]">
+                  <div>
+                    <h3 className="text-3xl font-black tracking-tight text-white">O2O Certification Queue</h3>
+                    <p className="text-sm text-primary font-bold uppercase tracking-widest mt-1">Pending Field Shadow Rubrics (Kirkpatrick Level 3)</p>
+                  </div>
+                  <Button variant="primary" className="px-6 py-3 bg-[#4CAF50] text-white border-none shadow-[0_0_20px_rgba(76,175,80,0.3)] hover:bg-[#45a049]">
+                    Export Training ROI
+                  </Button>
+                </Card>
+
+                <div className="bg-white/[0.01] border border-white/5 rounded-[48px] overflow-hidden backdrop-blur-md">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="bg-white/[0.03] text-[10px] text-white/30 uppercase font-black tracking-[0.3em]">
+                        <th className="px-10 py-8">Trainee Profile</th>
+                        <th className="px-10 py-8">Micro-Course (Level 2)</th>
+                        <th className="px-10 py-8">Shadow Score (Level 3)</th>
+                        <th className="px-10 py-8 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      <tr className="hover:bg-white/[0.03] transition-all group/row">
+                        <td className="px-10 py-10">
+                          <div className="flex items-center gap-6">
+                            <div className="w-16 h-16 bg-white/5 rounded-[20px] flex items-center justify-center text-2xl font-black group-hover/row:text-primary transition-colors text-white">
+                              R
+                            </div>
+                            <div>
+                              <p className="font-black text-xl tracking-tight text-white">Rahul Verma</p>
+                              <p className="text-[10px] text-white/20 font-black tracking-[0.2em] uppercase mt-1">Location: Kanpur</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-10 py-10">
+                          <StatusBadge status="95% - Pass" />
+                        </td>
+                        <td className="px-10 py-10">
+                          <div className="flex items-center gap-3">
+                            <Star size={16} className="text-primary fill-primary" />
+                            <span className="text-sm font-black text-white">4.8 / 5.0</span>
+                            <span className="text-[10px] text-white/30 font-black uppercase tracking-[0.1em] ml-2">(Mentor: Sumit)</span>
+                          </div>
+                        </td>
+                        <td className="px-10 py-10 text-right">
+                          <Button variant="primary" className="px-8 py-3.5 bg-primary text-black hover:bg-white transition-colors">
+                            Approve Level 1
+                          </Button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {activeTab !== 'overview' && activeTab !== 'supply-chain' && activeTab !== 'vendors' && activeTab !== 'training' && (
               <div className="animate-in zoom-in-95 duration-700 py-40 text-center bg-white/[0.01] border border-white/5 rounded-[64px] backdrop-blur-xl">
                 <div className="w-32 h-32 bg-white/5 rounded-[40px] flex items-center justify-center mx-auto mb-10 border border-white/10 group">
                   <Activity size={48} className="text-white/10 group-hover:text-primary group-hover:scale-110 transition-all duration-500" />
