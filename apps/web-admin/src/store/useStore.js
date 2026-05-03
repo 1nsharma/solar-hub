@@ -1,29 +1,7 @@
 import { create } from 'zustand';
 import { apiUrl } from '../config/api';
-import { User, Product, Service, Order, ServiceBooking } from '@solar-hub/types';
 
-interface StoreState {
-  language: 'en' | 'hi';
-  user: User | null;
-  products: Product[];
-  services: Service[];
-  cart: (Product & { quantity: number })[];
-  orders: Order[];
-  subscriptions: any[];
-  bookings: ServiceBooking[];
-  
-  setLanguage: (lang: 'en' | 'hi') => void;
-  fetchProducts: () => Promise<void>;
-  addOrder: (order: Partial<Order> & { items: any[] }) => Promise<void>;
-  addBooking: (booking: Partial<ServiceBooking>) => Promise<void>;
-  setUser: (user: User | null) => void;
-  addToCart: (product: Product) => void;
-  removeFromCart: (productId: string | number) => void;
-  clearCart: () => void;
-  addSubscription: (sub: any) => void;
-}
-
-export const useStore = create<StoreState>((set) => ({
+export const useStore = create((set) => ({
   language: 'en',
   user: null,
   products: [],

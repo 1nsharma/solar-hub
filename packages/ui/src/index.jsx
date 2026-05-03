@@ -1,8 +1,8 @@
 import React from 'react';
 
-export const Button = ({ children, onClick, variant = 'primary', className = '' }: any) => {
+export const Button = ({ children, onClick, variant = 'primary', className = '' }) => {
   const baseStyles = 'px-4 py-2 rounded-lg font-bold transition-all';
-  const variants: any = {
+  const variants = {
     primary: 'bg-[#FFD700] text-black hover:bg-[#FFC800]',
     secondary: 'bg-gray-800 text-white hover:bg-gray-700',
     outline: 'border-2 border-[#FFD700] text-[#FFD700] hover:bg-[#FFD700] hover:text-black'
@@ -15,15 +15,15 @@ export const Button = ({ children, onClick, variant = 'primary', className = '' 
   );
 };
 
-export const Card = ({ children, className = '' }: any) => (
+export const Card = ({ children, className = '' }) => (
   <div className={`bg-white dark:bg-[#121212] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 ${className}`}>
     {children}
   </div>
 );
 
-export const StatusBadge = ({ status, className = '' }: any) => {
-  const getColors = (s: string) => {
-    switch (s.toLowerCase()) {
+export const StatusBadge = ({ status, className = '' }) => {
+  const getColors = (s) => {
+    switch (s?.toLowerCase()) {
       case 'active':
       case 'completed':
       case 'paid':
@@ -41,12 +41,12 @@ export const StatusBadge = ({ status, className = '' }: any) => {
 
   return (
     <span className={`px-2 py-1 rounded-md text-xs font-medium ${getColors(status)} ${className}`}>
-      {status.toUpperCase()}
+      {status?.toUpperCase()}
     </span>
   );
 };
 
-export const Input = ({ label, ...props }: any) => (
+export const Input = ({ label, ...props }) => (
   <div className="flex flex-col gap-1 w-full">
     {label && <label className="text-sm font-semibold opacity-70">{label}</label>}
     <input 

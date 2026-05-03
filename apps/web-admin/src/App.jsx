@@ -35,32 +35,31 @@ import PartnerSection from './components/PartnerSection';
 import { translations } from './utils/translations';
 import { apiUrl } from './config/api';
 import PwaInstallButton from './components/PwaInstallButton';
-import { Product, Service } from '@solar-hub/types';
 import { Card, Button, StatusBadge, Input } from '@solar-hub/ui';
 
 function App() {
   const { user, setUser, cart, addToCart, products, services, fetchProducts, language, setLanguage } = useStore();
-  const t = (translations as any)[language];
+  const t = translations[language];
   
-  const [currentPage, setCurrentPage] = useState('home'); // 'home', 'vendor', 'dashboard', 'technician', or 'admin'
+  const [currentPage, setCurrentPage] = useState('home'); 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isPitchOpen, setIsPitchOpen] = useState(false);
-  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [selectedService, setSelectedService] = useState(null);
   
-  const [calcInputs, setCalcInputs] = useState<any>({
+  const [calcInputs, setCalcInputs] = useState({
     bill: 5000,
     pincode: '',
     roofType: 'Flat',
     area: 500
   });
-  const [notification, setNotification] = useState<string | null>(null);
-  const [externalDeals, setExternalDeals] = useState<any[]>([]);
+  const [notification, setNotification] = useState(null);
+  const [externalDeals, setExternalDeals] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [activeTab, setActiveTab] = useState<'products' | 'services'>('products'); // 'products' or 'services'
+  const [activeTab, setActiveTab] = useState('products'); 
   
   useEffect(() => {
     fetchProducts();
@@ -81,7 +80,6 @@ function App() {
     fetchExternal();
   }, [fetchProducts]);
 
-  // Role-Based Automatic Routing
   useEffect(() => {
     if (user) {
       if (user.role === 'admin') setCurrentPage('admin');
@@ -98,7 +96,7 @@ function App() {
   const estimatedSavings = (calcInputs.bill * 0.9).toFixed(0);
   const estimatedCost = (Number(recommendedKW) * 60000).toLocaleString();
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product) => {
     addToCart(product);
     setNotification(`${product.title} added to cart!`);
     setTimeout(() => setNotification(null), 3000);
@@ -108,7 +106,7 @@ function App() {
     setUser(null);
   };
 
-  const handleBookService = (service: Service) => {
+  const handleBookService = (service) => {
     if (!user) {
       setIsAuthModalOpen(true);
       return;
@@ -143,7 +141,6 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white">
-      {/* Notifications */}
       {notification && (
         <div className="fixed bottom-8 right-8 z-[200] bg-green-500 text-black font-black px-8 py-4 rounded-2xl shadow-[0_0_50px_rgba(34,197,94,0.3)] animate-in slide-in-from-right-4 flex items-center gap-3 border border-green-400/20">
           <CheckCircle2 size={20} />
@@ -151,7 +148,6 @@ function App() {
         </div>
       )}
 
-      {/* Navigation */}
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-50">
         <div className="backdrop-blur-3xl bg-white/[0.03] rounded-[32px] px-10 py-5 flex justify-between items-center shadow-2xl border border-white/5">
           <div className="flex items-center gap-4 group cursor-pointer" onClick={() => setCurrentPage('home')}>
@@ -222,7 +218,6 @@ function App() {
         </div>
       </nav>
 
-      {/* Modals */}
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
       <CartDrawer 
         isOpen={isCartOpen} 
@@ -237,11 +232,10 @@ function App() {
       <BookingModal 
         isOpen={isBookingOpen} 
         onClose={() => setIsBookingOpen(false)} 
-        service={selectedService as any}
+        service={selectedService}
         onComplete={() => setCurrentPage('dashboard')}
       />
 
-      {/* Hero Section */}
       <section className="relative min-h-screen flex items-center pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
@@ -284,12 +278,10 @@ function App() {
           </div>
         </div>
         
-        {/* Animated Background Elements */}
         <div className="absolute top-1/4 -right-40 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[200px] animate-pulse pointer-events-none"></div>
         <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[180px] animate-pulse pointer-events-none" style={{ animationDelay: '2s' }}></div>
       </section>
 
-      {/* Unified Explore Section */}
       <section id="products" className="py-40 relative z-10">
         <div className="container px-6 mx-auto">
           <div className="text-center mb-20">
@@ -297,7 +289,6 @@ function App() {
             <p className="text-white/30 text-xl font-medium tracking-[0.2em] uppercase">Authenticated Products & Professional Logistics</p>
           </div>
 
-          {/* Tab Switcher */}
           <div className="flex justify-center mb-20">
             <Card className="bg-white/5 p-2 rounded-[32px] border border-white/10 flex gap-2">
               <button 
@@ -344,7 +335,7 @@ function App() {
                     }
                     title={service.title}
                     desc={service.duration}
-                    price={service.price as any}
+                    price={service.price}
                     fullDesc={service.description}
                     onBook={() => handleBookService(service)}
                   />
@@ -354,7 +345,6 @@ function App() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="py-24 border-t border-white/5 relative bg-[#030303]">
         <div className="container mx-auto px-6 grid md:grid-cols-4 gap-20">
           <div className="col-span-1 md:col-span-2">
@@ -407,7 +397,7 @@ function App() {
   );
 }
 
-function ProductCard({ product, onAdd }: { product: Product; onAdd: (p: Product) => void }) {
+function ProductCard({ product, onAdd }) {
   return (
     <Card className="p-6 group flex flex-col h-full relative overflow-hidden bg-white/[0.02] border-white/5 hover:border-primary/30 transition-all duration-500">
       <div className="h-72 rounded-[24px] overflow-hidden mb-8 bg-white/5 relative border border-white/5">
@@ -416,7 +406,7 @@ function ProductCard({ product, onAdd }: { product: Product; onAdd: (p: Product)
           alt={product.title} 
           className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700" 
         />
-        {parseFloat(product.rating as any) >= 4.8 && (
+        {parseFloat(product.rating) >= 4.8 && (
           <div className="absolute top-5 left-5">
              <StatusBadge status="ELITE" className="bg-[#FFD700] text-black border-none px-4 py-1" />
           </div>
@@ -470,13 +460,13 @@ function ProductCard({ product, onAdd }: { product: Product; onAdd: (p: Product)
   );
 }
 
-function ServiceItem({ icon, title, desc, price, fullDesc, onBook }: { icon: any; title: string; desc: string; price: number; fullDesc: string; onBook: () => void }) {
+function ServiceItem({ icon, title, desc, price, fullDesc, onBook }) {
   return (
     <Card className="text-center p-10 group flex flex-col h-full relative overflow-hidden bg-white/[0.02] border-white/5 hover:border-primary/30 transition-all duration-500">
       <div className="absolute -right-12 -top-12 w-40 h-40 bg-primary/5 rounded-full group-hover:bg-primary/10 transition-all duration-700"></div>
       
       <div className="mb-10 inline-block p-6 bg-white/5 rounded-3xl group-hover:bg-primary/20 transition-all transform group-hover:rotate-12 border border-white/5">
-        {React.cloneElement(icon as any, { size: 48 })}
+        {React.cloneElement(icon, { size: 48 })}
       </div>
       
       <h4 className="text-3xl mb-3 font-black text-white italic tracking-tighter">{title}</h4>
