@@ -16,9 +16,9 @@ import { useStore } from '../../store/useStore';
 import { apiUrl } from '../../config/api';
 import { Card, Button, StatusBadge, Input } from '@solar-hub/ui';
 
-const PartnerDashboard = ({ onBack }: { onBack: () => void }) => {
+const PartnerDashboard = ({ onBack }) => {
   const { user } = useStore();
-  const [leads, setLeads] = useState<any[]>([]);
+  const [leads, setLeads] = useState([]);
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [newLead, setNewLead] = useState({
     customer_name: '',
@@ -45,7 +45,7 @@ const PartnerDashboard = ({ onBack }: { onBack: () => void }) => {
     }
   };
 
-  const handleCreateLead = async (e: React.FormEvent) => {
+  const handleCreateLead = async (e) => {
     e.preventDefault();
     if (!user) return;
     setLoading(true);
@@ -213,7 +213,7 @@ const PartnerDashboard = ({ onBack }: { onBack: () => void }) => {
                   required
                   placeholder="Enter full identity"
                   value={newLead.customer_name}
-                  onChange={(e: any) => setNewLead({...newLead, customer_name: e.target.value})}
+                  onChange={(e) => setNewLead({...newLead, customer_name: e.target.value})}
                 />
                 <Input 
                   label="PHONE NUMBER"
@@ -221,7 +221,7 @@ const PartnerDashboard = ({ onBack }: { onBack: () => void }) => {
                   type="tel"
                   placeholder="10-digit uplink"
                   value={newLead.customer_phone}
-                  onChange={(e: any) => setNewLead({...newLead, customer_phone: e.target.value})}
+                  onChange={(e) => setNewLead({...newLead, customer_phone: e.target.value})}
                 />
               </div>
 
@@ -230,7 +230,7 @@ const PartnerDashboard = ({ onBack }: { onBack: () => void }) => {
                 type="email"
                 placeholder="customer@neural.net"
                 value={newLead.customer_email}
-                onChange={(e: any) => setNewLead({...newLead, customer_email: e.target.value})}
+                onChange={(e) => setNewLead({...newLead, customer_email: e.target.value})}
               />
 
               <div className="grid md:grid-cols-2 gap-6">
@@ -252,7 +252,7 @@ const PartnerDashboard = ({ onBack }: { onBack: () => void }) => {
                   type="number"
                   placeholder="e.g. 5.0"
                   value={newLead.estimated_load}
-                  onChange={(e: any) => setNewLead({...newLead, estimated_load: e.target.value})}
+                  onChange={(e) => setNewLead({...newLead, estimated_load: e.target.value})}
                 />
               </div>
 
