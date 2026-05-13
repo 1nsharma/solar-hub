@@ -5,6 +5,7 @@ on:
     tags:
       - 'v*-vendor-apk'
       - 'v*-customer-apk'
+      - 'v*-technician-apk'
   workflow_dispatch:
     inputs:
       variant:
@@ -15,6 +16,7 @@ on:
         options:
           - vendor
           - customer
+          - technician
       release_tag:
         description: Optional GitHub release tag, for example v1.0.0-vendor-apk
         required: false
@@ -26,7 +28,7 @@ jobs:
     permissions:
       contents: write
     env:
-      APP_VARIANT: ${{ inputs.variant || (contains(github.ref_name, 'vendor') && 'vendor' || 'customer') }}
+      APP_VARIANT: ${{ inputs.variant || (contains(github.ref_name, 'technician') && 'technician' || (contains(github.ref_name, 'vendor') && 'vendor' || 'customer')) }}
       EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL || 'https://api.solarhub.in' }}
     steps:
       - uses: actions/checkout@v4

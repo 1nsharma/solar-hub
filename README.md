@@ -48,6 +48,8 @@ For launch steps covering APK/AAB builds, API environment setup, ecommerce monet
 
 For the product and revenue model, see [docs/business_model.md](file:///c:/Users/amits/Desktop/solar-hub/docs/business_model.md).
 
+For founder-facing requirements, selling position, persona coverage, and production gaps, see [docs/founder_requirements.md](file:///c:/Users/amits/Desktop/solar-hub/docs/founder_requirements.md).
+
 For Chrome install, vendor APK, Android Studio, and Play Store launch steps, see [docs/provider_chrome_and_vendor_apk.md](file:///c:/Users/amits/Desktop/solar-hub/docs/provider_chrome_and_vendor_apk.md).
 
 For running everything locally now and switching to real keys later, see [docs/local_runbook.md](file:///c:/Users/amits/Desktop/solar-hub/docs/local_runbook.md).

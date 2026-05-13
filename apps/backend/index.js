@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-const { revenueModel, servicePrograms, providerIntegrations } = require('./config/platform');
+const { revenueModel, servicePrograms, founderReadiness, providerIntegrations } = require('./config/platform');
 
 // Route Imports
 const authRoutes = require('./routes/auth');
@@ -44,6 +44,7 @@ app.use('/api', systemRoutes); // health, seed, external-deals
 // Platform Info Routes
 app.get('/api/revenue-model', (req, res) => res.json(revenueModel));
 app.get('/api/service-programs', (req, res) => res.json(servicePrograms));
+app.get('/api/founder-readiness', (req, res) => res.json(founderReadiness));
 app.get('/api/provider-integrations', (req, res) => res.json({
   mode: USE_MOCK ? 'local_mock' : 'production',
   integrations: providerIntegrations
