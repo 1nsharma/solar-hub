@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://solarhub.in/sitemap.xml
+Sitemap: https://1nsharma.github.io/solar-hub/sitemap.xml

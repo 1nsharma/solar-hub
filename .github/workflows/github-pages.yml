@@ -40,7 +40,9 @@ jobs:
         run: npm run build -w @solar-hub/web-admin -- --base=/solar-hub/
 
       - name: Add Pages marker
-        run: touch apps/web-admin/dist/.nojekyll
+        run: |
+          touch apps/web-admin/dist/.nojekyll
+          cp apps/web-admin/dist/index.html apps/web-admin/dist/404.html
 
       - uses: actions/upload-pages-artifact@v3
         with:
