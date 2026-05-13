@@ -1,6 +1,10 @@
 # SolarHub Platform
 
-SolarHub is a hybrid solar ecosystem combining an e-commerce marketplace for solar products with a comprehensive service platform for installation, maintenance, and AMC.
+SolarHub is a solar marketplace and service network for rooftop solar kits, installation, AMC, technician jobs, vendor orders, partner leads, and customer savings tracking.
+
+## License and Reuse
+
+This repository is public for demo, review, and deployment visibility only. It is not open source. The code, product flows, UI, documentation, and business logic are proprietary to SolarHub and may not be copied, reused, modified, hosted, or redistributed without written permission.
 
 ## Project Structure (Monorepo)
 

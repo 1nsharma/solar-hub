@@ -142,7 +142,7 @@ function App() {
       )}
 
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-50">
-        <div className="backdrop-blur-3xl bg-white/[0.03] rounded-[32px] px-10 py-5 flex justify-between items-center shadow-2xl border border-white/5">
+        <div className="backdrop-blur-3xl bg-[#102018]/95 rounded-[28px] px-6 md:px-10 py-4 flex justify-between items-center shadow-2xl border border-white/10">
           <div className="flex items-center gap-4 group cursor-pointer" onClick={() => setCurrentPage('home')}>
             <div className="bg-primary p-3 rounded-2xl group-hover:rotate-12 transition-all shadow-[0_0_30px_rgba(255,215,0,0.2)]">
               <Sun className="text-black" size={28} />
@@ -200,7 +200,7 @@ function App() {
                 variant="primary"
                 className="hidden md:block px-10 py-4 shadow-[0_0_30px_rgba(255,215,0,0.2)]"
               >
-                AUTHORIZE
+                Sign in
               </Button>
             )}
 
@@ -244,41 +244,41 @@ function App() {
               <span className="text-5xl font-black tracking-tighter italic text-white">SolarHub</span>
             </div>
             <p className="text-white/30 max-w-lg text-lg leading-relaxed font-medium">
-              The standardized terminal for high-performance solar assets. Connecting vendors, technicians, and mission-critical logistics to power the next century.
+              India's solar marketplace for verified products, installation, AMC, technician jobs, vendor orders, and partner-led customer acquisition.
             </p>
           </div>
           
           <div>
-            <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white mb-10">CORE NODES</h4>
+            <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white mb-10">Platform</h4>
             <ul className="space-y-6 text-white/40 text-xs font-black tracking-widest uppercase">
-              <li><a href="#" className="hover:text-primary transition-all">About Matrix</a></li>
+              <li><a href="#" className="hover:text-primary transition-all">About SolarHub</a></li>
               <li><a href="#products" className="hover:text-primary transition-all">Marketplace</a></li>
-              <li><a href="#services" className="hover:text-primary transition-all">Service Grid</a></li>
+              <li><a href="#products" className="hover:text-primary transition-all">Services</a></li>
               <li>
                 <button 
                   onClick={() => { setCurrentPage('vendor'); window.scrollTo(0,0); }}
                   className="hover:text-primary transition-all uppercase"
                 >
-                  Partner Uplink
+                  Vendor onboarding
                 </button>
               </li>
             </ul>
           </div>
           
           <div>
-            <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white mb-10">COMMS CENTER</h4>
+            <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white mb-10">Contact</h4>
             <ul className="space-y-6 text-white/40 text-xs font-black tracking-widest uppercase">
-              <li className="flex items-center gap-4"><MapPin size={18} className="text-primary" /> KANPUR SECTOR-7</li>
+              <li className="flex items-center gap-4"><MapPin size={18} className="text-primary" /> Kanpur, Uttar Pradesh</li>
               <li className="flex items-center gap-4"><Phone size={18} className="text-primary" /> +91 98XXX XXXXX</li>
-              <li className="flex items-center gap-4"><Zap size={18} className="text-primary" /> UPLINK@SOLARHUB.IO</li>
+              <li className="flex items-center gap-4"><Zap size={18} className="text-primary" /> hello@solarhub.io</li>
             </ul>
           </div>
         </div>
         <div className="container mx-auto px-6 mt-24 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-           <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.4em]">© 2026 SOLARHUB PROTOCOL. SYSTEM STANDBY.</p>
+           <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.4em]">(c) 2026 SolarHub. All rights reserved.</p>
            <div className="flex gap-10">
-              <span className="text-primary animate-pulse text-[10px] font-black uppercase tracking-widest">SERVER: OPTIMAL</span>
-              <span className="text-white/20 text-[10px] font-black uppercase tracking-widest italic cursor-pointer hover:text-white transition-colors">SECURITY MATRIX</span>
+              <span className="text-primary text-[10px] font-black uppercase tracking-widest">Marketplace ready</span>
+              <span className="text-white/20 text-[10px] font-black uppercase tracking-widest italic cursor-pointer hover:text-white transition-colors">Privacy and terms</span>
            </div>
         </div>
       </footer>
