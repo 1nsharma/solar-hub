@@ -1,7 +1,7 @@
 {
   "name": "SolarHub Provider Console",
   "short_name": "SolarHub",
-  "description": "Installable SolarHub console for vendors, technicians, partners, and admins.",
+  "description": "SolarHub marketplace and service network for customers, vendors, technicians, partners, and admins.",
   "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
