@@ -232,6 +232,7 @@ function App() {
       <PublicWebsite 
         onAddProduct={handleAddToCart}
         onBookService={handleBookService}
+        onVendorOnboarding={() => { setCurrentPage('vendor'); window.scrollTo(0,0); }}
       />
 
       <footer className="py-24 border-t border-white/5 relative bg-[#030303]">
