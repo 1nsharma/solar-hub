@@ -59,4 +59,5 @@ function calculateSolarRecommendation({ monthlyBill = 0, roofAreaSqFt = 0, state
   };
 }
 
-module.exports = { calculateSolarRecommendation, calculateSubsidy, calculateFinancialROI };
+export { calculateSolarRecommendation, calculateSubsidy, calculateFinancialROI, DEFAULT_TARIFF, GENERATION_PER_KW_MONTH, ROOF_SQFT_PER_KW, TURNKEY_COST_PER_KW };
+export default calculateSolarRecommendation;

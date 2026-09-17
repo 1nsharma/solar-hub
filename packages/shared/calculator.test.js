@@ -1,5 +1,5 @@
-const assert = require('assert');
-const { calculateSubsidy, calculateSolarRecommendation, calculateFinancialROI } = require('./calculator.js');
+import assert from 'assert';
+import { calculateSubsidy, calculateSolarRecommendation, calculateFinancialROI } from './calculator.js';
 
 assert.strictEqual(calculateSubsidy(1), 30000);
 assert.strictEqual(calculateSubsidy(2), 60000);

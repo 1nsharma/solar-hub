@@ -23,10 +23,13 @@ import {
   FileText,
   BadgePercent
 } from 'lucide-react';
+import { calculateSolarRecommendation } from '@solar-hub/shared';
+import { useStore } from '../../store/useStore';
 
 const heroImage = 'https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?auto=format&fit=crop&q=85&w=2400';
 
 export default function ConsumerFunnel({ products = [], services = [], onAddProduct, onBookService }) {
+  const { createLead } = useStore();
   const [calcInputs, setCalcInputs] = useState({
     bill: 4500,
     area: 450,
@@ -39,25 +42,25 @@ export default function ConsumerFunnel({ products = [], services = [], onAddProd
   const [surveySubmitted, setSurveySubmitted] = useState(false);
   const [surveyForm, setSurveyForm] = useState({ name: '', phone: '', city: 'Kanpur', roofArea: '400-600 sq ft' });
 
-  // Solar & PM Surya Ghar Subsidy Calculations
-  const recommendedKW = Math.max(1, Math.min(10, Math.round((calcInputs.bill / 1400) * 10) / 10));
+  // Canonical Solar & PM Surya Ghar Subsidy Calculations from @solar-hub/shared
+  const solarCalc = useMemo(() => {
+    return calculateSolarRecommendation({
+      monthlyBill: calcInputs.bill,
+      roofAreaSqFt: calcInputs.area,
+      tariffPerUnit: 7
+    });
+  }, [calcInputs.bill, calcInputs.area]);
+
+  const recommendedKW = solarCalc.recommendedKw;
   const roundedKW = recommendedKW.toFixed(1);
-  const unitsPerMonth = Math.round(recommendedKW * 120); // ~4 units/day/kW * 30 days
-  const estimatedSavings = Math.round(calcInputs.bill * 0.88);
-  const annualSavings = estimatedSavings * 12;
-  const grossCost = Math.round(recommendedKW * 58000);
-
-  // PM Surya Ghar Muft Bijli Yojana Central DBT Subsidy Formula:
-  // 1 kW = ₹30,000; 2 kW = ₹60,000; 3 kW and above = ₹78,000 max.
-  const centralSubsidy = useMemo(() => {
-    if (recommendedKW <= 1) return 30000;
-    if (recommendedKW <= 2) return 60000;
-    return 78000;
-  }, [recommendedKW]);
-
-  const netCost = Math.max(20000, grossCost - centralSubsidy);
-  const paybackYears = Math.max(1.8, (netCost / Math.max(1, annualSavings))).toFixed(1);
-  const lifetime25yrSavings = Math.round((annualSavings * 25) - netCost);
+  const unitsPerMonth = solarCalc.monthlyUnits;
+  const estimatedSavings = solarCalc.monthlySavings;
+  const annualSavings = solarCalc.annualSavings;
+  const grossCost = solarCalc.grossCost;
+  const centralSubsidy = solarCalc.centralSubsidy;
+  const netCost = solarCalc.netCost;
+  const paybackYears = solarCalc.paybackYears != null ? solarCalc.paybackYears.toFixed(1) : '2.1';
+  const lifetime25yrSavings = solarCalc.lifetime25yrSavings;
 
   // Filter products by category
   const filteredProducts = useMemo(() => {
@@ -68,8 +71,44 @@ export default function ConsumerFunnel({ products = [], services = [], onAddProd
     return products;
   }, [products, activeCategory]);
 
-  const handleSurveySubmit = (e) => {
+  const handleSurveySubmit = async (e) => {
     e.preventDefault();
+    try {
+      const leadPayload = {
+        name: surveyForm.name,
+        customer_name: surveyForm.name,
+        phone: surveyForm.phone,
+        customer_phone: surveyForm.phone,
+        city: surveyForm.city,
+        pincode: calcInputs.pincode,
+        requirement: `Rooftop Solar Survey (${surveyForm.roofArea}) | Bill: ₹${calcInputs.bill} | Recommended: ${roundedKW}kW`,
+        interest_type: 'Residential Rooftop',
+        estimated_load: recommendedKW,
+        monthly_bill: calcInputs.bill,
+        roof_area: calcInputs.area,
+        roof_area_sqft: calcInputs.area,
+        recommended_kw: recommendedKW,
+        subsidy_amount: centralSubsidy,
+        estimated_savings: estimatedSavings,
+        source: 'web_survey_modal',
+        calculator_payload: {
+          monthlyBill: calcInputs.bill,
+          roofAreaSqFt: calcInputs.area,
+          recommendedKw: recommendedKW,
+          centralSubsidy,
+          grossCost,
+          netCost,
+          paybackYears,
+          lifetime25yrSavings,
+          annualSavings
+        }
+      };
+      if (createLead) {
+        await createLead(leadPayload);
+      }
+    } catch (err) {
+      console.warn('Lead submission error:', err);
+    }
     setSurveySubmitted(true);
     setTimeout(() => {
       setSurveySubmitted(false);
