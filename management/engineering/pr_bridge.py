@@ -9,9 +9,9 @@ import urllib.request
 
 
 class PRBridge:
-    def __init__(self, workspace: str | Path, repo_root: str | Path):
+    def __init__(self, workspace: str | Path, repo_root: str | Path | None = None):
         self.workspace = Path(workspace).resolve()
-        self.repo_root = Path(repo_root).resolve()
+        self.repo_root = Path(repo_root or workspace).resolve()
 
     def commit(self, message: str) -> str:
         p = subprocess.run(["git", "add", "-A"], cwd=self.workspace, text=True, capture_output=True)
@@ -58,3 +58,14 @@ class PRBridge:
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
         return target
+
+    def create_spec(self, objective: str, report: dict, verification: dict) -> dict:
+        payload = {
+            "objective": objective,
+            "report": report,
+            "verification": verification,
+            "diff": report.get("diff", "") if isinstance(report, dict) else "",
+        }
+        artifact_path = self.workspace / ".solarhub" / "pr_spec.json"
+        saved = self.offline_spec(artifact_path, payload)
+        return {"ok": True, "artifact": str(saved), "payload": payload}

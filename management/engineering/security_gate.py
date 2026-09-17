@@ -12,8 +12,19 @@ SECRET_PATTERNS = [
     re.compile(r"\bsk-proj-[A-Za-z0-9_-]{20,}\b"),
     re.compile(r"\bAIza[0-9A-Za-z_-]{30,}\b"),
 ]
-BLOCKED_PATHS = {".env", ".env.local", ".env.production", ".pem", ".key"}
+BLOCKED_PATHS = (".env", ".env.local", ".env.production", ".pem", ".key")
 BLOCKED_PREFIXES = (".github/workflows/",)
+
+
+class SecurityReport(dict):
+    def __getattr__(self, name: str):
+        try:
+            return self[name]
+        except KeyError:
+            raise AttributeError(name)
+
+    def to_dict(self) -> dict:
+        return dict(self)
 
 
 class SecurityGate:
@@ -54,8 +65,9 @@ class SecurityGate:
                 blocked.append(rel)
         return sorted(set(blocked))
 
-    def run(self) -> dict:
+    def run(self) -> SecurityReport:
         files = self.changed_files()
         secrets = self.scan_secrets(files)
         blocked = self.blocked_changes(files)
-        return {"ok": not secrets and not blocked, "changed_files": files, "secret_findings": secrets, "blocked_changes": blocked}
+        return SecurityReport({"ok": not secrets and not blocked, "changed_files": files, "secret_findings": secrets, "blocked_changes": blocked})
+
