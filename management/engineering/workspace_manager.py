@@ -50,4 +50,5 @@ class WorkspaceManager:
         subprocess.run(["git", "worktree", "remove", "--force", str(path)], cwd=self.repo_root, text=True, capture_output=True)
         if path.exists():
             shutil.rmtree(path, ignore_errors=True)
+        subprocess.run(["git", "branch", "-D", workspace.branch], cwd=self.repo_root, text=True, capture_output=True)
         self._run("git", "worktree", "prune")
