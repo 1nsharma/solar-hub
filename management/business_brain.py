@@ -1,9 +1,4 @@
-"""SolarHub Business Brain - Phase 1 orchestration core.
-
-This module coordinates the existing AI workforce without replacing the
-existing SolarHub application. It provides a deterministic orchestration
-contract that can later be backed by any LLM/provider and real tools.
-"""
+"""SolarHub Business Brain - autonomous orchestration core."""
 
 from __future__ import annotations
 
@@ -13,7 +8,6 @@ from typing import Any, Dict, List, Optional
 import json
 import os
 import uuid
-
 
 AGENT_NAMES = {
     "build": "Build Agent",
@@ -48,22 +42,21 @@ class BusinessBrain:
         self.goal: Optional[Goal] = None
 
     def observe(self) -> Dict[str, Any]:
-        """Collect the minimum business/system context without requiring an LLM."""
         return {
             "timestamp": now(),
             "root_dir": self.root_dir,
             "active_goal": asdict(self.goal) if self.goal else None,
             "environment": {
                 "ai_provider_configured": bool(os.getenv("GOOGLE_API_KEY") or os.getenv("OPENAI_API_KEY")),
+                "github_configured": bool(os.getenv("GITHUB_TOKEN")),
             },
         }
 
     def think(self, objective: str, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Produce an explicit strategy object; provider-specific reasoning can plug in later."""
         return {
             "objective": objective,
             "reasoning_mode": "goal_decomposition",
-            "strategy": "decompose objective into specialist work and evaluate each outcome",
+            "strategy": "decompose objective into specialist work, resolve capabilities, execute tools, verify outcomes",
             "context": context,
         }
 
@@ -71,8 +64,7 @@ class BusinessBrain:
         objective = strategy["objective"]
         text = objective.lower()
         tasks: List[Dict[str, Any]] = []
-
-        if any(k in text for k in ("build", "code", "bug", "feature", "ui", "backend")):
+        if any(k in text for k in ("build", "code", "bug", "feature", "ui", "backend", "test", "deploy")):
             tasks.append({"agent": "build", "objective": objective})
         if any(k in text for k in ("market", "ads", "seo", "growth", "campaign", "lead")):
             tasks.append({"agent": "growth", "objective": objective})
@@ -82,63 +74,56 @@ class BusinessBrain:
             tasks.append({"agent": "operations", "objective": objective})
         if any(k in text for k in ("video", "creative", "content", "demo", "thumbnail", "presentation")):
             tasks.append({"agent": "creative", "objective": objective})
-
         if not tasks:
             tasks.append({"agent": "build", "objective": objective})
-
         return tasks
 
-    def act(self, tasks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Dispatch tasks to the available specialist contracts."""
+    def act(self, tasks: List[Dict[str, Any]], context: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+        """Execute planned work through AgentRuntime -> Capability -> ToolRuntime."""
+        try:
+            from .agent_runtime import AgentRuntime
+        except ImportError:
+            from agent_runtime import AgentRuntime
+        runtime = AgentRuntime(self.root_dir)
         results = []
         for task in tasks:
+            domain = task["agent"]
+            execution = runtime.execute(domain, task["objective"], context or {})
             results.append({
-                "task_id": str(uuid.uuid4()),
-                "agent": AGENT_NAMES.get(task["agent"], task["agent"]),
-                "status": "queued",
+                "task_id": execution["task_id"],
+                "agent": AGENT_NAMES.get(domain, domain),
+                "status": execution["status"],
                 "objective": task["objective"],
+                "capability": execution["capability"],
+                "tool_results": execution["results"],
             })
         return results
 
     def verify(self, results: List[Dict[str, Any]]) -> Dict[str, Any]:
         completed = sum(r.get("status") == "completed" for r in results)
         return {
-            "ok": all(r.get("status") in {"queued", "completed"} for r in results),
+            "ok": bool(results) and completed == len(results),
             "tasks": len(results),
             "completed": completed,
-            "pending": len(results) - completed,
+            "pending_or_failed": len(results) - completed,
         }
 
     def learn(self, objective: str, observation: Dict[str, Any], results: List[Dict[str, Any]], verification: Dict[str, Any]) -> None:
-        event = {
-            "timestamp": now(),
-            "type": "business_cycle",
-            "objective": objective,
-            "observation": observation,
-            "results": results,
-            "verification": verification,
-        }
+        event = {"timestamp": now(), "type": "business_cycle", "objective": objective, "observation": observation, "results": results, "verification": verification}
         with open(self.events_file, "a", encoding="utf-8") as f:
             f.write(json.dumps(event, ensure_ascii=False) + "\n")
 
-    def run(self, objective: str, success_metrics: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def run(self, objective: str, success_metrics: Optional[Dict[str, Any]] = None, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         self.goal = Goal(objective=objective, success_metrics=success_metrics or {})
         observation = self.observe()
         strategy = self.think(objective, observation)
         tasks = self.plan(strategy)
-        results = self.act(tasks)
+        results = self.act(tasks, context)
         verification = self.verify(results)
         self.learn(objective, observation, results, verification)
-        return {
-            "goal": asdict(self.goal),
-            "observation": observation,
-            "strategy": strategy,
-            "tasks": tasks,
-            "results": results,
-            "verification": verification,
-        }
+        return {"goal": asdict(self.goal), "observation": observation, "strategy": strategy, "tasks": tasks, "results": results, "verification": verification}
 
 
 if __name__ == "__main__":
     brain = BusinessBrain()
-    print(json.dumps(brain.run("Build SolarHub autonomous business foundation"), indent=2))
+    print(json.dumps(brain.run("Inspect SolarHub autonomous business foundation"), indent=2))
