@@ -1,0 +1,31 @@
+{
+  "by_domain": {
+    "OPERATIONS": {
+      "tactics": [],
+      "effectiveness": [
+        {
+          "timestamp": "2026-09-17T19:34:36.037069",
+          "score": 1.0,
+          "context": "Plan with 1 tasks"
+        },
+        {
+          "timestamp": "2026-09-17T19:36:38.780896",
+          "score": 1.0,
+          "context": "Plan with 1 tasks"
+        }
+      ]
+    }
+  },
+  "learnings": [
+    {
+      "timestamp": "2026-09-17T19:34:36.037090",
+      "domain": "OPERATIONS",
+      "change": "strategy_update"
+    },
+    {
+      "timestamp": "2026-09-17T19:36:38.780924",
+      "domain": "OPERATIONS",
+      "change": "strategy_update"
+    }
+  ]
+}
