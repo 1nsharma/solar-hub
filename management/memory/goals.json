@@ -10,6 +10,17 @@
       "priority": "high",
       "status": "active",
       "created_at": "2026-09-17T19:36:48.616322"
+    },
+    {
+      "id": "goal_1789673828",
+      "description": "Improve mobile app component reusability",
+      "domain": "BUILD",
+      "success_criteria": [
+        "Goal achieved"
+      ],
+      "priority": "medium",
+      "status": "active",
+      "created_at": "2026-09-17T19:37:08.919802"
     }
   ],
   "completed": [],

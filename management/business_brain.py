@@ -15,12 +15,21 @@ Business Domains:
   - CREATIVE: Content creation (Videos, Presentations, Graphics, Tutorials)
 """
 
+import sys
+from pathlib import Path
+
+# Add management to path for imports
+sys.path.insert(0, str(Path(__file__).parent))
+
 import os
 import json
 import time
 from datetime import datetime
 from typing import Dict, List, Optional, Any
 from enum import Enum
+
+from agents.business_agents import GrowthAgent, SalesAgent, OperationsAgent, CreativeAgent
+from tools.tool_runtime import ToolRuntime
 
 
 class BusinessDomain(Enum):
@@ -323,10 +332,37 @@ class BusinessBrain:
             "recommendations": []
         }
         
-        # TODO: Implement AI-powered analysis
-        # For now, basic heuristic analysis
-        
+        # Analyze active goals and generate action plans
         goals = observation["context"].get("goals", [])
+        
+        for goal in goals:
+            if goal.get("status") == "active":
+                # Generate actionable tasks for each goal
+                goal_domain = goal.get("domain", "OPERATIONS")
+                
+                # Create specific recommendations based on goal
+                recommendation = f"Execute actions toward: {goal['description']}"
+                analysis["opportunities"].append({
+                    "type": "goal_execution",
+                    "goal_id": goal.get("id"),
+                    "description": goal['description'],
+                    "domain": goal_domain,
+                    "priority": goal.get("priority", "medium")
+                })
+                analysis["recommendations"].append(recommendation)
+        
+        # Check for execution failures
+        events = observation["context"].get("recent_events", [])
+        failed_events = [e for e in events if e.get("outcome") == "failed"]
+        if failed_events:
+            analysis["risks"].append({
+                "type": "execution_failure",
+                "description": f"{len(failed_events)} recent failed actions",
+                "priority": "high"
+            })
+            analysis["recommendations"].append("Review and adjust execution strategy")
+        
+        # If no goals exist, suggest goal setting
         if not goals:
             analysis["opportunities"].append({
                 "type": "goal_setting",
@@ -334,16 +370,6 @@ class BusinessBrain:
                 "priority": "high"
             })
             analysis["recommendations"].append("Define quarterly business goals")
-        
-        events = observation["context"].get("recent_events", [])
-        failed_events = [e for e in events if e.get("outcome") == "failed"]
-        if failed_events:
-            analysis["risks"].append({
-                "type": "execution_failure",
-                "description": f"{len(failed_events)} recent failed actions",
-                "priority": "medium"
-            })
-            analysis["recommendations"].append("Review and adjust execution strategy")
         
         return analysis
     
