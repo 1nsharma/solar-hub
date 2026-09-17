@@ -1,10 +1,16 @@
-const CACHE_NAME = 'solarhub-provider-v1';
-const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/favicon.svg'];
+const CACHE_NAME = 'solarhub-provider-v2';
+const SCOPE_PATH = self.location.pathname.substring(0, self.location.pathname.lastIndexOf('/') + 1);
+const APP_SHELL = [
+  SCOPE_PATH,
+  `${SCOPE_PATH}index.html`,
+  `${SCOPE_PATH}manifest.webmanifest`,
+  `${SCOPE_PATH}favicon.svg`
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(APP_SHELL))
+      .then((cache) => cache.addAll(APP_SHELL).catch((err) => console.warn('PWA precache partial failure:', err)))
       .then(() => self.skipWaiting())
   );
 });
@@ -24,7 +30,7 @@ self.addEventListener('fetch', (event) => {
   if (requestUrl.origin !== self.location.origin) return;
 
   if (event.request.mode === 'navigate') {
-    event.respondWith(fetch(event.request).catch(() => caches.match('/index.html')));
+    event.respondWith(fetch(event.request).catch(() => caches.match(`${SCOPE_PATH}index.html`)));
     return;
   }
 

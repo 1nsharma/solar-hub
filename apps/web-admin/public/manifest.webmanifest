@@ -2,8 +2,8 @@
   "name": "SolarHub Provider Console",
   "short_name": "SolarHub",
   "description": "SolarHub marketplace and service network for customers, vendors, technicians, partners, and admins.",
-  "start_url": "/?source=pwa",
-  "scope": "/",
+  "start_url": "./?source=pwa",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#080B0F",
@@ -11,7 +11,7 @@
   "categories": ["business", "shopping", "productivity"],
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
@@ -22,22 +22,22 @@
       "name": "Vendor Dashboard",
       "short_name": "Vendor",
       "description": "Open vendor inventory and order dashboard.",
-      "url": "/?role=vendor&source=pwa",
-      "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+      "url": "./?role=vendor&source=pwa",
+      "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
     },
     {
       "name": "Technician Jobs",
       "short_name": "Jobs",
       "description": "Open technician service assignments.",
-      "url": "/?role=technician&source=pwa",
-      "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+      "url": "./?role=technician&source=pwa",
+      "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
     },
     {
       "name": "Partner Leads",
       "short_name": "Leads",
       "description": "Open partner lead dashboard.",
-      "url": "/?role=partner&source=pwa",
-      "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+      "url": "./?role=partner&source=pwa",
+      "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
     }
   ]
 }
