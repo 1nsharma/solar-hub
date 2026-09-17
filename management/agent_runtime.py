@@ -522,6 +522,25 @@ class AgentRuntime:
         self.register_agent(DesignerAgent(self.root_dir))
         self.register_agent(QAAgent(self.root_dir))
         self.register_agent(BackendAgent(self.root_dir))
+        
+        # Register business specialist agents from business_agents.py
+        try:
+            import sys
+            import os
+            management_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            if management_dir not in sys.path:
+                sys.path.insert(0, management_dir)
+            
+            from agents.business_agents import (
+                GrowthAgent, SalesAgent, OperationsAgent, CreativeAgent
+            )
+            self.register_agent(GrowthAgent(self.root_dir))
+            self.register_agent(SalesAgent(self.root_dir))
+            self.register_agent(OperationsAgent(self.root_dir))
+            self.register_agent(CreativeAgent(self.root_dir))
+            print("[AgentRuntime] Business specialist agents loaded successfully")
+        except ImportError as e:
+            print(f"[AgentRuntime] Warning: Could not load business agents: {e}")
     
     def register_agent(self, agent: BaseAgent):
         """Register an agent with the runtime."""
@@ -534,27 +553,43 @@ class AgentRuntime:
     
     def list_agents(self) -> List[Dict[str, Any]]:
         """List all registered agents with their capabilities."""
-        return [
-            {
+        result = []
+        for agent in self.agents.values():
+            agent_info = {
                 "name": agent.name,
                 "domain": agent.domain,
-                "status": agent.status.value,
-                "capabilities": agent.get_capabilities()
+                "capabilities": agent.get_capabilities() if hasattr(agent, 'get_capabilities') else []
             }
-            for agent in self.agents.values()
-        ]
+            
+            # Handle both BaseAgent types (runtime and business_agents)
+            if hasattr(agent, 'status'):
+                agent_info["status"] = agent.status.value if hasattr(agent.status, 'value') else str(agent.status)
+            else:
+                agent_info["status"] = "IDLE"
+            
+            if hasattr(agent, 'performance_metrics'):
+                agent_info["metrics"] = agent.performance_metrics
+            
+            result.append(agent_info)
+        
+        return result
     
     def route_task(self, task: AgentTask) -> Optional[BaseAgent]:
         """Route a task to the appropriate agent based on domain."""
         domain_to_agent = {
             "BUILD": ["Project Manager", "UI/UX Designer", "Backend Developer", "QA Tester"],
-            "GROWTH": ["Project Manager"],  # TODO: Add marketing specialist
-            "SALES": ["Project Manager"],   # TODO: Add sales specialist
-            "OPERATIONS": ["Project Manager"],  # TODO: Add operations specialist
-            "CREATIVE": ["UI/UX Designer"]  # TODO: Add creative specialist
+            "GROWTH": ["Growth Specialist", "Project Manager"],
+            "SALES": ["Sales Specialist", "Project Manager"],
+            "OPERATIONS": ["Operations Specialist", "Project Manager"],
+            "CREATIVE": ["Creative Specialist", "UI/UX Designer"]
         }
         
-        candidate_agents = domain_to_agent.get(task.domain, ["Project Manager"])
+        # Handle BusinessDomain enum if passed as domain
+        task_domain = str(task.domain)
+        if "BusinessDomain." in task_domain:
+            task_domain = task_domain.replace("BusinessDomain.", "")
+        
+        candidate_agents = domain_to_agent.get(task_domain, ["Project Manager"])
         
         for agent_name in candidate_agents:
             agent = self.agents.get(agent_name)

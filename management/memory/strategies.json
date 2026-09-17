@@ -22,6 +22,66 @@
           "timestamp": "2026-09-17T19:44:21.443597",
           "score": 1.0,
           "context": "Plan with 2 tasks"
+        },
+        {
+          "timestamp": "2026-09-17T19:47:43.695175",
+          "score": 1.0,
+          "context": "Plan with 2 tasks"
+        },
+        {
+          "timestamp": "2026-09-17T19:48:07.975181",
+          "score": 1.0,
+          "context": "Plan with 3 tasks"
+        },
+        {
+          "timestamp": "2026-09-17T19:48:29.841917",
+          "score": 1.0,
+          "context": "Plan with 3 tasks"
+        },
+        {
+          "timestamp": "2026-09-17T19:48:38.189813",
+          "score": 1.0,
+          "context": "Plan with 3 tasks"
+        },
+        {
+          "timestamp": "2026-09-17T19:58:07.514564",
+          "score": 1.0,
+          "context": "Plan with 3 tasks"
+        },
+        {
+          "timestamp": "2026-09-17T19:59:58.685087",
+          "score": 1.0,
+          "context": "Plan with 3 tasks"
+        }
+      ]
+    },
+    "CREATIVE": {
+      "tactics": [],
+      "effectiveness": [
+        {
+          "timestamp": "2026-09-17T19:48:07.975452",
+          "score": 1.0,
+          "context": "Plan with 3 tasks"
+        },
+        {
+          "timestamp": "2026-09-17T19:48:29.842248",
+          "score": 1.0,
+          "context": "Plan with 3 tasks"
+        },
+        {
+          "timestamp": "2026-09-17T19:48:38.189468",
+          "score": 1.0,
+          "context": "Plan with 3 tasks"
+        },
+        {
+          "timestamp": "2026-09-17T19:58:07.514182",
+          "score": 1.0,
+          "context": "Plan with 3 tasks"
+        },
+        {
+          "timestamp": "2026-09-17T19:59:58.685535",
+          "score": 1.0,
+          "context": "Plan with 3 tasks"
         }
       ]
     }
@@ -45,6 +105,61 @@
     {
       "timestamp": "2026-09-17T19:44:21.443639",
       "domain": "OPERATIONS",
+      "change": "strategy_update"
+    },
+    {
+      "timestamp": "2026-09-17T19:47:43.695210",
+      "domain": "OPERATIONS",
+      "change": "strategy_update"
+    },
+    {
+      "timestamp": "2026-09-17T19:48:07.975219",
+      "domain": "OPERATIONS",
+      "change": "strategy_update"
+    },
+    {
+      "timestamp": "2026-09-17T19:48:07.975480",
+      "domain": "CREATIVE",
+      "change": "strategy_update"
+    },
+    {
+      "timestamp": "2026-09-17T19:48:29.841949",
+      "domain": "OPERATIONS",
+      "change": "strategy_update"
+    },
+    {
+      "timestamp": "2026-09-17T19:48:29.842277",
+      "domain": "CREATIVE",
+      "change": "strategy_update"
+    },
+    {
+      "timestamp": "2026-09-17T19:48:38.189505",
+      "domain": "CREATIVE",
+      "change": "strategy_update"
+    },
+    {
+      "timestamp": "2026-09-17T19:48:38.189844",
+      "domain": "OPERATIONS",
+      "change": "strategy_update"
+    },
+    {
+      "timestamp": "2026-09-17T19:58:07.514234",
+      "domain": "CREATIVE",
+      "change": "strategy_update"
+    },
+    {
+      "timestamp": "2026-09-17T19:58:07.514599",
+      "domain": "OPERATIONS",
+      "change": "strategy_update"
+    },
+    {
+      "timestamp": "2026-09-17T19:59:58.685181",
+      "domain": "OPERATIONS",
+      "change": "strategy_update"
+    },
+    {
+      "timestamp": "2026-09-17T19:59:58.685571",
+      "domain": "CREATIVE",
       "change": "strategy_update"
     }
   ]
