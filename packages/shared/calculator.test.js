@@ -7,7 +7,7 @@ assert.strictEqual(calculateSubsidy(3), 78000);
 assert.strictEqual(calculateSubsidy(10), 78000);
 
 const result = calculateSolarRecommendation({ monthlyBill: 7000, roofAreaSqFt: 475, tariffPerUnit: 7 });
-assert.strictEqual(result.recommendedKw, 8 === 0 ? 0 : 5);
+assert.strictEqual(result.recommendedKw, 5);
 assert.strictEqual(result.centralSubsidy, 78000);
 assert.strictEqual(result.requiredRoofSqFt, 760);
 assert.strictEqual(result.roofConstraintWarning, true);
