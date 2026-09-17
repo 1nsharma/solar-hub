@@ -33,6 +33,7 @@ jobs:
           cache: npm
 
       - uses: actions/configure-pages@v5
+        continue-on-error: true
         with:
           enablement: true
 
