@@ -1,9 +1,4 @@
-"""SolarHub Agent -> Capability -> Tool execution bridge.
-
-The runtime turns specialist plans into explicit tool calls. It is local-first:
-local tools can execute without internet; external tools return a structured
-failure when connectivity or credentials are missing.
-"""
+"""SolarHub Agent -> Capability -> Tool execution bridge."""
 from __future__ import annotations
 
 from dataclasses import asdict
@@ -15,12 +10,13 @@ import uuid
 
 try:
     from .tools.tool_runtime import ToolRuntime
+    from .engineering.engineering_loop import EngineeringLoop
 except ImportError:
     from tools.tool_runtime import ToolRuntime
+    from engineering.engineering_loop import EngineeringLoop
 
 
 DOMAIN_TO_CAPABILITY = {
-    "build": "software_delivery",
     "pm": "software_delivery",
     "project_manager": "software_delivery",
     "designer": "content_production",
@@ -29,6 +25,8 @@ DOMAIN_TO_CAPABILITY = {
     "qa_tester": "software_delivery",
     "backend": "software_delivery",
     "backend_developer": "software_delivery",
+    "engineering": "software_delivery",
+    "build": "software_delivery",
     "growth": "growth_research",
     "growth_agent": "growth_research",
     "sales": "sales_operations",
@@ -78,6 +76,13 @@ class AgentRuntime:
         context = context or {}
         task_id = str(uuid.uuid4())
         domain = domain.lower()
+        if domain == "engineering":
+            result = EngineeringLoop(self.root_dir, max_attempts=int(context.get("max_attempts", 3)), timeout=int(context.get("timeout", 180))).run(
+                objective, allowed_paths=context.get("allowed_paths"), checks=context.get("checks")
+            )
+            result.update({"task_id": task_id, "domain": domain, "capability": self.required_capability(domain), "objective": objective})
+            self._event({"type": "engineering_cycle", **result})
+            return result
         calls = self._build_tool_plan(domain, objective, context)
         results = []
         for call in calls:
@@ -131,5 +136,4 @@ class AgentRuntime:
 
 
 if __name__ == "__main__":
-    runtime = AgentRuntime()
-    print(json.dumps(runtime.execute("build", "Inspect SolarHub build health"), indent=2))
+    print(json.dumps(AgentRuntime().execute("build", "Inspect SolarHub build health"), indent=2))
