@@ -1,9 +1,4 @@
-"""SolarHub Agent -> Capability -> Tool execution bridge.
-
-The runtime turns specialist plans into explicit tool calls. It is local-first:
-local tools can execute without internet; external tools return a structured
-failure when connectivity or credentials are missing.
-"""
+"""SolarHub Agent -> Capability -> Tool execution bridge."""
 from __future__ import annotations
 
 from dataclasses import asdict
@@ -15,19 +10,17 @@ import uuid
 
 try:
     from .tools.tool_runtime import ToolRuntime
+    from .engineering.engineering_loop import EngineeringLoop
 except ImportError:
     from tools.tool_runtime import ToolRuntime
+    from engineering.engineering_loop import EngineeringLoop
 
 
 DOMAIN_TO_CAPABILITY = {
-    "build": "software_delivery",
-    "growth": "growth_research",
-    "sales": "sales_operations",
-    "operations": "solar_operations",
-    "creative": "content_production",
-    "security": "security_audit",
-    "finance": "finance_analysis",
-    "payments": "payment_intelligence",
+    "pm": "software_delivery", "designer": "content_production", "qa": "software_delivery",
+    "backend": "software_delivery", "engineering": "software_delivery", "build": "software_delivery",
+    "growth": "growth_research", "sales": "sales_operations", "operations": "solar_operations",
+    "creative": "content_production", "security": "security_audit", "finance": "finance_analysis", "payments": "payment_intelligence",
 }
 
 
@@ -52,6 +45,13 @@ class AgentRuntime:
         context = context or {}
         task_id = str(uuid.uuid4())
         domain = domain.lower()
+        if domain == "engineering":
+            result = EngineeringLoop(self.root_dir, max_attempts=int(context.get("max_attempts", 3)), timeout=int(context.get("timeout", 180))).run(
+                objective, allowed_paths=context.get("allowed_paths"), checks=context.get("checks")
+            )
+            result.update({"task_id": task_id, "domain": domain, "capability": self.required_capability(domain), "objective": objective})
+            self._event({"type": "engineering_cycle", **result})
+            return result
         calls = self._build_tool_plan(domain, objective, context)
         results = []
         for call in calls:
@@ -63,13 +63,8 @@ class AgentRuntime:
         return {"task_id": task_id, "domain": domain, "capability": self.required_capability(domain), "objective": objective, "status": "completed" if ok else "partial_or_failed", "results": results}
 
     def _build_tool_plan(self, domain: str, objective: str, context: dict[str, Any]) -> list[dict[str, Any]]:
-        """Choose safe, deterministic starter tool chains until LLM planning is connected."""
-        if domain == "build":
-            return [
-                {"tool": "git.status"},
-                {"tool": "security.secrets"},
-                {"tool": "security.dependencies"},
-            ]
+        if domain in {"build", "qa", "backend", "pm"}:
+            return [{"tool": "git.status"}, {"tool": "security.secrets"}, {"tool": "security.dependencies"}]
         if domain == "security":
             return [{"tool": "security.secrets"}, {"tool": "security.dependencies"}]
         if domain == "creative":
@@ -79,13 +74,9 @@ class AgentRuntime:
         if domain == "operations":
             return [{"tool": "business.customer"}, {"tool": "business.inventory"}, {"tool": "business.crm"}]
         if domain == "growth":
-            calls = [{"tool": "website.status", "args": {"url": context["url"]}}] if context.get("url") else []
-            return calls or [{"tool": "file.list", "args": {"path": "."}}]
-        if domain in {"finance", "payments"}:
-            return [{"tool": "file.list", "args": {"path": "."}}]
+            return [{"tool": "website.status", "args": {"url": context["url"]}}] if context.get("url") else [{"tool": "file.list", "args": {"path": "."}}]
         return [{"tool": "file.list", "args": {"path": "."}}]
 
 
 if __name__ == "__main__":
-    runtime = AgentRuntime()
-    print(json.dumps(runtime.execute("build", "Inspect SolarHub build health"), indent=2))
+    print(json.dumps(AgentRuntime().execute("build", "Inspect SolarHub build health"), indent=2))
