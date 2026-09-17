@@ -35,7 +35,7 @@ def make_fixture(root: Path) -> None:
         encoding="utf-8",
     )
     (root / "run_tests.py").write_text(
-        "import pathlib, sys\n\nsys.path.insert(0, str(pathlib.Path(__file__).parent))\nfrom test_app import test_add\ntest_add()\nprint('fixture tests passed')\n",
+        'import sys\nsys.path.insert(0, ".")\nfrom test_app import test_add\ntest_add()\nprint("fixture tests passed")\n',
         encoding="utf-8",
     )
     assert run("git", "add", ".", cwd=root).returncode == 0
@@ -47,6 +47,11 @@ def repair_fixture(workspace: Path) -> None:
     text = path.read_text(encoding="utf-8")
     assert "return a - b" in text
     path.write_text(text.replace("return a - b", "return a + b"), encoding="utf-8")
+    # Clear Python bytecode cache to ensure fresh import
+    for pycache in workspace.rglob("__pycache__"):
+        if pycache.is_dir():
+            import shutil
+            shutil.rmtree(pycache, ignore_errors=True)
 
 
 def test_full_e2e_harness() -> None:

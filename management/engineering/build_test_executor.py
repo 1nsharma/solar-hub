@@ -30,10 +30,16 @@ class BuildTestExecutor:
         self.workspace = Path(workspace).resolve()
         self.timeout = max(10, min(timeout, 600))
 
-    def run(self, name: str) -> CommandResult:
-        if name not in self.COMMANDS:
-            raise ValueError(f"Command is not allowlisted: {name}")
-        command = self.COMMANDS[name]
+    def run(self, name_or_cmd: str | list[str]) -> CommandResult:
+        if isinstance(name_or_cmd, list):
+            # Direct command execution for fixtures
+            command = " ".join(name_or_cmd)
+            cmd_key = None
+        else:
+            if name_or_cmd not in self.COMMANDS:
+                raise ValueError(f"Command is not allowlisted: {name_or_cmd}")
+            command = self.COMMANDS[name_or_cmd]
+            cmd_key = name_or_cmd
         started = time.monotonic()
         try:
             p = subprocess.run(command, cwd=self.workspace, shell=True, text=True, capture_output=True, timeout=self.timeout)
