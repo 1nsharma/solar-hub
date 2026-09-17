@@ -1,5 +1,5 @@
 {
-  "software_delivery": {"name":"software_delivery","description":"Local software development, testing and git delivery","tools":["file.read","file.write","file.list","command.run","git.status","git.diff","git.log","git.branch","git.commit","test.run"],"offline":true,"status":"available"},
+  "software_delivery": {"name":"software_delivery","description":"Local software development, testing and git delivery","tools":["file.read","file.write","file.list","command.run","git.status","git.diff","git.log","git.branch","git.commit","test.run","engineering.execute_loop"],"offline":true,"status":"available"},
   "growth_research": {"name":"growth_research","description":"Market, website and acquisition research","tools":["browser.fetch","website.status","api.request"],"offline":false,"status":"available","requirement":"Internet or configured research provider"},
   "sales_operations": {"name":"sales_operations","description":"Lead, CRM, outreach and sales workflow automation","tools":["business.leads","business.crm","api.request"],"offline":true,"status":"available"},
   "solar_operations": {"name":"solar_operations","description":"Customer, inventory, order, vendor and service operations","tools":["business.customer","business.inventory","business.crm","business.invoice"],"offline":true,"status":"available"},
