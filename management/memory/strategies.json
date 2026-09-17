@@ -1,0 +1,87 @@
+{
+  "project_manager": {
+    "domain": "pm",
+    "capability": "software_delivery",
+    "description": "Monitors project health, task progress, and coordinates cross-agent execution",
+    "tools": ["git.status", "git.log", "file.list"],
+    "plan_template": [
+      {"action": "audit_status", "tool": "git.status"},
+      {"action": "inspect_history", "tool": "git.log", "args": {"limit": 5}},
+      {"action": "survey_workspace", "tool": "file.list", "args": {"path": "management"}}
+    ]
+  },
+  "ui_ux_designer": {
+    "domain": "designer",
+    "capability": "content_production",
+    "description": "Reviews persona screens, design tokens, and frontend components",
+    "tools": ["file.list", "file.read"],
+    "plan_template": [
+      {"action": "list_personas", "tool": "file.list", "args": {"path": "apps/mobile/components/persona"}},
+      {"action": "inspect_web_ui", "tool": "file.list", "args": {"path": "packages/ui"}}
+    ]
+  },
+  "qa_tester": {
+    "domain": "qa",
+    "capability": "software_delivery",
+    "description": "Executes automated test suites, type verification, and regression audits",
+    "tools": ["test.run", "security.dependencies"],
+    "plan_template": [
+      {"action": "run_tests", "tool": "test.run", "args": {"command": "npm test"}},
+      {"action": "check_dependencies", "tool": "security.dependencies"}
+    ]
+  },
+  "backend_developer": {
+    "domain": "backend",
+    "capability": "software_delivery",
+    "description": "Maintains API services, data models, routes, and security boundaries",
+    "tools": ["file.list", "git.diff", "security.secrets"],
+    "plan_template": [
+      {"action": "check_routes", "tool": "file.list", "args": {"path": "apps/backend"}},
+      {"action": "verify_secrets", "tool": "security.secrets"},
+      {"action": "review_changes", "tool": "git.diff"}
+    ]
+  },
+  "growth_agent": {
+    "domain": "growth",
+    "capability": "growth_research",
+    "description": "Conducts market research, SEO checks, and customer acquisition experiments",
+    "tools": ["website.status", "browser.fetch", "api.request"],
+    "plan_template": [
+      {"action": "check_site_health", "tool": "website.status", "args": {"url": "https://solar-hub.example.com"}},
+      {"action": "market_scan", "tool": "browser.fetch", "args": {"url": "https://example.com/solar-market"}}
+    ]
+  },
+  "sales_agent": {
+    "domain": "sales",
+    "capability": "sales_operations",
+    "description": "Automates lead qualification, CRM tracking, outreach, and proposal generation",
+    "tools": ["business.leads", "business.crm", "business.invoice"],
+    "plan_template": [
+      {"action": "qualify_leads", "tool": "business.leads"},
+      {"action": "sync_crm", "tool": "business.crm"},
+      {"action": "prepare_invoice_spec", "tool": "business.invoice"}
+    ]
+  },
+  "operations_agent": {
+    "domain": "operations",
+    "capability": "solar_operations",
+    "description": "Coordinates technicians, orders, AMC schedules, inventory, and field delivery",
+    "tools": ["business.customer", "business.inventory", "business.crm"],
+    "plan_template": [
+      {"action": "inspect_customers", "tool": "business.customer"},
+      {"action": "check_inventory", "tool": "business.inventory"},
+      {"action": "update_service_status", "tool": "business.crm"}
+    ]
+  },
+  "creative_agent": {
+    "domain": "creative",
+    "capability": "content_production",
+    "description": "Drafts video scripts, product presentation decks, and visual assets",
+    "tools": ["media.script", "media.thumbnail", "media.presentation"],
+    "plan_template": [
+      {"action": "draft_script", "tool": "media.script", "args": {"title": "SolarHub Launch Video", "outline": ["Problem", "Solution", "Demo", "CTA"]}},
+      {"action": "create_thumbnail", "tool": "media.thumbnail", "args": {"title": "SolarHub Promo"}},
+      {"action": "create_deck", "tool": "media.presentation", "args": {"title": "SolarHub Investor Deck"}}
+    ]
+  }
+}

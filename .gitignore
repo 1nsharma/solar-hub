@@ -21,6 +21,25 @@ apps/*/.env.*
 # Local run output
 .local-logs/
 
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+env/
+venv/
+
+# Management runtime logs and transient memory
+management/memory/*.jsonl
+!management/memory/goals.json
+!management/memory/strategies.json
+
+# Sandbox build artifacts
+management/sandbox/dist/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -33,3 +52,4 @@ apps/*/.env.*
 *.njsproj
 *.sln
 *.sw?
+

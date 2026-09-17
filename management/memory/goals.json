@@ -1,0 +1,13 @@
+[
+  {
+    "goal_id": "solarhub-foundation-v1",
+    "objective": "Establish capability-driven autonomous execution for SolarHub",
+    "status": "completed",
+    "specialists": ["pm", "backend", "qa", "operations"],
+    "created_at": "2026-09-17T20:00:00Z",
+    "metrics": {
+      "verified_capabilities": 8,
+      "registered_tools": 27
+    }
+  }
+]
