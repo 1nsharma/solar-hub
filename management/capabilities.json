@@ -1,0 +1,11 @@
+{
+  "software_delivery": {"name":"software_delivery","description":"Local software development, testing and git delivery","tools":["file.read","file.write","file.list","command.run","git.status","git.diff","git.log","git.branch","git.commit","test.run"],"offline":true,"status":"available"},
+  "growth_research": {"name":"growth_research","description":"Market, website and acquisition research","tools":["browser.fetch","website.status","api.request"],"offline":false,"status":"available","requirement":"Internet or configured research provider"},
+  "sales_operations": {"name":"sales_operations","description":"Lead, CRM, outreach and sales workflow automation","tools":["business.leads","business.crm","api.request"],"offline":true,"status":"available"},
+  "solar_operations": {"name":"solar_operations","description":"Customer, inventory, order, vendor and service operations","tools":["business.customer","business.inventory","business.crm","business.invoice"],"offline":true,"status":"available"},
+  "content_production": {"name":"content_production","description":"Scripts, thumbnails, presentations and media job planning","tools":["media.script","media.thumbnail","media.presentation"],"offline":true,"status":"available"},
+  "security_audit": {"name":"security_audit","description":"Local secret and dependency security checks plus remote header inspection","tools":["security.secrets","security.dependencies","security.headers"],"offline":true,"status":"available"},
+  "finance_analysis": {"name":"finance_analysis","description":"Finance data inspection and analysis foundation","tools":["file.read","file.list","api.request"],"offline":true,"status":"available"},
+  "payment_intelligence": {"name":"payment_intelligence","description":"Payment workflow inspection and future provider integration","tools":["file.read","api.request"],"offline":true,"status":"available","requirement":"Configured payment provider for live transactions"},
+  "general_automation": {"name":"general_automation","description":"Generic local workspace automation","tools":["file.read","file.write","file.list","command.run"],"offline":true,"status":"available"}
+}
