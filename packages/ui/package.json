@@ -2,6 +2,7 @@
   "name": "@solar-hub/ui",
   "version": "1.0.0",
   "main": "./src/index.jsx",
+  "types": "./src/index.d.ts",
   "type": "module",
   "peerDependencies": {
     "react": "19.1.0"

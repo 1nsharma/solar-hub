@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const Button = ({ children, onClick, variant = 'primary', className = '' }) => {
+export const Button = ({ children, onClick, variant = 'primary', className = '', ...props }) => {
   const baseStyles = 'px-4 py-2 rounded-lg font-bold transition-all';
   const variants = {
     primary: 'bg-[#FFD700] text-black hover:bg-[#FFC800]',
@@ -9,19 +9,19 @@ export const Button = ({ children, onClick, variant = 'primary', className = '' 
   };
 
   return (
-    <button className={`${baseStyles} ${variants[variant]} ${className}`} onClick={onClick}>
+    <button className={`${baseStyles} ${variants[variant] || ''} ${className}`} onClick={onClick} {...props}>
       {children}
     </button>
   );
 };
 
-export const Card = ({ children, className = '' }) => (
-  <div className={`bg-white dark:bg-[#121212] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 ${className}`}>
+export const Card = ({ children, className = '', ...props }) => (
+  <div className={`bg-white dark:bg-[#121212] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 ${className}`} {...props}>
     {children}
   </div>
 );
 
-export const StatusBadge = ({ status, className = '' }) => {
+export const StatusBadge = ({ status, className = '', ...props }) => {
   const getColors = (s) => {
     switch (s?.toLowerCase()) {
       case 'active':
@@ -40,7 +40,7 @@ export const StatusBadge = ({ status, className = '' }) => {
   };
 
   return (
-    <span className={`px-2 py-1 rounded-md text-xs font-medium ${getColors(status)} ${className}`}>
+    <span className={`px-2 py-1 rounded-md text-xs font-medium ${getColors(status)} ${className}`} {...props}>
       {status?.toUpperCase()}
     </span>
   );

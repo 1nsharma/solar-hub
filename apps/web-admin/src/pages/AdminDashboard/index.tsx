@@ -239,7 +239,7 @@ export default function AdminDashboard({ onBack }: { onBack: () => void }) {
                           <p className="text-[10px] text-white/30 uppercase font-black tracking-[0.2em] mb-2">{stat.title}</p>
                           <h2 className="text-4xl font-black tracking-tighter text-white">{stat.value}</h2>
                           <div className="absolute -right-4 -bottom-4 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity">
-                            {React.cloneElement(stat.icon as React.ReactElement, { size: 100 })}
+                            {React.cloneElement(stat.icon as any, { size: 100 })}
                           </div>
                         </>
                       )}
