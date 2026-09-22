@@ -1,61 +1,84 @@
-# SolarHub Platform
+# SolarHub
 
-SolarHub is a solar marketplace and service network for rooftop solar kits, installation, AMC, technician jobs, vendor orders, partner leads, and customer savings tracking.
+SolarHub is a solar marketplace and service-network platform exploring workflows for rooftop solar, installation, AMC, technician jobs, vendor orders, partner leads, and customer savings tracking.
 
-## License and Reuse
+## What I built
 
-This repository is public for demo, review, and deployment visibility only. It is not open source. The code, product flows, UI, documentation, and business logic are proprietary to SolarHub and may not be copied, reused, modified, hosted, or redistributed without written permission.
+SolarHub is structured as a monorepo with:
 
-## Project Structure (Monorepo)
+- **Web admin** — React + Vite dashboards
+- **Mobile app** — React Native / Expo
+- **Backend API** — Express.js
+- **Shared packages** — business logic, types, and reusable UI
 
-This project uses **npm workspaces** to manage multiple applications and shared packages.
+Recent engineering work includes a canonical calculator flow, lead creation, durable lead-event emission, and automated test coverage around those workflows.
 
-### Applications (`apps/`)
-- **[web-admin](file:///c:/Users/amits/Desktop/solar-hub/apps/web-admin)**: Dashboards for Admins, Vendors, and Technicians (React + Vite).
-- **[mobile](file:///c:/Users/amits/Desktop/solar-hub/apps/mobile)**: Customer-facing mobile application (React Native / Expo).
-- **[backend](file:///c:/Users/amits/Desktop/solar-hub/apps/backend)**: Express.js API handling business logic, payments, and orders.
+## Architecture
 
-### Shared Packages (`packages/`)
-- **[shared](file:///c:/Users/amits/Desktop/solar-hub/packages/shared)**: Core business logic, constants, and validation rules.
-- **[types](file:///c:/Users/amits/Desktop/solar-hub/packages/types)**: Shared TypeScript definitions and interfaces.
-- **[ui](file:///c:/Users/amits/Desktop/solar-hub/packages/ui)**: Reusable React components shared across web applications.
+```
+Web / Mobile Clients
+        ↓
+     Backend API
+        ↓
+Business Services
+        ↓
+Data + Lead Events
+        ↓
+Operations / Partner Workflows
+```
+
+The implementation is evolving; this repository should be treated as an engineering case study rather than a claim of a completed commercial rollout.
+
+## Repository Structure
+
+```
+apps/
+├── web-admin/
+├── mobile/
+└── backend/
+
+packages/
+├── shared/
+├── types/
+└── ui/
+```
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js (v18+)
-- npm (v7+)
 
-### Installation
+- Node.js 18+
+- npm 7+
+
+### Install
+
 ```bash
 npm install
 ```
 
-### Running Locally
+### Development
 
-- **Start all services (Dev)**:
-  ```bash
-  npm run dev -ws
-  ```
+```bash
+npm run dev -ws
+```
 
-- **Start specific app**:
-  ```bash
-  npm run dev -w @solar-hub/web-admin
-  npm run dev -w @solar-hub/backend
-  ```
+Or run an individual workspace:
 
-## Deployment
+```bash
+npm run dev -w @solar-hub/web-admin
+npm run dev -w @solar-hub/backend
+```
 
-For detailed deployment instructions and architecture, see [docs/deployment_architecture.md](file:///c:/Users/amits/Desktop/solar-hub/docs/deployment_architecture.md).
+## Documentation
 
-For launch steps covering APK/AAB builds, API environment setup, ecommerce monetization, and QA, see [docs/release_checklist.md](file:///c:/Users/amits/Desktop/solar-hub/docs/release_checklist.md).
+See the `docs/` directory for architecture, deployment, business-model, release, debugging, and local-runbook documentation.
 
-For the product and revenue model, see [docs/business_model.md](file:///c:/Users/amits/Desktop/solar-hub/docs/business_model.md).
+## Status
 
-For founder-facing requirements, selling position, persona coverage, and production gaps, see [docs/founder_requirements.md](file:///c:/Users/amits/Desktop/solar-hub/docs/founder_requirements.md).
+**Engineering:** Active development  
+**Product:** Case-study / development stage  
+**Measured commercial outcomes:** Not yet measured
 
-For Chrome install, vendor APK, Android Studio, and Play Store launch steps, see [docs/provider_chrome_and_vendor_apk.md](file:///c:/Users/amits/Desktop/solar-hub/docs/provider_chrome_and_vendor_apk.md).
+## License and Reuse
 
-For running everything locally now and switching to real keys later, see [docs/local_runbook.md](file:///c:/Users/amits/Desktop/solar-hub/docs/local_runbook.md).
-
-For debugger setup and GitHub APK release workflow, see [docs/debugging_and_release.md](file:///c:/Users/amits/Desktop/solar-hub/docs/debugging_and_release.md).
+This repository is public for demonstration, review, and deployment visibility. It is not presented as an open-source project. See the repository's current licensing terms before reusing code or product assets.
