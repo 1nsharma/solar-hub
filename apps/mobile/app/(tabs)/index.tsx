@@ -30,7 +30,7 @@ import * as Haptics from 'expo-haptics';
 const { width } = Dimensions.get('window');
 
 type Kit = {
-  id: string | number;
+  id: string;
   title: string;
   price: number;
   category: string;
@@ -38,7 +38,10 @@ type Kit = {
   rating: number;
   image_url: string;
   description: string;
+  stock_quantity: number;
 };
+
+
 
 export default function HomeScreen() {
   const [featuredKits, setFeaturedKits] = useState<Kit[]>([]);
@@ -74,11 +77,13 @@ export default function HomeScreen() {
       })
       .catch(err => {
         setFeaturedKits([
-          { id: 101, title: 'Premium On-Grid Kit 5kW', price: 285000, category: 'Kits', vendor: 'Tata Power', rating: 4.9, image_url: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d', description: '5kW on-grid kit' },
-          { id: 102, title: 'Essential Hybrid Kit 3kW', price: 195000, category: 'Kits', vendor: 'Luminous', rating: 4.8, image_url: 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d', description: '3kW hybrid kit' }
+          { id: '101', title: 'Premium On-Grid Kit 5kW', price: 285000, category: 'Kits', vendor: 'Tata Power', rating: 4.9, image_url: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d', description: '5kW on-grid kit', stock_quantity: 10 },
+          { id: '102', title: 'Essential Hybrid Kit 3kW', price: 195000, category: 'Kits', vendor: 'Luminous', rating: 4.8, image_url: 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d', description: '3kW hybrid kit', stock_quantity: 5 }
         ]);
       });
+
   }, []);
+
 
   // ROLE SELECTION OVERLAY (For the Demo Launch)
   if (!demoRole) {

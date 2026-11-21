@@ -6,8 +6,10 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "test": "node --check index.js && node --check tests/qa_smoke_test.js",
+    "test": "node --check index.js && node tests/microgrid_test.js",
+    "test:microgrid": "node tests/microgrid_test.js",
     "smoke": "node tests/qa_smoke_test.js"
+
   },
   "keywords": [],
   "author": "",

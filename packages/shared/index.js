@@ -19,3 +19,5 @@ export const formatCurrency = (amount) => new Intl.NumberFormat('en-IN', { style
 export * from './behavioral.js';
 export * from './supply-chain.js';
 export * from './calculator.js';
+export * from './microgrid.js';
+

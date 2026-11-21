@@ -93,8 +93,10 @@ const providerIntegrations = {
   payments: 'Razorpay / Escrow.pay',
   logistics: 'Delhivery / Shadowfax',
   notifications: 'Gupshup (WhatsApp/SMS)',
-  maps: 'Google Maps API / MapmyIndia'
+  maps: 'Google Maps API / MapmyIndia',
+  smart_metering: 'SolarSync IoT ESP32 / MQTT Microgrid Gateway'
 };
+
 
 module.exports = {
   revenueModel,

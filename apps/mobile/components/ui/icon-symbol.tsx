@@ -26,7 +26,15 @@ const MAPPING = {
   'storefront.fill': 'store',
   'person.2.fill': 'group',
   'person.fill': 'person',
+  'bolt.fill': 'bolt',
+  'wallet.pass.fill': 'account-balance-wallet',
+  'arrow.triangle.2.circlepath': 'sync',
+  'shield.fill': 'security',
+  'chart.bar.fill': 'bar-chart',
+  'power': 'power-settings-new',
+  'leaf.fill': 'eco',
 } as IconMapping;
+
 
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.

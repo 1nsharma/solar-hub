@@ -215,3 +215,102 @@ CREATE TABLE audit_logs (
     new_value JSONB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- ============================================================
+-- 19. UNIFIED MICROGRID & SMART METERING ARCHITECTURE
+-- Interconnecting SolarHub Expo with solar_wallet IoT Database
+-- ============================================================
+
+-- Meter Device Registry
+CREATE TABLE IF NOT EXISTS meter_devices (
+    device_id VARCHAR(50) PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    device_type VARCHAR(50) NOT NULL DEFAULT 'smart_meter', -- 'smart_meter', 'solar_inverter', 'relay_module', 'microgrid_gateway'
+    location VARCHAR(255) DEFAULT 'Building Microgrid Main',
+    role VARCHAR(20) NOT NULL DEFAULT 'consumer', -- 'provider', 'consumer', 'prosumer'
+    relay_state BOOLEAN DEFAULT true,
+    device_status VARCHAR(20) DEFAULT 'online', -- 'online', 'offline', 'error', 'maintenance', 'cutoff'
+    firmware_version VARCHAR(20) DEFAULT 'v1.4.2-esp32',
+    wifi_rssi INTEGER DEFAULT -58,
+    last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Smart Meter Real-Time Telemetry
+CREATE TABLE IF NOT EXISTS meter_telemetry (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    device_id VARCHAR(50) NOT NULL REFERENCES meter_devices(device_id) ON DELETE CASCADE,
+    voltage DECIMAL(6, 2) NOT NULL DEFAULT 230.0,
+    current DECIMAL(6, 3) NOT NULL DEFAULT 0.0,
+    power_watts DECIMAL(10, 2) NOT NULL DEFAULT 0.0,
+    energy_kwh DECIMAL(12, 4) NOT NULL DEFAULT 0.0,
+    frequency DECIMAL(5, 2) NOT NULL DEFAULT 50.0,
+    power_factor DECIMAL(4, 3) NOT NULL DEFAULT 0.99,
+    solar_generation_watts DECIMAL(10, 2) DEFAULT 0.0,
+    recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Energy Wallets (Prepaid microgrid metering balance)
+CREATE TABLE IF NOT EXISTS energy_wallets (
+    wallet_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    device_id VARCHAR(50) UNIQUE NOT NULL REFERENCES meter_devices(device_id) ON DELETE CASCADE,
+    balance DECIMAL(12, 2) NOT NULL DEFAULT 500.00 CHECK (balance >= 0),
+    security_deposit DECIMAL(10, 2) NOT NULL DEFAULT 2000.00,
+    auto_cutoff_threshold DECIMAL(6, 2) NOT NULL DEFAULT 0.00,
+    is_cutoff_active BOOLEAN DEFAULT false,
+    last_recharge_at TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Dynamic Pricing Engine Log
+CREATE TABLE IF NOT EXISTS dynamic_pricing_log (
+    log_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    current_rate DECIMAL(6, 2) NOT NULL,
+    base_rate DECIMAL(6, 2) NOT NULL DEFAULT 6.50,
+    solar_supply_watts DECIMAL(10, 2) NOT NULL,
+    grid_demand_watts DECIMAL(10, 2) NOT NULL,
+    time_of_day_multiplier DECIMAL(4, 2) DEFAULT 1.0,
+    pricing_tier VARCHAR(20) DEFAULT 'normal', -- 'excess_supply', 'normal', 'peak_demand'
+    recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- P2P Microgrid Energy Trades (Prosumer-to-Consumer / Consumer-to-Grid)
+CREATE TABLE IF NOT EXISTS microgrid_trades (
+    trade_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    seller_device_id VARCHAR(50) NOT NULL REFERENCES meter_devices(device_id),
+    buyer_device_id VARCHAR(50) NOT NULL REFERENCES meter_devices(device_id),
+    energy_kwh DECIMAL(10, 4) NOT NULL,
+    rate_per_kwh DECIMAL(6, 2) NOT NULL,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    trade_type VARCHAR(30) DEFAULT 'p2p_direct', -- 'p2p_direct', 'community_pool', 'grid_export'
+    status VARCHAR(20) DEFAULT 'settled', -- 'matched', 'settled', 'disputed'
+    settled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Legal Consent & Infrastructure Agreement
+CREATE TABLE IF NOT EXISTS p2p_agreements (
+    agreement_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    device_id VARCHAR(50) NOT NULL REFERENCES meter_devices(device_id) ON DELETE CASCADE,
+    agreement_type VARCHAR(100) DEFAULT 'shared_green_energy_infrastructure',
+    version VARCHAR(20) DEFAULT 'v1.0',
+    digital_signature TEXT NOT NULL,
+    ip_address VARCHAR(45),
+    is_active BOOLEAN DEFAULT true,
+    accepted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Microgrid Events & Safety Cutoff Log
+CREATE TABLE IF NOT EXISTS microgrid_events (
+    event_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    device_id VARCHAR(50) NOT NULL REFERENCES meter_devices(device_id) ON DELETE CASCADE,
+    event_type VARCHAR(50) NOT NULL, -- 'cutoff', 'restore', 'safety_trip', 'rate_change', 'p2p_trade'
+    description TEXT NOT NULL,
+    metadata JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_telemetry_device ON meter_telemetry(device_id, recorded_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trades_buyer ON microgrid_trades(buyer_device_id, settled_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trades_seller ON microgrid_trades(seller_device_id, settled_at DESC);
+CREATE INDEX IF NOT EXISTS idx_events_device ON microgrid_events(device_id, created_at DESC);

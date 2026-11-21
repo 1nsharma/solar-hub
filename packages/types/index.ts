@@ -127,4 +127,106 @@ export interface SubscriptionPlan {
   features: string[];
 }
 
-export const TYPES_VERSION = "1.2.0";
+// ============================================================
+// MICROGRID & SMART METERING ARCHITECTURE TYPES
+// ============================================================
+
+export type MeterDeviceRole = 'provider' | 'consumer' | 'prosumer';
+export type MeterDeviceStatus = 'online' | 'offline' | 'error' | 'maintenance' | 'cutoff';
+
+export interface MeterDevice {
+  device_id: string;
+  user_id?: string;
+  device_type: 'smart_meter' | 'solar_inverter' | 'relay_module' | 'microgrid_gateway';
+  location: string;
+  role: MeterDeviceRole;
+  relay_state: boolean;
+  device_status: MeterDeviceStatus;
+  firmware_version: string;
+  wifi_rssi: number;
+  last_seen: string;
+}
+
+export interface MeterTelemetry {
+  device_id: string;
+  voltage: number;
+  current: number;
+  power_watts: number;
+  energy_kwh: number;
+  frequency: number;
+  power_factor: number;
+  solar_generation_watts?: number;
+  recorded_at: string;
+}
+
+export interface EnergyWallet {
+  wallet_id?: string;
+  device_id: string;
+  balance: number;
+  security_deposit: number;
+  auto_cutoff_threshold: number;
+  is_cutoff_active: boolean;
+  current_rate: number;
+  hourly_cost_estimate: number;
+  last_recharge_at?: string;
+  updated_at: string;
+}
+
+export interface DynamicPricingInfo {
+  current_rate: number;
+  base_rate: number;
+  min_rate: number;
+  max_rate: number;
+  time_of_day_multiplier: number;
+  pricing_tier: 'excess_supply' | 'normal' | 'peak_demand';
+  solar_supply_watts: number;
+  grid_demand_watts: number;
+  last_updated: string;
+}
+
+export interface MicrogridTrade {
+  trade_id: string;
+  seller_device_id: string;
+  seller_name?: string;
+  buyer_device_id: string;
+  buyer_name?: string;
+  energy_kwh: number;
+  rate_per_kwh: number;
+  total_amount: number;
+  trade_type: 'p2p_direct' | 'community_pool' | 'grid_export';
+  status: 'matched' | 'settled' | 'disputed';
+  settled_at: string;
+}
+
+export interface P2PAgreement {
+  agreement_id: string;
+  device_id: string;
+  agreement_type: string;
+  version: string;
+  digital_signature: string;
+  is_active: boolean;
+  accepted_at: string;
+}
+
+export interface MicrogridEvent {
+  event_id: string;
+  device_id: string;
+  event_type: 'cutoff' | 'restore' | 'safety_trip' | 'rate_change' | 'p2p_trade' | 'recharge';
+  description: string;
+  metadata?: any;
+  created_at: string;
+}
+
+export interface MicrogridSummary {
+  grid_status: 'stable' | 'peak' | 'constrained';
+  total_meters: number;
+  online_meters: number;
+  total_solar_generation_kw: number;
+  total_microgrid_demand_kw: number;
+  active_trades_count: number;
+  current_tariff: number;
+  carbon_offset_kg_today: number;
+}
+
+export const TYPES_VERSION = "1.3.0";
+
